@@ -92,13 +92,30 @@
         };
 
         function getLayerY(layerIndex, totalLayers, isMyTeam) {
-            const fieldHeight = 100;
-            const topMargin = 8;
-            const bottomMargin = 8;
-            const usableHeight = fieldHeight - topMargin - bottomMargin;
-            const spacing = usableHeight / (totalLayers + 1);
-            let y = topMargin + spacing * (layerIndex + 1);
-            return isMyTeam ? (fieldHeight - y) : y;
+            // Goalkeeper should be at touchline (5% from edge)
+            // Other layers should be equally spaced in remaining field
+            if (layerIndex === 0) {
+                // Goalkeeper at touchline
+                return isMyTeam ? 95 : 5;
+            }
+            
+            // For other layers, use equal spacing in the middle 80% of field
+            const startY = 15; // Start after goalkeeper area
+            const endY = 85;   // End before opposite goalkeeper area
+            const usableHeight = endY - startY;
+            const outfieldLayers = totalLayers - 1; // Exclude goalkeeper
+            
+            if (outfieldLayers === 1) {
+                // Only one outfield layer, place in middle
+                return isMyTeam ? (100 - 50) : 50;
+            }
+            
+            // Equal spacing for multiple outfield layers
+            const spacing = usableHeight / (outfieldLayers - 1);
+            const outfieldIndex = layerIndex - 1; // Adjust for goalkeeper
+            let y = startY + (spacing * outfieldIndex);
+            
+            return isMyTeam ? (100 - y) : y;
         }
 
         function createPlayer(x, y, position, team, index) {
