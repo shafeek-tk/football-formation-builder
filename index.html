@@ -209,12 +209,13 @@
             player.style.left = x + '%';
             player.style.top = y + '%';
             const playerId = `${team}-${index}`;
+            const playerNumber = Math.floor(index/10) + (index%10) + 1;
             player.setAttribute('data-player-id', playerId);
             player.innerHTML = `
                 <div class="player-icon">
-                    <div class="player-number">${position}</div>
+                    <div class="player-number">${playerNumber}</div>
                 </div>
-                <div class="player-name" onclick="editPlayerName(this)" data-player-id="${playerId}">Player ${Math.floor(index/10) + (index%10) + 1}</div>
+                <div class="player-name" onclick="editPlayerName(this)" data-player-id="${playerId}">Player ${playerNumber}</div>
             `;
             return player;
         }
@@ -259,17 +260,24 @@
             if (!container) return;
             
             container.innerHTML = '';
-            let playerCount = 0; // Start from 0 to match field player indexing
+            let playerCount = 0;
             
             formation.forEach((layer, layerIndex) => {
                 layer.forEach((x, playerIndex) => {
+                    const playerNumber = playerCount + 1;
                     const input = document.createElement('input');
                     input.className = 'player-input';
-                    input.placeholder = `Player ${playerCount + 1}`;
-                    input.value = `Player ${playerCount + 1}`;
+                    input.placeholder = `#${playerNumber} Player Name`;
+                    input.value = `Player ${playerNumber}`;
                     const teamPrefix = teamName.toLowerCase().includes('my') ? 'my-team' : 'opp-team';
                     const playerId = `${teamPrefix}-${layerIndex * 10 + playerIndex}`;
                     input.setAttribute('data-player-id', playerId);
+                    
+                    // Add number label before input
+                    const label = document.createElement('div');
+                    label.style.cssText = 'display:flex;align-items:center;gap:8px;margin:3px 0;';
+                    label.innerHTML = `<span style="color:#ccc;font-weight:bold;min-width:25px;">#${playerNumber}</span>`;
+                    label.appendChild(input);
                     
                     // Two-way binding: input changes update field
                     input.addEventListener('input', function() {
@@ -290,7 +298,7 @@
                         }
                     });
                     
-                    container.appendChild(input);
+                    container.appendChild(label);
                     playerCount++;
                 });
             });
