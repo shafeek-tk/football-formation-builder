@@ -305,7 +305,8 @@
             const myTeamInputs = document.querySelectorAll('input[data-player-id^="my-team-"]');
             let myTeamIndex = 0;
             myTeamInputs.forEach(input => {
-                if (!input.value.trim() && myTeamIndex < myTeamNames.length) {
+                // Fill empty inputs OR inputs with default values (MT1, MT2, etc.)
+                if ((!input.value.trim() || input.value.startsWith('MT')) && myTeamIndex < myTeamNames.length) {
                     input.value = myTeamNames[myTeamIndex];
                     const playerId = input.getAttribute('data-player-id');
                     updatePlayerName(playerId, myTeamNames[myTeamIndex]);
@@ -316,7 +317,8 @@
             const oppTeamInputs = document.querySelectorAll('input[data-player-id^="opp-team-"]');
             let oppTeamIndex = 0;
             oppTeamInputs.forEach(input => {
-                if (!input.value.trim() && oppTeamIndex < oppTeamNames.length) {
+                // Fill empty inputs OR inputs with default values (OPP1, OPP2, etc.)
+                if ((!input.value.trim() || input.value.startsWith('OPP')) && oppTeamIndex < oppTeamNames.length) {
                     input.value = oppTeamNames[oppTeamIndex];
                     const playerId = input.getAttribute('data-player-id');
                     updatePlayerName(playerId, oppTeamNames[oppTeamIndex]);
