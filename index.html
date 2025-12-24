@@ -238,12 +238,26 @@
             const myFormation = document.getElementById('myTeamFormation')?.value || '442';
             const oppFormation = document.getElementById('oppTeamFormation')?.value || '442';
             
-            // Save existing input field values before clearing
+            // Save existing input field values before clearing - organize by team and position
             const existingInputValues = {};
             document.querySelectorAll('input[data-player-id]').forEach(input => {
                 const playerId = input.getAttribute('data-player-id');
                 if (playerId && input.value.trim()) {
                     existingInputValues[playerId] = input.value;
+                }
+            });
+            
+            // Also save by sequential order for each team to handle formation changes better
+            const myTeamNames = [];
+            const oppTeamNames = [];
+            document.querySelectorAll('input[data-player-id^="my-team-"]').forEach(input => {
+                if (input.value.trim()) {
+                    myTeamNames.push(input.value);
+                }
+            });
+            document.querySelectorAll('input[data-player-id^="opp-team-"]').forEach(input => {
+                if (input.value.trim()) {
+                    oppTeamNames.push(input.value);
                 }
             });
             
@@ -278,12 +292,35 @@
             createPlayerInputs('oppTeamInputs', O, 'Away Team');
             
             // Restore input field values and sync to field players
+            // First try exact ID matches
             Object.keys(existingInputValues).forEach(playerId => {
                 const inputField = document.querySelector(`input[data-player-id="${playerId}"]`);
                 if (inputField) {
                     inputField.value = existingInputValues[playerId];
-                    // Also update the field player
                     updatePlayerName(playerId, existingInputValues[playerId]);
+                }
+            });
+            
+            // Then fill remaining empty fields with sequential names
+            const myTeamInputs = document.querySelectorAll('input[data-player-id^="my-team-"]');
+            let myTeamIndex = 0;
+            myTeamInputs.forEach(input => {
+                if (!input.value.trim() && myTeamIndex < myTeamNames.length) {
+                    input.value = myTeamNames[myTeamIndex];
+                    const playerId = input.getAttribute('data-player-id');
+                    updatePlayerName(playerId, myTeamNames[myTeamIndex]);
+                    myTeamIndex++;
+                }
+            });
+            
+            const oppTeamInputs = document.querySelectorAll('input[data-player-id^="opp-team-"]');
+            let oppTeamIndex = 0;
+            oppTeamInputs.forEach(input => {
+                if (!input.value.trim() && oppTeamIndex < oppTeamNames.length) {
+                    input.value = oppTeamNames[oppTeamIndex];
+                    const playerId = input.getAttribute('data-player-id');
+                    updatePlayerName(playerId, oppTeamNames[oppTeamIndex]);
+                    oppTeamIndex++;
                 }
             });
             
