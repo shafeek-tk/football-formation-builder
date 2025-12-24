@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="og:title" content="Football Formation Builder">
+    <meta property="og:description" content="Create and share football team formations with tactical analysis">
+    <meta property="og:image" content="https://via.placeholder.com/1200x630/2d5a2d/ffffff?text=Football+Formation+Builder">
+    <meta property="og:url" content="">
+    <meta name="twitter:card" content="summary_large_image">
+    <title>Football Formation Builder</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font:14px -apple-system,BlinkMacSystemFont,Arial,sans-serif;background:#1a1a1a;color:#fff;display:flex;height:100vh}
+        .sidebar{width:250px;padding:20px;background:#2a2a2a;border-right:1px solid #444}
+        .main{flex:1;padding:20px;display:flex;justify-content:center;align-items:center}
+        .field{width:500px;height:700px;background:linear-gradient(180deg,#2d5a2d 0%,#3a6b3a 50%,#2d5a2d 100%);border:3px solid #fff;position:relative;border-radius:8px}
+        .field::before{content:'';position:absolute;top:50%;left:0;right:0;height:2px;background:#fff}
+        .field::after{content:'';position:absolute;top:50%;left:50%;width:120px;height:120px;border:2px solid #fff;border-radius:50%;transform:translate(-50%,-50%)}
+        .goal-area{position:absolute;width:200px;height:80px;border:2px solid #fff;left:50%;transform:translateX(-50%)}
+        .goal-area.top{top:0}
+        .goal-area.bottom{bottom:0}
+        .penalty-area{position:absolute;width:300px;height:150px;border:2px solid #fff;left:50%;transform:translateX(-50%)}
+        .penalty-area.top{top:0}
+        .penalty-area.bottom{bottom:0}
+        .player{position:absolute;transform:translate(-50%,-50%);text-align:center;cursor:pointer}
+        .player-icon{width:32px;height:32px;margin:0 auto;position:relative;background-size:contain;background-repeat:no-repeat;background-position:center}
+        .player-icon{width:32px;height:32px;margin:0 auto;position:relative;background-size:contain;background-repeat:no-repeat;background-position:center}
+        .my-team .player-icon{background-image:url('icons8-t-shirt-48 (1).png')}
+        .opp-team .player-icon{background-image:url('icons8-t-shirt-48.png')}
+        .player-number{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:8px;font-weight:bold;color:#fff;text-shadow:1px 1px 1px rgba(0,0,0,0.8)}
+        .player-name{font-size:10px;margin-top:3px;padding:2px 4px;background:rgba(0,0,0,0.9);border-radius:3px;white-space:nowrap;max-width:90px;overflow:hidden;text-overflow:ellipsis;color:#fff;font-weight:bold;border:1px solid rgba(255,255,255,0.3);min-height:16px}
+        .player-name-input{font-size:10px;margin-top:3px;padding:2px 4px;background:rgba(255,255,255,0.9);border-radius:3px;border:2px solid #007acc;color:#000;font-weight:bold;width:60px;text-align:center}
+        .player-input{width:100%;padding:6px;margin:3px 0;background:#333;color:#fff;border:1px solid #555;border-radius:4px;font-size:12px;position:relative}
+        .input-number{position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:10px;color:#999;font-weight:bold}
+        .formation-select{width:100%;padding:8px;margin-bottom:20px;background:#333;color:#fff;border:1px solid #555;border-radius:4px}
+        .player-input{width:100%;padding:6px;margin:3px 0;background:#333;color:#fff;border:1px solid #555;border-radius:4px;font-size:12px}
+        .share-btn{width:100%;padding:10px;background:#007acc;color:#fff;border:none;border-radius:4px;cursor:pointer;margin-top:20px;font-weight:bold}
+        .share-btn:hover{background:#005a99}
+        .section-title{font-size:12px;font-weight:bold;margin:15px 0 8px 0;color:#ccc;text-transform:uppercase}
+        @media (max-width:768px){
+            body{padding:10px}
+            .container{flex-direction:column;gap:15px}
+            .sidebar{width:100%;order:2}
+            .field-container{order:1;height:250px}
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h2 style="margin-bottom:20px;font-size:18px">Formation Builder</h2>
+        <select id="formation" class="formation-select">
+            <option value="442">4-4-2</option>
+            <option value="433">4-3-3</option>
+            <option value="352">3-5-2</option>
+            <option value="451">4-5-1</option>
+            <option value="4231">4-2-3-1</option>
+            <option value="4123">4-1-2-3</option>
+            <option value="421">4-2-1-3</option>
+            <option value="532">5-3-2</option>
+            <option value="343">3-4-3</option>
+            <option value="4141">4-1-4-1</option>
+            <option value="4321">4-3-2-1</option>
+        </select>
+        <div class="section-title">Your Team</div>
+        <div id="players"></div>
+        <div class="section-title">Opponent Team</div>
+        <select id="oppFormation" class="formation-select">
+            <option value="442">4-4-2</option>
+            <option value="433">4-3-3</option>
+            <option value="352">3-5-2</option>
+            <option value="451">4-5-1</option>
+            <option value="4231">4-2-3-1</option>
+            <option value="4123">4-1-2-3</option>
+            <option value="421">4-2-1-3</option>
+            <option value="532">5-3-2</option>
+            <option value="343">3-4-3</option>
+            <option value="4141">4-1-4-1</option>
+            <option value="4321">4-3-2-1</option>
+        </select>
+        <button class="share-btn" onclick="share()">📋 Copy Share Link</button>
+        <button class="share-btn" onclick="downloadImage()" style="background:#28a745;margin-top:10px">📥 Download Image</button>
+    </div>
+    <div class="main">
+        <div class="field" id="field">
+            <div class="penalty-area top"></div>
+            <div class="goal-area top"></div>
+            <div class="penalty-area bottom"></div>
+            <div class="goal-area bottom"></div>
+        </div>
+        <div style="position:fixed;bottom:5px;left:50%;transform:translateX(-50%);text-align:center;font-size:8px;color:#888;background:rgba(0,0,0,0.1);padding:2px 6px;border-radius:3px;opacity:0.6">
+            <a target="_blank" href="https://icons8.com/icon/y1jile6KU9QN/t-shirt" style="color:#888;text-decoration:none">Icons8</a>
+        </div>
+    </div>
+
+    <script>
+        // Dynamic layer calculation based on formation
+        const getFormationLayers = (formation) => {
+            const layers = {
+                442: 4, 433: 4, 352: 4, 451: 4, 4231: 5, 4123: 5, 421: 5, 532: 4, 343: 4, 4141: 5, 4321: 5
+            };
+            return layers[formation] || 4;
+        };
+        
+        // Calculate Y positions with equal spacing between layers
+        const getLayerY = (formation, layer, isOpponent = false) => {
+            const totalLayers = getFormationLayers(formation);
+            const fieldHalf = 350;
+            
+            if (layer === 0) {
+                // Goalkeepers positioned optimally in goal area
+                return isOpponent ? 30 : 670;
+            }
+            
+            const outfieldLayers = totalLayers - 1;
+            const layerSpacing = fieldHalf / (outfieldLayers + 1);
+            
+            if (isOpponent) {
+                return layerSpacing * layer;
+            } else {
+                return 680 - (layerSpacing * layer);
+            }
+        };
+        
+        const F={
+            442:[
+                [250, getLayerY('442', 0)],  // GK
+                [100, getLayerY('442', 1)], [200, getLayerY('442', 1)], [300, getLayerY('442', 1)], [400, getLayerY('442', 1)], // DEF - centered with 100px spacing
+                [100, getLayerY('442', 2)], [200, getLayerY('442', 2)], [300, getLayerY('442', 2)], [400, getLayerY('442', 2)], // MID - same spacing
+                [200, getLayerY('442', 3)], [300, getLayerY('442', 3)]  // ATT
+            ],
+            433:[
+                [250, getLayerY('433', 0)],  // GK
+                [100, getLayerY('433', 1)], [250, getLayerY('433', 1)], [400, getLayerY('433', 1)], // DEF - wider spacing
+                [80, getLayerY('433', 2)], [250, getLayerY('433', 2)], [420, getLayerY('433', 2)], // MID - wider spacing
+                [60, getLayerY('433', 3)], [180, getLayerY('433', 3)], [320, getLayerY('433', 3)], [440, getLayerY('433', 3)] // ATT - wider for names
+            ],
+            352:[
+                [250, getLayerY('352', 0)],  // GK
+                [150, getLayerY('352', 1)], [250, getLayerY('352', 1)], [350, getLayerY('352', 1)], // DEF
+                [50, getLayerY('352', 2)], [150, getLayerY('352', 2)], [250, getLayerY('352', 2)], [350, getLayerY('352', 2)], [450, getLayerY('352', 2)], // MID - maximum width
+                [180, getLayerY('352', 3)], [320, getLayerY('352', 3)]  // ATT
+            ],
+            451:[
+                [250, getLayerY('451', 0)],  // GK
+                [100, getLayerY('451', 1)], [180, getLayerY('451', 1)], [320, getLayerY('451', 1)], [400, getLayerY('451', 1)], // DEF
+                [50, getLayerY('451', 2)], [150, getLayerY('451', 2)], [250, getLayerY('451', 2)], [350, getLayerY('451', 2)], [450, getLayerY('451', 2)], // MID - maximum width
+                [250, getLayerY('451', 3)]   // ATT
+            ],
+            4231:[
+                [250, getLayerY('4231', 0)],  // GK
+                [100, getLayerY('4231', 1)], [180, getLayerY('4231', 1)], [320, getLayerY('4231', 1)], [400, getLayerY('4231', 1)], // DEF
+                [180, getLayerY('4231', 2)], [320, getLayerY('4231', 2)], // DMID - wider spacing
+                [60, getLayerY('4231', 3)], [250, getLayerY('4231', 3)], [440, getLayerY('4231', 3)], // AMID - maximum width
+                [250, getLayerY('4231', 4)]   // ATT
+            ],
+            4123:[
+                [250, getLayerY('4123', 0)],  // GK
+                [100, getLayerY('4123', 1)], [180, getLayerY('4123', 1)], [320, getLayerY('4123', 1)], [400, getLayerY('4123', 1)], // DEF
+                [250, getLayerY('4123', 2)], // CDM
+                [150, getLayerY('4123', 3)], [350, getLayerY('4123', 3)], // CAM - wider spacing
+                [60, getLayerY('4123', 4)], [250, getLayerY('4123', 4)], [440, getLayerY('4123', 4)] // ATT - maximum width
+            ],
+            421:[
+                [250, getLayerY('421', 0)],  // GK
+                [100, getLayerY('421', 1)], [180, getLayerY('421', 1)], [320, getLayerY('421', 1)], [400, getLayerY('421', 1)], // DEF
+                [180, getLayerY('421', 2)], [320, getLayerY('421', 2)], // DMID
+                [250, getLayerY('421', 3)],  // AMID (diamond tip)
+                [100, getLayerY('421', 4)], [250, getLayerY('421', 4)], [400, getLayerY('421', 4)] // ATT - wider spacing
+            ],
+            532:[
+                [250, getLayerY('532', 0)],  // GK
+                [80, getLayerY('532', 1)], [150, getLayerY('532', 1)], [250, getLayerY('532', 1)], [350, getLayerY('532', 1)], [420, getLayerY('532', 1)], // DEF (much wider)
+                [100, getLayerY('532', 2)], [250, getLayerY('532', 2)], [400, getLayerY('532', 2)], // MID (wider)
+                [180, getLayerY('532', 3)], [320, getLayerY('532', 3)]  // ATT
+            ],
+            343:[
+                [250, getLayerY('343', 0)],  // GK
+                [150, getLayerY('343', 1)], [250, getLayerY('343', 1)], [350, getLayerY('343', 1)], // DEF
+                [60, getLayerY('343', 2)], [160, getLayerY('343', 2)], [340, getLayerY('343', 2)], [440, getLayerY('343', 2)], // MID (much wider)
+                [100, getLayerY('343', 3)], [250, getLayerY('343', 3)], [400, getLayerY('343', 3)] // ATT (wider)
+            ],
+            4141:[
+                [250, getLayerY('4141', 0)],  // GK
+                [100, getLayerY('4141', 1)], [180, getLayerY('4141', 1)], [320, getLayerY('4141', 1)], [400, getLayerY('4141', 1)], // DEF (wider)
+                [250, getLayerY('4141', 2)],  // DMID
+                [80, getLayerY('4141', 3)], [160, getLayerY('4141', 3)], [340, getLayerY('4141', 3)], [420, getLayerY('4141', 3)], // MID (much wider)
+                [250, getLayerY('4141', 4)]   // ATT
+            ],
+            4321:[
+                [250, getLayerY('4321', 0)],  // GK
+                [100, getLayerY('4321', 1)], [180, getLayerY('4321', 1)], [320, getLayerY('4321', 1)], [400, getLayerY('4321', 1)], // DEF (wider)
+                [120, getLayerY('4321', 2)], [250, getLayerY('4321', 2)], [380, getLayerY('4321', 2)], // MID (wider)
+                [180, getLayerY('4321', 3)], [320, getLayerY('4321', 3)], // AMID
+                [250, getLayerY('4321', 4)]   // ATT
+            ]
+        };
+        
+        const O={
+            442:[
+                [250, getLayerY('442', 0, true)],   // GK
+                [400, getLayerY('442', 1, true)], [300, getLayerY('442', 1, true)], [200, getLayerY('442', 1, true)], [100, getLayerY('442', 1, true)], // DEF - centered with 100px spacing
+                [400, getLayerY('442', 2, true)], [300, getLayerY('442', 2, true)], [200, getLayerY('442', 2, true)], [100, getLayerY('442', 2, true)], // MID - same spacing
+                [300, getLayerY('442', 3, true)], [200, getLayerY('442', 3, true)]  // ATT
+            ],
+            433:[
+                [250, getLayerY('433', 0, true)],   // GK
+                [400, getLayerY('433', 1, true)], [250, getLayerY('433', 1, true)], [100, getLayerY('433', 1, true)], // DEF - wider spacing
+                [420, getLayerY('433', 2, true)], [250, getLayerY('433', 2, true)], [80, getLayerY('433', 2, true)], // MID - wider spacing
+                [440, getLayerY('433', 3, true)], [320, getLayerY('433', 3, true)], [180, getLayerY('433', 3, true)], [60, getLayerY('433', 3, true)] // ATT - wider for names
+            ],
+            352:[
+                [250, getLayerY('352', 0, true)],   // GK
+                [350, getLayerY('352', 1, true)], [250, getLayerY('352', 1, true)], [150, getLayerY('352', 1, true)], // DEF
+                [440, getLayerY('352', 2, true)], [370, getLayerY('352', 2, true)], [250, getLayerY('352', 2, true)], [130, getLayerY('352', 2, true)], [60, getLayerY('352', 2, true)], // MID (much wider)
+                [320, getLayerY('352', 3, true)], [180, getLayerY('352', 3, true)]  // ATT
+            ],
+            451:[
+                [250, getLayerY('451', 0, true)],   // GK
+                [400, getLayerY('451', 1, true)], [320, getLayerY('451', 1, true)], [180, getLayerY('451', 1, true)], [100, getLayerY('451', 1, true)], // DEF (wider)
+                [440, getLayerY('451', 2, true)], [360, getLayerY('451', 2, true)], [250, getLayerY('451', 2, true)], [140, getLayerY('451', 2, true)], [60, getLayerY('451', 2, true)], // MID (much wider)
+                [250, getLayerY('451', 3, true)]   // ATT
+            ],
+            4231:[
+                [250, getLayerY('4231', 0, true)],   // GK
+                [400, getLayerY('4231', 1, true)], [320, getLayerY('4231', 1, true)], [180, getLayerY('4231', 1, true)], [100, getLayerY('4231', 1, true)], // DEF (wider)
+                [340, getLayerY('4231', 2, true)], [160, getLayerY('4231', 2, true)], // DMID
+                [420, getLayerY('4231', 3, true)], [250, getLayerY('4231', 3, true)], [80, getLayerY('4231', 3, true)], // AMID (much wider)
+                [250, getLayerY('4231', 4, true)]   // ATT
+            ],
+            4123:[
+                [250, getLayerY('4123', 0, true)],   // GK
+                [400, getLayerY('4123', 1, true)], [320, getLayerY('4123', 1, true)], [180, getLayerY('4123', 1, true)], [100, getLayerY('4123', 1, true)], // DEF (wider)
+                [250, getLayerY('4123', 2, true)], // CDM (single defensive midfielder)
+                [350, getLayerY('4123', 3, true)], [150, getLayerY('4123', 3, true)], // CAM (two attacking midfielders - wider)
+                [420, getLayerY('4123', 4, true)], [250, getLayerY('4123', 4, true)], [80, getLayerY('4123', 4, true)] // ATT (three forwards - wider spread)
+            ],
+            421:[
+                [250, getLayerY('421', 0, true)],   // GK
+                [400, getLayerY('421', 1, true)], [320, getLayerY('421', 1, true)], [180, getLayerY('421', 1, true)], [100, getLayerY('421', 1, true)], // DEF (wider)
+                [340, getLayerY('421', 2, true)], [160, getLayerY('421', 2, true)], // DMID
+                [250, getLayerY('421', 3, true)],  // AMID (diamond tip)
+                [380, getLayerY('421', 4, true)], [250, getLayerY('421', 4, true)], [120, getLayerY('421', 4, true)] // ATT (wider)
+            ],
+            532:[
+                [250, getLayerY('532', 0, true)],   // GK
+                [420, getLayerY('532', 1, true)], [350, getLayerY('532', 1, true)], [250, getLayerY('532', 1, true)], [150, getLayerY('532', 1, true)], [80, getLayerY('532', 1, true)], // DEF (much wider)
+                [400, getLayerY('532', 2, true)], [250, getLayerY('532', 2, true)], [100, getLayerY('532', 2, true)], // MID (wider)
+                [320, getLayerY('532', 3, true)], [180, getLayerY('532', 3, true)]  // ATT
+            ],
+            343:[
+                [250, getLayerY('343', 0, true)],   // GK
+                [350, getLayerY('343', 1, true)], [250, getLayerY('343', 1, true)], [150, getLayerY('343', 1, true)], // DEF
+                [440, getLayerY('343', 2, true)], [340, getLayerY('343', 2, true)], [160, getLayerY('343', 2, true)], [60, getLayerY('343', 2, true)], // MID (much wider)
+                [400, getLayerY('343', 3, true)], [250, getLayerY('343', 3, true)], [100, getLayerY('343', 3, true)] // ATT (wider)
+            ],
+            4141:[
+                [250, getLayerY('4141', 0, true)],   // GK
+                [400, getLayerY('4141', 1, true)], [320, getLayerY('4141', 1, true)], [180, getLayerY('4141', 1, true)], [100, getLayerY('4141', 1, true)], // DEF (wider)
+                [250, getLayerY('4141', 2, true)],  // DMID
+                [420, getLayerY('4141', 3, true)], [340, getLayerY('4141', 3, true)], [160, getLayerY('4141', 3, true)], [80, getLayerY('4141', 3, true)], // MID (much wider)
+                [250, getLayerY('4141', 4, true)]   // ATT
+            ],
+            4321:[
+                [250, getLayerY('4321', 0, true)],   // GK
+                [400, getLayerY('4321', 1, true)], [320, getLayerY('4321', 1, true)], [180, getLayerY('4321', 1, true)], [100, getLayerY('4321', 1, true)], // DEF (wider)
+                [380, getLayerY('4321', 2, true)], [250, getLayerY('4321', 2, true)], [120, getLayerY('4321', 2, true)], // MID (wider)
+                [320, getLayerY('4321', 3, true)], [180, getLayerY('4321', 3, true)], // AMID
+                [250, getLayerY('4321', 4, true)]   // ATT
+            ]
+        };
+        
+        // Position abbreviations for each formation
+        const POS = {
+            442: ['GK','LB','CB','CB','RB','LM','CM','CM','RM','ST','ST'],
+            433: ['GK','LB','CB','RB','LM','CM','RM','LW','ST','RW','CF'],
+            352: ['GK','CB','CB','CB','LWB','CM','CM','CM','RWB','ST','ST'],
+            451: ['GK','LB','CB','CB','RB','LM','CM','CM','CM','RM','ST'],
+            4231: ['GK','LB','CB','CB','RB','CDM','CDM','LM','CAM','RM','ST'],
+            4123: ['GK','LB','CB','CB','RB','CDM','LAM','RAM','LW','ST','RW'],
+            421: ['GK','LB','CB','CB','RB','CDM','CDM','CAM','LW','ST','RW'],
+            532: ['GK','LCB','CB','CB','CB','RCB','LM','CM','RM','ST','ST'],
+            343: ['GK','CB','CB','CB','LM','CM','CM','RM','LW','ST','RW'],
+            4141: ['GK','LB','CB','CB','RB','CDM','LM','CM','CM','RM','ST'],
+            4321: ['GK','LB','CB','CB','RB','CM','CM','CM','LAM','RAM','ST']
+        };
+        
+        let S={f:'442',o:'442',p:Array(11).fill('').map((_,i)=>`Player ${i+1}`)};
+        
+        function init(){
+            const u=new URLSearchParams(location.search).get('s');
+            if(u)try{S=JSON.parse(atob(u))}catch(e){}
+            S.o=S.o||'442'; // Default opponent formation
+            render();
+        }
+        
+        function render(){
+            document.getElementById('formation').value=S.f;
+            document.getElementById('oppFormation').value=S.o;
+            const pp=document.getElementById('players');
+            pp.innerHTML=S.p.map((n,i)=>`<div style="position:relative"><input class="player-input" value="${n}" onblur="handleBlur(${i},this.value)" onkeydown="handleTab(event,${i})" placeholder="Player ${i+1}" style="padding-right:30px"><span class="input-number">#${i+1}</span></div>`).join('');
+            
+            const ff=document.getElementById('field');
+            const myTeam=F[S.f].map((pos,i)=>`
+                <div class="player my-team" style="left:${pos[0]}px;top:${pos[1]}px">
+                    <div class="player-icon">
+                        <div class="player-number">${POS[S.f][i]}</div>
+                    </div>
+                    <div class="player-name" onclick="editPlayerName(${i})" style="cursor:pointer" id="name-${i}">${S.p[i]||`P${i+1}`}</div>
+                </div>`).join('');
+            const oppTeam=O[S.o].map((pos,i)=>`
+                <div class="player opp-team" style="left:${pos[0]}px;top:${pos[1]}px">
+                    <div class="player-icon">
+                        <div class="player-number">${POS[S.o][i]}</div>
+                    </div>
+                    <div class="player-name">Away ${i+1}</div>
+                </div>`).join('');
+            
+            const fieldMarkings=`
+                <div class="penalty-area top"></div>
+                <div class="goal-area top"></div>
+                <div class="penalty-area bottom"></div>
+                <div class="goal-area bottom"></div>
+            `;
+            
+            ff.innerHTML=fieldMarkings+myTeam+oppTeam;
+        }
+        
+        let tabPressed = false;
+        
+        function updatePlayer(i,v){
+            S.p[i]=v;
+            render();
+            update();
+        }
+        
+        function handleTab(event,i){
+            if(event.key==='Tab'&&!event.shiftKey&&i<10){
+                tabPressed = i + 1; // Store next input index
+            }
+        }
+        
+        function editPlayerName(i){
+            const nameEl = document.getElementById(`name-${i}`);
+            const currentName = S.p[i] || `Player ${i+1}`;
+            
+            // Create input element
+            const input = document.createElement('input');
+            input.className = 'player-name-input';
+            input.value = currentName;
+            input.maxLength = 12;
+            input.setAttribute('data-player-index', i);
+            
+            // Replace name with input
+            nameEl.replaceWith(input);
+            input.focus();
+            input.select();
+            
+            // Handle save/cancel
+            const saveEdit = () => {
+                const newName = input.value.trim();
+                if(newName && newName !== currentName){
+                    S.p[i] = newName;
+                    update();
+                }
+                render();
+            };
+            
+            const saveAndMoveNext = () => {
+                const newName = input.value.trim();
+                if(newName && newName !== currentName){
+                    S.p[i] = newName;
+                    update();
+                }
+                render();
+                // Move to next player
+                if(i < 10){
+                    setTimeout(() => editPlayerName(i + 1), 50);
+                }
+            };
+            
+            input.onblur = (e) => {
+                // Don't save if we're tabbing to next player
+                if(!e.relatedTarget || !e.relatedTarget.classList?.contains('player-name-input')){
+                    saveEdit();
+                }
+            };
+            
+            input.onkeydown = (e) => {
+                if(e.key === 'Enter') saveEdit();
+                if(e.key === 'Escape') render();
+                if(e.key === 'Tab' && !e.shiftKey && i < 10){
+                    e.preventDefault();
+                    saveAndMoveNext();
+                }
+            };
+        }
+        
+        function handleBlur(i,v){
+            updatePlayer(i,v);
+            if(tabPressed !== false){
+                setTimeout(()=>{
+                    const inputs=document.querySelectorAll('.player-input');
+                    if(inputs[tabPressed])inputs[tabPressed].focus();
+                    tabPressed = false;
+                },0);
+            }
+        }
+        
+        function update(){
+            const s=btoa(JSON.stringify(S));
+            history.replaceState(null,null,`?s=${s}`);
+        }
+        
+        function share(){
+            // Update meta tags for social sharing
+            const title = `${S.f} vs ${S.o} Formation`;
+            const description = `Tactical analysis: ${S.f} formation vs ${S.o} formation`;
+            document.querySelector('meta[property="og:title"]').content = title;
+            document.querySelector('meta[property="og:description"]').content = description;
+            document.querySelector('meta[property="og:url"]').content = location.href;
+            
+            navigator.clipboard.writeText(location.href).then(()=>{
+                const btn=document.querySelector('.share-btn');
+                const orig=btn.innerHTML;
+                btn.innerHTML='✅ Copied!';
+                setTimeout(()=>btn.innerHTML=orig,2000);
+            });
+        }
+        
+        function downloadImage(){
+            const field = document.getElementById('field');
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Set canvas size
+            canvas.width = 800;
+            canvas.height = 1000;
+            
+            // Draw field background
+            ctx.fillStyle = '#2d5a2d';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw field markings
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(50, 50, 700, 900); // Field border
+            ctx.beginPath();
+            ctx.moveTo(50, 500);
+            ctx.lineTo(750, 500);
+            ctx.stroke(); // Center line
+            
+            // Draw center circle
+            ctx.beginPath();
+            ctx.arc(400, 500, 80, 0, 2 * Math.PI);
+            ctx.stroke();
+            
+            // Draw penalty areas
+            ctx.strokeRect(200, 50, 400, 120); // Top penalty area
+            ctx.strokeRect(200, 830, 400, 120); // Bottom penalty area
+            
+            // Draw goal areas
+            ctx.strokeRect(300, 50, 200, 60); // Top goal area
+            ctx.strokeRect(300, 890, 200, 60); // Bottom goal area
+            
+            // Draw players
+            const players = field.querySelectorAll('.player');
+            players.forEach(player => {
+                const rect = player.getBoundingClientRect();
+                const fieldRect = field.getBoundingClientRect();
+                const x = ((rect.left - fieldRect.left) / fieldRect.width) * 700 + 50;
+                const y = ((rect.top - fieldRect.top) / fieldRect.height) * 900 + 50;
+                
+                // Draw player circle
+                const isMyTeam = player.classList.contains('my-team');
+                ctx.fillStyle = isMyTeam ? '#ff4444' : '#00aa00';
+                ctx.beginPath();
+                ctx.arc(x, y, 15, 0, 2 * Math.PI);
+                ctx.fill();
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                
+                // Draw player number
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 12px Arial';
+                ctx.textAlign = 'center';
+                const number = player.querySelector('.player-number').textContent;
+                ctx.fillText(number, x, y + 4);
+                
+                // Draw player name
+                ctx.font = '10px Arial';
+                const name = player.querySelector('.player-name').textContent;
+                ctx.fillText(name, x, y + 35);
+            });
+            
+            // Add title
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 24px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(`${S.f} vs ${S.o}`, 400, 30);
+            
+            // Download image
+            const link = document.createElement('a');
+            link.download = `formation-${S.f}-vs-${S.o}.png`;
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+        
+        document.getElementById('formation').onchange=function(){
+            S.f=this.value;
+            render();
+            update();
+        };
+        
+        document.getElementById('oppFormation').onchange=function(){
+            S.o=this.value;
+            render();
+            update();
+        };
+        
+        init();
+    </script>
+</body>
+</html>
