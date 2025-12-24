@@ -92,9 +92,13 @@
         };
 
         function getLayerY(layerIndex, totalLayers, isMyTeam) {
-            const spacing = 100 / (totalLayers + 1);
-            let y = spacing * (layerIndex + 1);
-            return isMyTeam ? (100 - y) : y;
+            const fieldHeight = 100;
+            const topMargin = 8;
+            const bottomMargin = 8;
+            const usableHeight = fieldHeight - topMargin - bottomMargin;
+            const spacing = usableHeight / (totalLayers + 1);
+            let y = topMargin + spacing * (layerIndex + 1);
+            return isMyTeam ? (fieldHeight - y) : y;
         }
 
         function createPlayer(x, y, position, team, index) {
