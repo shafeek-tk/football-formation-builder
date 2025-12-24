@@ -473,7 +473,7 @@
                                 if (formationData.myTeamNames[index]) {
                                     nameEl.textContent = formationData.myTeamNames[index];
                                     // Update corresponding input
-                                    const playerId = nameEl.getAttribute('data-player-id');
+                                    const playerId = nameEl.parentElement.getAttribute('data-player-id');
                                     const input = document.querySelector(`input[data-player-id="${playerId}"]`);
                                     if (input) {
                                         input.value = formationData.myTeamNames[index];
@@ -487,7 +487,7 @@
                                 if (formationData.oppTeamNames[index]) {
                                     nameEl.textContent = formationData.oppTeamNames[index];
                                     // Update corresponding input
-                                    const playerId = nameEl.getAttribute('data-player-id');
+                                    const playerId = nameEl.parentElement.getAttribute('data-player-id');
                                     const input = document.querySelector(`input[data-player-id="${playerId}"]`);
                                     if (input) {
                                         input.value = formationData.oppTeamNames[index];
