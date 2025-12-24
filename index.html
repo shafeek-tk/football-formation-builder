@@ -301,9 +301,17 @@
                     
                     // Two-way binding: input changes update field
                     input.addEventListener('input', function() {
+                        console.log('Input changed, looking for player ID:', playerId);
                         const fieldPlayer = document.querySelector(`[data-player-id="${playerId}"] .player-name`);
+                        console.log('Found field player:', fieldPlayer);
                         if (fieldPlayer) {
                             fieldPlayer.textContent = this.value;
+                            console.log('Updated field player to:', this.value);
+                        } else {
+                            console.log('No field player found for ID:', playerId);
+                            // List all available player IDs for debugging
+                            const allPlayers = document.querySelectorAll('.player');
+                            console.log('Available player IDs:', Array.from(allPlayers).map(p => p.getAttribute('data-player-id')));
                         }
                     });
                     
