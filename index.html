@@ -243,10 +243,7 @@
             const F = formations[myFormation];
             const O = formations[oppFormation];
             
-            // Clear and create input fields
-            createPlayerInputs('myTeamInputs', F, 'My Team');
-            createPlayerInputs('oppTeamInputs', O, 'Opposition');
-            
+            // Create field players first
             // My team
             F.forEach((layer, layerIndex) => {
                 layer.forEach((x, playerIndex) => {
@@ -266,6 +263,10 @@
                     field.appendChild(player);
                 });
             });
+            
+            // Create input fields AFTER field players exist
+            createPlayerInputs('myTeamInputs', F, 'My Team');
+            createPlayerInputs('oppTeamInputs', O, 'Opposition');
             
             // Update input labels with positions
             updateInputLabels('myTeamInputs', F, 'My Team');
