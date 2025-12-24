@@ -397,9 +397,98 @@
         }
 
         function shareFormation() {
-            const url = window.location.origin + window.location.pathname + '#formation=' + btoa(JSON.stringify({formation: document.getElementById('formation').value}));
-            navigator.clipboard.writeText(url);
-            alert('Formation URL copied to clipboard!');
+            // Collect all formation data
+            const myFormation = document.getElementById('myTeamFormation')?.value || '442';
+            const oppFormation = document.getElementById('oppTeamFormation')?.value || '442';
+            
+            // Collect all player names
+            const myTeamNames = [];
+            const oppTeamNames = [];
+            
+            document.querySelectorAll('.my-team .player-name').forEach(nameEl => {
+                myTeamNames.push(nameEl.textContent);
+            });
+            
+            document.querySelectorAll('.opp-team .player-name').forEach(nameEl => {
+                oppTeamNames.push(nameEl.textContent);
+            });
+            
+            const formationData = {
+                myFormation: myFormation,
+                oppFormation: oppFormation,
+                myTeamNames: myTeamNames,
+                oppTeamNames: oppTeamNames
+            };
+            
+            const encodedData = btoa(JSON.stringify(formationData));
+            const url = window.location.origin + window.location.pathname + '#formation=' + encodedData;
+            
+            navigator.clipboard.writeText(url).then(() => {
+                alert('Formation URL copied to clipboard!');
+            }).catch(() => {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = url;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                alert('Formation URL copied to clipboard!');
+            });
+        }
+
+        function loadFromURL() {
+            const hash = window.location.hash;
+            if (hash.startsWith('#formation=')) {
+                try {
+                    const encodedData = hash.substring(11); // Remove '#formation='
+                    const formationData = JSON.parse(atob(encodedData));
+                    
+                    // Set formations
+                    if (document.getElementById('myTeamFormation')) {
+                        document.getElementById('myTeamFormation').value = formationData.myFormation || '442';
+                    }
+                    if (document.getElementById('oppTeamFormation')) {
+                        document.getElementById('oppTeamFormation').value = formationData.oppFormation || '442';
+                    }
+                    
+                    // Load the formation first
+                    loadFormation();
+                    
+                    // Then set player names after a short delay to ensure players are created
+                    setTimeout(() => {
+                        if (formationData.myTeamNames) {
+                            document.querySelectorAll('.my-team .player-name').forEach((nameEl, index) => {
+                                if (formationData.myTeamNames[index]) {
+                                    nameEl.textContent = formationData.myTeamNames[index];
+                                    // Update corresponding input
+                                    const playerId = nameEl.getAttribute('data-player-id');
+                                    const input = document.querySelector(`input[data-player-id="${playerId}"]`);
+                                    if (input) {
+                                        input.value = formationData.myTeamNames[index];
+                                    }
+                                }
+                            });
+                        }
+                        
+                        if (formationData.oppTeamNames) {
+                            document.querySelectorAll('.opp-team .player-name').forEach((nameEl, index) => {
+                                if (formationData.oppTeamNames[index]) {
+                                    nameEl.textContent = formationData.oppTeamNames[index];
+                                    // Update corresponding input
+                                    const playerId = nameEl.getAttribute('data-player-id');
+                                    const input = document.querySelector(`input[data-player-id="${playerId}"]`);
+                                    if (input) {
+                                        input.value = formationData.oppTeamNames[index];
+                                    }
+                                }
+                            });
+                        }
+                    }, 100);
+                } catch (e) {
+                    console.error('Error loading formation from URL:', e);
+                }
+            }
         }
 
         function downloadImage() {
@@ -408,7 +497,10 @@
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
-            loadFormation();
+            loadFromURL(); // Load from URL first if available
+            if (!window.location.hash.startsWith('#formation=')) {
+                loadFormation(); // Only load default if no URL data
+            }
         });
     </script>
 </body>
