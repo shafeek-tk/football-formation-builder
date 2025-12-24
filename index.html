@@ -166,6 +166,42 @@
             
             return 'CM';
         }
+
+        function getLayerY(layerIndex, totalLayers, isMyTeam) {
+            // Each team uses only their half of the field
+            // My team (blue): bottom half (50-100%)
+            // Away team (red): top half (0-50%)
+            
+            // Goalkeeper at the edge of their half
+            if (layerIndex === 0) {
+                return isMyTeam ? 95 : 5;  // My team GK at bottom, away GK at top
+            }
+            
+            // Outfield players distributed in their half only
+            const outfieldLayers = totalLayers - 1;
+            const outfieldIndex = layerIndex - 1;
+            
+            let y;
+            if (isMyTeam) {
+                // My team (blue): bottom half only (55% to 85%)
+                if (outfieldLayers === 1) {
+                    y = 70;
+                } else {
+                    const spacing = 30 / (outfieldLayers - 1);
+                    y = 85 - (spacing * outfieldIndex);
+                }
+            } else {
+                // Away team (red): top half only (15% to 45%) 
+                if (outfieldLayers === 1) {
+                    y = 30;
+                } else {
+                    const spacing = 30 / (outfieldLayers - 1);
+                    y = 15 + (spacing * outfieldIndex);
+                }
+            }
+            
+            return y;
+        }
             // Remove debug logging
             // Each team uses only their half of the field
             // My team (blue): bottom half (50-100%)
