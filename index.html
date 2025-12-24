@@ -38,6 +38,11 @@
         .share-btn{width:100%;padding:10px;background:#007acc;color:#fff;border:none;border-radius:4px;cursor:pointer;margin-top:20px;font-weight:bold}
         .share-btn:hover{background:#005a99}
         .section-title{font-size:12px;font-weight:bold;margin:15px 0 8px 0;color:#ccc;text-transform:uppercase}
+        .top-controls{display:flex;gap:15px;align-items:center;justify-content:center;padding:15px;background:#2a2a2a;margin-bottom:20px;border-radius:8px;flex-wrap:wrap}
+        .top-controls select{width:200px;padding:8px;background:#333;color:#fff;border:1px solid #555;border-radius:4px}
+        .top-controls button{padding:8px 15px;background:#007acc;color:#fff;border:none;border-radius:4px;cursor:pointer;font-weight:bold}
+        .top-controls button:hover{background:#005a99}
+        .sidebar-toggle{background:#007acc;color:#fff;border:none;padding:5px 10px;border-radius:4px;cursor:pointer;font-size:12px;margin-bottom:10px}
         @media (max-width:768px){
             body{padding:5px}
             .container{flex-direction:column;gap:10px}
@@ -45,13 +50,33 @@
             .field{width:95vw;height:60vh;margin-bottom:10px}
             .section-title{font-size:11px;margin:10px 0 5px 0}
             .player-input,.formation-select,.share-btn{padding:6px;font-size:11px}
+            .top-controls{flex-direction:column;gap:10px}
+            .top-controls select{width:100%}
         }
     </style>
 </head>
 <body>
-    <div class="sidebar">
-        <h2 style="margin-bottom:20px;font-size:18px">Formation Builder</h2>
-        <select id="formation" class="formation-select">
+    <div class="top-controls">
+        <select id="formation" onchange="loadFormation()">
+            <option value="442">4-4-2</option>
+            <option value="433">4-3-3</option>
+            <option value="352">3-5-2</option>
+            <option value="451">4-5-1</option>
+            <option value="4231">4-2-3-1</option>
+            <option value="4123">4-1-2-3</option>
+            <option value="421">4-2-1-3</option>
+            <option value="343">3-4-3</option>
+            <option value="532">5-3-2</option>
+            <option value="541">5-4-1</option>
+        </select>
+        <button onclick="shareFormation()">Share</button>
+        <button onclick="downloadImage()">Download</button>
+        <button class="sidebar-toggle" onclick="toggleSidebar()">Players</button>
+    </div>
+    
+    <div class="container">
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-content">
             <option value="442">4-4-2</option>
             <option value="433">4-3-3</option>
             <option value="352">3-5-2</option>
@@ -520,6 +545,11 @@
             render();
             update();
         };
+        
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.style.display = sidebar.style.display === 'none' ? 'block' : 'none';
+        }
         
         init();
     </script>
