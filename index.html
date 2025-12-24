@@ -238,12 +238,12 @@
             const myFormation = document.getElementById('myTeamFormation')?.value || '442';
             const oppFormation = document.getElementById('oppTeamFormation')?.value || '442';
             
-            // Save existing player names before clearing
-            const existingNames = {};
-            document.querySelectorAll('.player .player-name').forEach(nameEl => {
-                const playerId = nameEl.parentElement.getAttribute('data-player-id');
-                if (playerId && nameEl.textContent.trim()) {
-                    existingNames[playerId] = nameEl.textContent;
+            // Save existing input field values before clearing
+            const existingInputValues = {};
+            document.querySelectorAll('input[data-player-id]').forEach(input => {
+                const playerId = input.getAttribute('data-player-id');
+                if (playerId && input.value.trim()) {
+                    existingInputValues[playerId] = input.value;
                 }
             });
             
@@ -273,26 +273,17 @@
                 });
             });
             
-            // Restore existing names
-            Object.keys(existingNames).forEach(playerId => {
-                const playerElement = document.querySelector(`[data-player-id="${playerId}"]`);
-                if (playerElement) {
-                    const nameElement = playerElement.querySelector('.player-name');
-                    if (nameElement) {
-                        nameElement.textContent = existingNames[playerId];
-                    }
-                }
-            });
-            
             // Create input fields AFTER field players exist
             createPlayerInputs('myTeamInputs', F, 'Home Team');
             createPlayerInputs('oppTeamInputs', O, 'Away Team');
             
-            // Restore names in input fields too
-            Object.keys(existingNames).forEach(playerId => {
+            // Restore input field values and sync to field players
+            Object.keys(existingInputValues).forEach(playerId => {
                 const inputField = document.querySelector(`input[data-player-id="${playerId}"]`);
                 if (inputField) {
-                    inputField.value = existingNames[playerId];
+                    inputField.value = existingInputValues[playerId];
+                    // Also update the field player
+                    updatePlayerName(playerId, existingInputValues[playerId]);
                 }
             });
             
