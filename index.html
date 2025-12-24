@@ -178,11 +178,12 @@
             player.className = `player ${team}`;
             player.style.left = x + '%';
             player.style.top = y + '%';
+            player.setAttribute('data-player-id', `${team}-${index}`);
             player.innerHTML = `
                 <div class="player-icon">
                     <div class="player-number">${position}</div>
                 </div>
-                <div class="player-name" onclick="editPlayerName(this)">P${index + 1}</div>
+                <div class="player-name" onclick="editPlayerName(this)" data-player-id="${team}-${index}">Player ${index + 1}</div>
             `;
             return player;
         }
@@ -235,6 +236,27 @@
                     input.className = 'player-input';
                     input.placeholder = `Player ${playerCount}`;
                     input.value = `Player ${playerCount}`;
+                    input.setAttribute('data-player-id', `${teamName.toLowerCase().includes('my') ? 'my-team' : 'opp-team'}-${playerCount - 1}`);
+                    
+                    // Two-way binding: input changes update field
+                    input.addEventListener('input', function() {
+                        const fieldPlayer = document.querySelector(`[data-player-id="${this.getAttribute('data-player-id')}"] .player-name`);
+                        if (fieldPlayer) {
+                            fieldPlayer.textContent = this.value;
+                        }
+                    });
+                    
+                    // Tab navigation
+                    input.addEventListener('keydown', function(e) {
+                        if (e.key === 'Tab') {
+                            e.preventDefault();
+                            const inputs = container.querySelectorAll('.player-input');
+                            const currentIndex = Array.from(inputs).indexOf(this);
+                            const nextIndex = (currentIndex + 1) % inputs.length;
+                            inputs[nextIndex].focus();
+                        }
+                    });
+                    
                     container.appendChild(input);
                     playerCount++;
                 });
@@ -243,17 +265,27 @@
 
         function editPlayerName(element) {
             const currentName = element.textContent;
+            const playerId = element.getAttribute('data-player-id');
             const input = document.createElement('input');
             input.className = 'player-name-input';
             input.value = currentName;
+            
             input.onblur = () => {
                 element.textContent = input.value || currentName;
                 element.style.display = 'block';
                 input.remove();
+                
+                // Update corresponding input field
+                const inputField = document.querySelector(`input[data-player-id="${playerId}"]`);
+                if (inputField) {
+                    inputField.value = input.value || currentName;
+                }
             };
+            
             input.onkeydown = (e) => {
                 if (e.key === 'Enter') input.blur();
             };
+            
             element.style.display = 'none';
             element.parentNode.appendChild(input);
             input.focus();
