@@ -77,7 +77,7 @@
     
     <div class="player-controls">
         <div class="team-section">
-            <h3>My Team (Blue)</h3>
+            <h3>Home Team (Blue)</h3>
             <select id="myTeamFormation" onchange="loadFormation()">
                 <option value="442">4-4-2</option>
                 <option value="433">4-3-3</option>
@@ -94,7 +94,7 @@
         </div>
         
         <div class="team-section">
-            <h3>Opposition (Red)</h3>
+            <h3>Away Team (Red)</h3>
             <select id="oppTeamFormation" onchange="loadFormation()">
                 <option value="442">4-4-2</option>
                 <option value="433">4-3-3</option>
@@ -265,8 +265,8 @@
             });
             
             // Create input fields AFTER field players exist
-            createPlayerInputs('myTeamInputs', F, 'My Team');
-            createPlayerInputs('oppTeamInputs', O, 'Opposition');
+            createPlayerInputs('myTeamInputs', F, 'Home Team');
+            createPlayerInputs('oppTeamInputs', O, 'Away Team');
             
             // Update input labels with positions
             updateInputLabels('myTeamInputs', F, 'My Team');
@@ -283,13 +283,13 @@
             formation.forEach((layer, layerIndex) => {
                 layer.forEach((x, playerIndex) => {
                     const playerNumber = playerCount + 1;
-                    const displayPrefix = teamName.toLowerCase().includes('my') ? 'MT' : 'OPP';
-                    const defaultValue = teamName.toLowerCase().includes('my') ? `${displayPrefix}${playerNumber}` : '';
+                    const displayPrefix = teamName.toLowerCase().includes('home') ? 'MT' : 'OPP';
+                    const defaultValue = teamName.toLowerCase().includes('home') ? `${displayPrefix}${playerNumber}` : '';
                     const input = document.createElement('input');
                     input.className = 'player-input';
                     input.placeholder = `${displayPrefix}${playerNumber}`;
                     input.value = defaultValue;
-                    const teamPrefix = teamName.toLowerCase().includes('my') ? 'my-team' : 'opp-team';
+                    const teamPrefix = teamName.toLowerCase().includes('home') ? 'my-team' : 'opp-team';
                     const playerId = `${teamPrefix}-${layerIndex * 10 + playerIndex}`;
                     input.setAttribute('data-player-id', playerId);
                     
