@@ -33,7 +33,7 @@
         .opp-team .player-icon{background-image:url('red-jersey.png')}
         .player-number{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:min(1.8vw,7px);font-weight:bold;color:#fff;text-shadow:1px 1px 1px rgba(0,0,0,0.8)}
         .player-position-label{position:absolute;top:-12px;left:50%;transform:translateX(-50%);font-size:min(1.5vw,6px);font-weight:bold;color:#fff;background:rgba(0,0,0,0.7);padding:1px 3px;border-radius:2px;text-shadow:1px 1px 1px rgba(0,0,0,0.8);white-space:nowrap}
-        .player-name{font-size:min(2.2vw,9px);margin-top:3px;padding:2px 5px;background:linear-gradient(135deg,rgba(0,0,0,0.9),rgba(0,0,0,0.7));border-radius:4px;color:#fff;font-weight:bold;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border:1px solid rgba(255,255,255,0.2);box-shadow:0 1px 3px rgba(0,0,0,0.5);text-shadow:1px 1px 2px rgba(0,0,0,0.8);transition:all 0.2s ease}
+        .player-name{font-size:min(2.2vw,9px);margin-top:3px;padding:2px 5px;background:linear-gradient(135deg,rgba(0,0,0,0.9),rgba(0,0,0,0.7));border-radius:4px;color:#fff;font-weight:bold;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border:1px solid rgba(255,255,255,0.2);box-shadow:0 1px 3px rgba(0,0,0,0.5);text-shadow:1px 1px 2px rgba(0,0,0,0.8);transition:all 0.2s ease;min-height:16px;display:block}
         .player-name:hover{background:linear-gradient(135deg,rgba(0,0,0,0.95),rgba(0,0,0,0.8));border-color:rgba(255,255,255,0.4);box-shadow:0 2px 5px rgba(0,0,0,0.7);transform:scale(1.05)}
         .player-name-input{font-size:10px;margin-top:2px;padding:1px 3px;background:#fff;border-radius:2px;border:1px solid #007acc;color:#000;width:40px;text-align:center}
         
@@ -226,7 +226,7 @@
                 <div class="player-icon">
                     <div class="player-number">${playerNumber}</div>
                 </div>
-                <div class="player-name" onclick="editPlayerName(this)" data-player-id="${playerId}">${playerName}</div>
+                <div class="player-name" onclick="editPlayerName(this)">${playerName}</div>
             `;
             return player;
         }
@@ -301,18 +301,7 @@
                     
                     // Two-way binding: input changes update field
                     input.addEventListener('input', function() {
-                        console.log('Input changed, looking for player ID:', playerId);
-                        const fieldPlayer = document.querySelector(`[data-player-id="${playerId}"] .player-name`);
-                        console.log('Found field player:', fieldPlayer);
-                        if (fieldPlayer) {
-                            fieldPlayer.textContent = this.value;
-                            console.log('Updated field player to:', this.value);
-                        } else {
-                            console.log('No field player found for ID:', playerId);
-                            // List all available player IDs for debugging
-                            const allPlayers = document.querySelectorAll('.player');
-                            console.log('Available player IDs:', Array.from(allPlayers).map(p => p.getAttribute('data-player-id')));
-                        }
+                        updatePlayerName(playerId, this.value);
                     });
                     
                     // Auto-select text when focused
@@ -360,9 +349,20 @@
             });
         }
 
+        function updatePlayerName(playerId, newName) {
+            const playerElement = document.querySelector(`[data-player-id="${playerId}"]`);
+            if (playerElement) {
+                const oldNameElement = playerElement.querySelector('.player-name');
+                if (oldNameElement) {
+                    // Just update the text content - don't recreate the element
+                    oldNameElement.textContent = newName;
+                }
+            }
+        }
+
         function editPlayerName(element) {
             const currentName = element.textContent;
-            const playerId = element.getAttribute('data-player-id');
+            const playerId = element.getAttribute('data-player-id') || element.parentElement.getAttribute('data-player-id');
             const input = document.createElement('input');
             input.className = 'player-name-input';
             input.value = currentName;
@@ -373,21 +373,23 @@
                 input.remove();
                 
                 // Update corresponding input field
-                const inputField = document.querySelector(`input[data-player-id="${playerId}"]`);
-                if (inputField) {
-                    inputField.value = input.value || currentName;
+                if (playerId) {
+                    const inputField = document.querySelector(`input[data-player-id="${playerId}"]`);
+                    if (inputField) {
+                        inputField.value = input.value || currentName;
+                    }
                 }
             };
             
             input.onkeydown = (e) => {
                 if (e.key === 'Enter') {
                     input.blur();
-                } else if (e.key === 'Tab') {
+                } else if (e.key === 'Tab' && playerId) {
                     e.preventDefault();
                     input.blur();
                     
                     // Find next player in the same team to edit
-                    const currentTeam = playerId.split('-')[0] + '-' + playerId.split('-')[1]; // my-team or opp-team
+                    const currentTeam = playerId.split('-')[0] + '-' + playerId.split('-')[1];
                     const allTeamPlayers = document.querySelectorAll(`[data-player-id^="${currentTeam}"] .player-name`);
                     const currentIndex = Array.from(allTeamPlayers).indexOf(element);
                     const nextIndex = (currentIndex + 1) % allTeamPlayers.length;
@@ -402,7 +404,7 @@
             element.style.display = 'none';
             element.parentNode.appendChild(input);
             input.focus();
-            input.select(); // Auto-select all text so user can just start typing
+            input.select();
         }
 
         function shareFormation() {
