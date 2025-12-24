@@ -92,35 +92,45 @@
         };
 
         function getLayerY(layerIndex, totalLayers, isMyTeam) {
-            // Each team uses only their half of the field (0-50% or 50-100%)
-            const halfFieldStart = isMyTeam ? 50 : 0;   // My team: bottom half (50-100%), Away: top half (0-50%)
-            const halfFieldEnd = isMyTeam ? 100 : 50;
+            // Debug: log the calculation
+            console.log(`Layer ${layerIndex}/${totalLayers}, isMyTeam: ${isMyTeam}`);
+            
+            // Each team uses only their half of the field
+            // My team (blue): bottom half (50-100%)
+            // Away team (red): top half (0-50%)
             
             // Goalkeeper at the edge of their half
             if (layerIndex === 0) {
-                return isMyTeam ? 95 : 5;  // Goalkeeper at touchline
+                const gkY = isMyTeam ? 95 : 5;
+                console.log(`Goalkeeper Y: ${gkY}`);
+                return gkY;
             }
             
-            // Outfield players distributed in their half
-            const usableHalfHeight = 40;  // Use 40% of total field for outfield players in each half
+            // Outfield players distributed in their half only
             const outfieldLayers = totalLayers - 1;
-            
-            if (outfieldLayers === 1) {
-                // Single outfield layer in middle of their half
-                return isMyTeam ? 70 : 30;
-            }
-            
-            // Equal spacing for outfield layers within their half
-            const spacing = usableHalfHeight / (outfieldLayers - 1);
             const outfieldIndex = layerIndex - 1;
             
+            let y;
             if (isMyTeam) {
-                // My team: spread from 55% to 85% (bottom half)
-                return 85 - (spacing * outfieldIndex);
+                // My team: bottom half only (55% to 85%)
+                if (outfieldLayers === 1) {
+                    y = 70; // Single layer in bottom half
+                } else {
+                    const spacing = 30 / (outfieldLayers - 1); // 30% range (55-85)
+                    y = 85 - (spacing * outfieldIndex);
+                }
             } else {
-                // Away team: spread from 15% to 45% (top half) 
-                return 15 + (spacing * outfieldIndex);
+                // Away team: top half only (15% to 45%) 
+                if (outfieldLayers === 1) {
+                    y = 30; // Single layer in top half
+                } else {
+                    const spacing = 30 / (outfieldLayers - 1); // 30% range (15-45)
+                    y = 15 + (spacing * outfieldIndex);
+                }
             }
+            
+            console.log(`Outfield Y: ${y}`);
+            return y;
         }
 
         function createPlayer(x, y, position, team, index) {
