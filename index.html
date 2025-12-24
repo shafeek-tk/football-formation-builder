@@ -208,6 +208,21 @@
             return y;
         }
 
+        function getPlayerY(layerIndex, playerIndex, totalLayers, layerSize, isMyTeam) {
+            const baseY = getLayerY(layerIndex, totalLayers, isMyTeam);
+            
+            // For defensive line (first outfield layer), push fullbacks forward
+            if (layerIndex === 1 && layerSize >= 4) {
+                const isFullback = playerIndex === 0 || playerIndex === layerSize - 1; // First or last player
+                if (isFullback) {
+                    // Push fullbacks 3% forward (towards opponent goal)
+                    return isMyTeam ? baseY - 3 : baseY + 3;
+                }
+            }
+            
+            return baseY;
+        }
+
         function createPlayer(x, y, position, team, index) {
             const player = document.createElement('div');
             player.className = `player ${team}`;
@@ -242,8 +257,8 @@
             
             // My team
             F.forEach((layer, layerIndex) => {
-                const y = getLayerY(layerIndex, F.length, true);
                 layer.forEach((x, playerIndex) => {
+                    const y = getPlayerY(layerIndex, playerIndex, F.length, layer.length, true);
                     const position = getPlayerPosition(layerIndex, playerIndex, F.length, layer.length);
                     const player = createPlayer(x, y, position, 'my-team', layerIndex * 10 + playerIndex);
                     field.appendChild(player);
@@ -252,8 +267,8 @@
             
             // Opposition
             O.forEach((layer, layerIndex) => {
-                const y = getLayerY(layerIndex, O.length, false);
                 layer.forEach((x, playerIndex) => {
+                    const y = getPlayerY(layerIndex, playerIndex, O.length, layer.length, false);
                     const position = getPlayerPosition(layerIndex, playerIndex, O.length, layer.length);
                     const player = createPlayer(x, y, position, 'opp-team', layerIndex * 10 + playerIndex);
                     field.appendChild(player);
