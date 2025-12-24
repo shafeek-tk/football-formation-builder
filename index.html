@@ -286,7 +286,23 @@
             };
             
             input.onkeydown = (e) => {
-                if (e.key === 'Enter') input.blur();
+                if (e.key === 'Enter') {
+                    input.blur();
+                } else if (e.key === 'Tab') {
+                    e.preventDefault();
+                    input.blur();
+                    
+                    // Find next player in the same team to edit
+                    const currentTeam = playerId.split('-')[0] + '-' + playerId.split('-')[1]; // my-team or opp-team
+                    const allTeamPlayers = document.querySelectorAll(`[data-player-id^="${currentTeam}"] .player-name`);
+                    const currentIndex = Array.from(allTeamPlayers).indexOf(element);
+                    const nextIndex = (currentIndex + 1) % allTeamPlayers.length;
+                    
+                    // Edit the next player
+                    setTimeout(() => {
+                        editPlayerName(allTeamPlayers[nextIndex]);
+                    }, 50);
+                }
             };
             
             element.style.display = 'none';
