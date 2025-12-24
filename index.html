@@ -136,7 +136,36 @@
             '541': [[50], [15, 27, 50, 73, 85], [25, 35, 65, 75], [50]]
         };
 
-        function getLayerY(layerIndex, totalLayers, isMyTeam) {
+        function getPlayerPosition(layerIndex, playerIndex, totalLayers, layerSize) {
+            // Goalkeeper
+            if (layerIndex === 0) return 'GK';
+            
+            // Striker/Forward (last layer)
+            if (layerIndex === totalLayers - 1) {
+                return layerSize === 1 ? 'ST' : (playerIndex === 0 || playerIndex === layerSize - 1) ? 'LW' : 'ST';
+            }
+            
+            // Defenders (first outfield layer)
+            if (layerIndex === 1) {
+                if (layerSize === 4) {
+                    return ['LB', 'CB', 'CB', 'RB'][playerIndex];
+                } else if (layerSize === 3) {
+                    return ['CB', 'CB', 'CB'][playerIndex];
+                } else if (layerSize === 5) {
+                    return ['LB', 'CB', 'CB', 'CB', 'RB'][playerIndex];
+                }
+                return 'CB';
+            }
+            
+            // Midfielders (middle layers)
+            if (layerSize === 1) return 'CAM';
+            if (layerSize === 2) return ['CM', 'CM'][playerIndex];
+            if (layerSize === 3) return ['LM', 'CM', 'RM'][playerIndex];
+            if (layerSize === 4) return ['LM', 'CM', 'CM', 'RM'][playerIndex];
+            if (layerSize === 5) return ['LM', 'CM', 'CM', 'CM', 'RM'][playerIndex];
+            
+            return 'CM';
+        }
             // Remove debug logging
             // Each team uses only their half of the field
             // My team (blue): bottom half (50-100%)
@@ -207,7 +236,7 @@
             F.forEach((layer, layerIndex) => {
                 const y = getLayerY(layerIndex, F.length, true);
                 layer.forEach((x, playerIndex) => {
-                    const position = layerIndex === 0 ? 'GK' : layerIndex === F.length - 1 ? 'ST' : 'P';
+                    const position = getPlayerPosition(layerIndex, playerIndex, F.length, layer.length);
                     const player = createPlayer(x, y, position, 'my-team', layerIndex * 10 + playerIndex);
                     field.appendChild(player);
                 });
@@ -217,7 +246,7 @@
             O.forEach((layer, layerIndex) => {
                 const y = getLayerY(layerIndex, O.length, false);
                 layer.forEach((x, playerIndex) => {
-                    const position = layerIndex === 0 ? 'GK' : layerIndex === O.length - 1 ? 'ST' : 'P';
+                    const position = getPlayerPosition(layerIndex, playerIndex, O.length, layer.length);
                     const player = createPlayer(x, y, position, 'opp-team', layerIndex * 10 + playerIndex);
                     field.appendChild(player);
                 });
