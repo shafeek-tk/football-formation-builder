@@ -281,11 +281,11 @@
             formation.forEach((layer, layerIndex) => {
                 layer.forEach((x, playerIndex) => {
                     const playerNumber = playerCount + 1;
-                    const teamPrefix = teamName.toLowerCase().includes('my') ? 'MT' : 'OPP';
+                    const displayPrefix = teamName.toLowerCase().includes('my') ? 'MT' : 'OPP';
                     const input = document.createElement('input');
                     input.className = 'player-input';
-                    input.placeholder = `${teamPrefix}${playerNumber}`;
-                    input.value = `${teamPrefix}${playerNumber}`;
+                    input.placeholder = `${displayPrefix}${playerNumber}`;
+                    input.value = `${displayPrefix}${playerNumber}`;
                     const teamPrefix = teamName.toLowerCase().includes('my') ? 'my-team' : 'opp-team';
                     const playerId = `${teamPrefix}-${layerIndex * 10 + playerIndex}`;
                     input.setAttribute('data-player-id', playerId);
