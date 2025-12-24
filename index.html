@@ -215,8 +215,8 @@
             if (layerSize >= 3) {
                 const isWidePlayer = playerIndex === 0 || playerIndex === layerSize - 1; // First or last player
                 if (isWidePlayer) {
-                    // Push wide players 5% forward (towards opponent goal)
-                    return isMyTeam ? baseY - 5 : baseY + 5;
+                    // Push wide players 2% forward (towards opponent goal) - subtle positioning
+                    return isMyTeam ? baseY - 2 : baseY + 2;
                 }
             }
             
