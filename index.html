@@ -296,6 +296,11 @@
                         }
                     });
                     
+                    // Auto-select text when focused
+                    input.addEventListener('focus', function() {
+                        this.select();
+                    });
+                    
                     // Tab navigation
                     input.addEventListener('keydown', function(e) {
                         if (e.key === 'Tab') {
@@ -378,6 +383,7 @@
             element.style.display = 'none';
             element.parentNode.appendChild(input);
             input.focus();
+            input.select(); // Auto-select all text so user can just start typing
         }
 
         function shareFormation() {
