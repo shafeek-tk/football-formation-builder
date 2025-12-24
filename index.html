@@ -243,8 +243,23 @@
 
         function loadFormation() {
             const field = document.getElementById('field');
-            const myFormation = document.getElementById('myTeamFormation')?.value || document.getElementById('formation').value;
-            const oppFormation = document.getElementById('oppTeamFormation')?.value || document.getElementById('formation').value;
+            
+            // Get formation values - main dropdown controls both if individual ones don't exist
+            let myFormation, oppFormation;
+            
+            const mainFormation = document.getElementById('formation')?.value;
+            const myTeamSelect = document.getElementById('myTeamFormation');
+            const oppTeamSelect = document.getElementById('oppTeamFormation');
+            
+            if (myTeamSelect && oppTeamSelect) {
+                // Use individual team formations
+                myFormation = myTeamSelect.value;
+                oppFormation = oppTeamSelect.value;
+            } else {
+                // Use main formation for both teams
+                myFormation = mainFormation;
+                oppFormation = mainFormation;
+            }
             
             field.querySelectorAll('.player').forEach(p => p.remove());
             
@@ -412,8 +427,30 @@
             alert('Download feature - would capture field as image');
         }
 
+        function syncFormations() {
+            const mainFormation = document.getElementById('formation');
+            const myTeamFormation = document.getElementById('myTeamFormation');
+            const oppTeamFormation = document.getElementById('oppTeamFormation');
+            
+            if (mainFormation && myTeamFormation && oppTeamFormation) {
+                // When main formation changes, update both team formations
+                myTeamFormation.value = mainFormation.value;
+                oppTeamFormation.value = mainFormation.value;
+            }
+            
+            loadFormation();
+        }
+
         // Initialize
-        loadFormation();
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set up main formation dropdown to sync with team dropdowns
+            const mainFormation = document.getElementById('formation');
+            if (mainFormation) {
+                mainFormation.onchange = syncFormations;
+            }
+            
+            loadFormation();
+        });
     </script>
 </body>
 </html>
