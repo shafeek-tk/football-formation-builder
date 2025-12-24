@@ -503,7 +503,39 @@
         }
 
         function downloadImage() {
-            alert('Download feature - would capture field as image');
+            const field = document.getElementById('field');
+            
+            // Use html2canvas to capture the field as an image
+            if (typeof html2canvas !== 'undefined') {
+                html2canvas(field, {
+                    backgroundColor: '#0f5132',
+                    scale: 2, // Higher quality
+                    useCORS: true
+                }).then(canvas => {
+                    // Create download link
+                    const link = document.createElement('a');
+                    link.download = 'football-formation.png';
+                    link.href = canvas.toDataURL();
+                    link.click();
+                });
+            } else {
+                // Fallback: Load html2canvas library and try again
+                const script = document.createElement('script');
+                script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+                script.onload = () => {
+                    html2canvas(field, {
+                        backgroundColor: '#0f5132',
+                        scale: 2,
+                        useCORS: true
+                    }).then(canvas => {
+                        const link = document.createElement('a');
+                        link.download = 'football-formation.png';
+                        link.href = canvas.toDataURL();
+                        link.click();
+                    });
+                };
+                document.head.appendChild(script);
+            }
         }
 
         // Initialize
