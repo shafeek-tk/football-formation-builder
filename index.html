@@ -23,17 +23,17 @@
     <meta name="twitter:image" content="https://shafeek-tk.github.io/football-formation-builder/formation-preview.png">
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
-        body{font-family:system-ui,sans-serif;background:#1a1a1a;color:#fff;padding:10px}
+        body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;min-height:100vh}
         
-        .header{text-align:center;margin-bottom:20px}
-        .header h1{font-size:24px;margin-bottom:15px}
-        .controls{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:20px}
-        .controls select,.controls button{padding:8px 12px;background:#333;color:#fff;border:1px solid #555;border-radius:4px;font-size:14px}
-        .controls button{background:#007acc;cursor:pointer}
-        .controls button:hover{background:#005a99}
+        .header{text-align:center;padding:2rem;background:rgba(255,255,255,0.1);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,0.1)}
+        .header h1{font-size:2rem;font-weight:600;margin-bottom:1rem;color:#fff;text-shadow:0 2px 4px rgba(0,0,0,0.1)}
+        .controls{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-bottom:1rem}
+        .controls select,.controls button{padding:0.75rem 1.5rem;background:rgba(255,255,255,0.2);color:#fff;border:1px solid rgba(255,255,255,0.2);border-radius:50px;font-size:0.9rem;backdrop-filter:blur(10px)}
+        .controls button{cursor:pointer;font-weight:500;transition:all 0.3s ease}
+        .controls button:hover{background:rgba(255,255,255,0.3);transform:translateY(-2px);box-shadow:0 8px 25px rgba(0,0,0,0.15)}
         
-        .field-container{display:flex;justify-content:center;margin-bottom:20px}
-        .field{width:min(90vw,400px);height:min(80vh,600px);background:#0f5132;border:2px solid #fff;position:relative;border-radius:8px}
+        .field-container{display:flex;justify-content:center;margin-bottom:2rem;padding:0 1rem}
+        .field{width:min(90vw,400px);height:min(80vh,600px);background:linear-gradient(135deg,#2d5a2d 0%,#1e3a1e 100%);border:3px solid rgba(255,255,255,0.3);position:relative;border-radius:20px;box-shadow:0 20px 40px rgba(0,0,0,0.3);backdrop-filter:blur(10px)}
         .field::before{content:'';position:absolute;top:50%;left:0;right:0;height:2px;background:#fff}
         .field::after{content:'';position:absolute;top:50%;left:50%;width:80px;height:80px;border:2px solid #fff;border-radius:50%;transform:translate(-50%,-50%)}
         
@@ -56,27 +56,30 @@
         .footer{position:fixed;bottom:5px;right:5px;font-size:8px;color:#888;opacity:0.6}
         .footer a{color:#888;text-decoration:none}
         
-        .mode-toggle{position:fixed;top:20px;right:20px;z-index:1000;display:flex;gap:5px}
-        .mode-btn{padding:6px 12px;background:#007acc;color:#fff;border:none;border-radius:20px;font-size:12px;font-weight:bold;box-shadow:0 2px 8px rgba(0,0,0,0.3);transition:all 0.2s ease;cursor:pointer}
-        .mode-btn:hover{background:#005a99;transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,0.4)}
-        .mode-btn.active{background:#28a745;box-shadow:0 2px 8px rgba(40,167,69,0.4)}
+        .mode-toggle{position:fixed;top:1.5rem;right:1.5rem;z-index:1000;display:flex;gap:0.5rem;background:rgba(255,255,255,0.1);padding:0.5rem;border-radius:50px;backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.1)}
+        .mode-btn{padding:0.5rem 1rem;background:transparent;color:rgba(255,255,255,0.7);border:none;border-radius:25px;font-size:0.8rem;font-weight:500;transition:all 0.3s ease;cursor:pointer}
+        .mode-btn:hover{background:rgba(255,255,255,0.1);color:#fff}
+        .mode-btn.active{background:rgba(255,255,255,0.2);color:#fff;box-shadow:0 4px 12px rgba(0,0,0,0.2)}
         
-        .player-controls{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:20px;max-width:800px;margin-left:auto;margin-right:auto}
-        .team-section{background:#2a2a2a;padding:15px;border-radius:8px}
-        .team-section h3{margin-bottom:10px;font-size:16px;color:#ccc}
-        .team-section select{width:100%;padding:8px;background:#333;color:#fff;border:1px solid #555;border-radius:4px;margin-bottom:15px}
-        .player-input{width:100%;padding:6px;margin:0;background:#333;color:#fff;border:1px solid #555;border-radius:4px;font-size:12px;min-width:120px}
-        .input-label{display:flex;align-items:center;gap:8px;margin:3px 0;}
-        .input-number{color:#ccc;font-weight:bold;min-width:35px;font-size:11px}
-        .input-position{color:#999;font-size:9px}
+        .player-controls{display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-top:2rem;max-width:800px;margin-left:auto;margin-right:auto;padding:0 1rem}
+        .team-section{background:rgba(255,255,255,0.1);padding:2rem;border-radius:20px;backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.1)}
+        .team-section h3{margin-bottom:1rem;font-size:1.2rem;color:#fff;font-weight:600}
+        .team-section select{width:100%;padding:0.75rem;background:rgba(255,255,255,0.1);color:#fff;border:1px solid rgba(255,255,255,0.2);border-radius:12px;margin-bottom:1rem;backdrop-filter:blur(10px);font-size:0.9rem}
+        .player-input{width:100%;padding:0.75rem;margin:0;background:rgba(255,255,255,0.1);color:#fff;border:1px solid rgba(255,255,255,0.2);border-radius:12px;font-size:0.9rem;backdrop-filter:blur(10px);transition:all 0.3s ease}
+        .player-input:focus{outline:none;border-color:rgba(255,255,255,0.4);background:rgba(255,255,255,0.15)}
+        .input-label{display:flex;align-items:center;gap:0.75rem;margin:0.5rem 0}
+        .input-number{color:rgba(255,255,255,0.8);font-weight:600;min-width:35px;font-size:0.9rem}
+        .input-position{color:rgba(255,255,255,0.6);font-size:0.8rem}
         
         @media (max-width:768px){
-            .controls{flex-direction:column;align-items:center}
+            .header{padding:1.5rem 1rem}
+            .header h1{font-size:1.5rem}
+            .controls{flex-direction:column;align-items:center;gap:0.75rem}
             .controls select,.controls button{width:200px}
             .field{width:95vw;height:70vh}
-            .player-controls{grid-template-columns:1fr;gap:15px}
-            .mode-toggle{top:10px;right:10px;flex-direction:column;gap:2px}
-            .mode-btn{padding:4px 8px;font-size:10px}
+            .player-controls{grid-template-columns:1fr;gap:1.5rem;padding:0 1rem}
+            .mode-toggle{top:1rem;right:1rem;flex-direction:column;gap:0.25rem;padding:0.25rem}
+            .mode-btn{padding:0.5rem 0.75rem;font-size:0.75rem}
         }
     </style>
 </head>
