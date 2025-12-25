@@ -54,10 +54,10 @@
         .team-section{background:#2a2a2a;padding:15px;border-radius:8px}
         .team-section h3{margin-bottom:10px;font-size:16px;color:#ccc}
         .team-section select{width:100%;padding:8px;background:#333;color:#fff;border:1px solid #555;border-radius:4px;margin-bottom:15px}
-        .player-input{width:100%;padding:6px;margin:0;background:#333;color:#fff;border:1px solid #555;border-radius:4px;font-size:12px;min-width:120px}
-        .input-label{display:flex;align-items:center;gap:8px;margin:3px 0;}
-        .input-number{color:#ccc;font-weight:bold;min-width:35px;font-size:11px}
-        .input-position{color:#999;font-size:9px}
+        .player-input{padding:6px;margin:2px;background:#333;color:#fff;border:1px solid #555;border-radius:4px;font-size:12px;width:100px}
+        .input-label{display:inline-flex;align-items:center;gap:5px;margin:3px;}
+        .input-number{color:#ccc;font-weight:bold;font-size:11px}
+        .players-grid{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
         
         @media (max-width:768px){
             .controls{flex-direction:column;align-items:center}
@@ -213,8 +213,11 @@
             const homeContainer = document.getElementById('homePlayers');
             const awayContainer = document.getElementById('awayPlayers');
             
-            homeContainer.innerHTML = '';
-            awayContainer.innerHTML = '';
+            homeContainer.innerHTML = '<div class="players-grid"></div>';
+            awayContainer.innerHTML = '<div class="players-grid"></div>';
+            
+            const homeGrid = homeContainer.querySelector('.players-grid');
+            const awayGrid = awayContainer.querySelector('.players-grid');
             
             // Home team inputs
             homeFormationData.positions.forEach((pos, index) => {
@@ -226,7 +229,7 @@
                            data-player-id="home-${index}" oninput="updatePlayerName(this)" 
                            onkeydown="handleTabNavigation(event)">
                 `;
-                homeContainer.appendChild(label);
+                homeGrid.appendChild(label);
             });
             
             // Away team inputs
@@ -239,7 +242,7 @@
                            data-player-id="away-${index}" oninput="updatePlayerName(this)" 
                            onkeydown="handleTabNavigation(event)">
                 `;
-                awayContainer.appendChild(label);
+                awayGrid.appendChild(label);
             });
         }
 
