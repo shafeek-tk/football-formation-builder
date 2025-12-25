@@ -3,24 +3,25 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Football Formation Builder</title>
+    <title>7-a-side Football Formation Builder</title>
     
     <!-- Favicon -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚽</text></svg>">
     
     <!-- Open Graph meta tags for social media previews -->
-    <meta property="og:title" content="Football Formation Builder">
-    <meta property="og:description" content="Create and share tactical football formations with custom player names and positions">
+    <meta property="og:title" content="7-a-side Football Formation Builder">
+    <meta property="og:description" content="Create and share 7v7 football formations with custom player names and positions">
     <meta property="og:image" content="https://shafeek-tk.github.io/football-formation-builder/formation-preview.png">
-    <meta property="og:url" content="https://shafeek-tk.github.io/football-formation-builder/">
+    <meta property="og:url" content="https://shafeek-tk.github.io/football-formation-builder/7s.html">
     <meta property="og:type" content="website">
-    <meta property="og:site_name" content="Football Formation Builder">
+    <meta property="og:site_name" content="7-a-side Football Formation Builder">
     
     <!-- Twitter Card meta tags -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Football Formation Builder">
-    <meta name="twitter:description" content="Create and share tactical football formations">
+    <meta name="twitter:title" content="7-a-side Football Formation Builder">
+    <meta name="twitter:description" content="Create and share 7v7 football formations">
     <meta name="twitter:image" content="https://shafeek-tk.github.io/football-formation-builder/formation-preview.png">
+    
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
         body{font-family:system-ui,sans-serif;background:#1a1a1a;color:#fff;padding:10px}
@@ -33,14 +34,14 @@
         .controls button:hover{background:#005a99}
         
         .field-container{display:flex;justify-content:center;margin-bottom:20px}
-        .field{width:min(90vw,400px);height:min(80vh,600px);background:#0f5132;border:2px solid #fff;position:relative;border-radius:8px}
+        .field{width:min(90vw,350px);height:min(70vh,500px);background:#0f5132;border:2px solid #fff;position:relative;border-radius:8px}
         .field::before{content:'';position:absolute;top:50%;left:0;right:0;height:2px;background:#fff}
-        .field::after{content:'';position:absolute;top:50%;left:50%;width:80px;height:80px;border:2px solid #fff;border-radius:50%;transform:translate(-50%,-50%)}
+        .field::after{content:'';position:absolute;top:50%;left:50%;width:60px;height:60px;border:2px solid #fff;border-radius:50%;transform:translate(-50%,-50%)}
         
-        .penalty-area{position:absolute;width:30%;height:20%;left:50%;transform:translateX(-50%);border:2px solid #fff}
+        .penalty-area{position:absolute;width:25%;height:18%;left:50%;transform:translateX(-50%);border:2px solid #fff}
         .penalty-area.top{top:0}
         .penalty-area.bottom{bottom:0}
-        .goal-area{position:absolute;width:15%;height:8%;left:50%;transform:translateX(-50%);border:2px solid #fff}
+        .goal-area{position:absolute;width:12%;height:8%;left:50%;transform:translateX(-50%);border:2px solid #fff}
         .goal-area.top{top:0}
         .goal-area.bottom{bottom:0}
         
@@ -68,18 +69,18 @@
         @media (max-width:768px){
             .controls{flex-direction:column;align-items:center}
             .controls select,.controls button{width:200px}
-            .field{width:95vw;height:70vh}
+            .field{width:95vw;height:60vh}
             .player-controls{grid-template-columns:1fr;gap:15px}
         }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>Football Formation Builder</h1>
+        <h1>7-a-side Football Formation Builder</h1>
         <div class="controls">
             <button onclick="shareFormation()">Share</button>
             <button onclick="downloadImage()">Download</button>
-            <a href="7s.html" style="padding:8px 12px;background:#666;color:#fff;text-decoration:none;border-radius:4px">7v7 Mode</a>
+            <a href="index.html" style="padding:8px 12px;background:#666;color:#fff;text-decoration:none;border-radius:4px">11v11 Mode</a>
         </div>
     </div>
     
@@ -96,16 +97,12 @@
         <div class="team-section">
             <h3>Home Team (Blue)</h3>
             <select id="myTeamFormation" onchange="loadFormation()">
-                <option value="442">4-4-2</option>
-                <option value="433">4-3-3</option>
-                <option value="352">3-5-2</option>
-                <option value="451">4-5-1</option>
-                <option value="4231">4-2-3-1</option>
-                <option value="4123">4-1-2-3</option>
-                <option value="4213">4-2-1-3</option>
-                <option value="343">3-4-3</option>
-                <option value="532">5-3-2</option>
-                <option value="541">5-4-1</option>
+                <option value="231">2-3-1</option>
+                <option value="321">3-2-1</option>
+                <option value="132">1-3-2</option>
+                <option value="222">2-2-2</option>
+                <option value="141">1-4-1</option>
+                <option value="312">3-1-2</option>
             </select>
             <div id="myTeamInputs"></div>
         </div>
@@ -113,16 +110,12 @@
         <div class="team-section">
             <h3>Away Team (Red)</h3>
             <select id="oppTeamFormation" onchange="loadFormation()">
-                <option value="442">4-4-2</option>
-                <option value="433">4-3-3</option>
-                <option value="352">3-5-2</option>
-                <option value="451">4-5-1</option>
-                <option value="4231">4-2-3-1</option>
-                <option value="4123">4-1-2-3</option>
-                <option value="4213">4-2-1-3</option>
-                <option value="343">3-4-3</option>
-                <option value="532">5-3-2</option>
-                <option value="541">5-4-1</option>
+                <option value="231">2-3-1</option>
+                <option value="321">3-2-1</option>
+                <option value="132">1-3-2</option>
+                <option value="222">2-2-2</option>
+                <option value="141">1-4-1</option>
+                <option value="312">3-1-2</option>
             </select>
             <div id="oppTeamInputs"></div>
         </div>
@@ -133,49 +126,15 @@
     </div>
 
     <script>
+        // 7-a-side formations (7 players per team)
         const formations = {
-            '442': [[50], [12.5, 37.5, 62.5, 87.5], [12.5, 37.5, 62.5, 87.5], [37.5, 62.5]],
-            '433': [[50], [12.5, 37.5, 62.5, 87.5], [25, 50, 75], [16.7, 50, 83.3]],
-            '451': [[50], [12.5, 37.5, 62.5, 87.5], [8.3, 29.2, 50, 70.8, 91.7], [50]],
-            '352': [[50], [25, 50, 75], [8.3, 29.2, 50, 70.8, 91.7], [37.5, 62.5]],
-            '4231': [[50], [12.5, 37.5, 62.5, 87.5], [37.5, 62.5], [16.7, 50, 83.3], [50]],
-            '4123': [[50], [12.5, 37.5, 62.5, 87.5], [50], [37.5, 62.5], [16.7, 50, 83.3]],
-            '4213': [[50], [12.5, 37.5, 62.5, 87.5], [37.5, 62.5], [50], [16.7, 50, 83.3]],
-            '343': [[50], [25, 50, 75], [12.5, 37.5, 62.5, 87.5], [16.7, 50, 83.3]],
-            '532': [[50], [8.3, 29.2, 50, 70.8, 91.7], [25, 50, 75], [37.5, 62.5]],
-            '541': [[50], [8.3, 29.2, 50, 70.8, 91.7], [12.5, 37.5, 62.5, 87.5], [50]]
+            '231': [[50], [25, 75], [20, 50, 80], [50]], // 2-3-1: GK, 2 defenders, 3 midfielders, 1 striker
+            '321': [[50], [20, 50, 80], [35, 65], [50]], // 3-2-1: GK, 3 defenders, 2 midfielders, 1 striker
+            '132': [[50], [50], [20, 50, 80], [35, 65]], // 1-3-2: GK, 1 defender, 3 midfielders, 2 strikers
+            '222': [[50], [25, 75], [25, 75], [25, 75]], // 2-2-2: GK, 2 defenders, 2 midfielders, 2 strikers
+            '141': [[50], [50], [15, 30, 50, 70, 85], [50]], // 1-4-1: GK, 1 defender, 4 midfielders, 1 striker
+            '312': [[50], [20, 50, 80], [50], [35, 65]] // 3-1-2: GK, 3 defenders, 1 midfielder, 2 strikers
         };
-
-        function getPlayerPosition(layerIndex, playerIndex, totalLayers, layerSize) {
-            // Goalkeeper
-            if (layerIndex === 0) return 'GK';
-            
-            // Striker/Forward (last layer)
-            if (layerIndex === totalLayers - 1) {
-                return layerSize === 1 ? 'ST' : (playerIndex === 0 || playerIndex === layerSize - 1) ? 'LW' : 'ST';
-            }
-            
-            // Defenders (first outfield layer)
-            if (layerIndex === 1) {
-                if (layerSize === 4) {
-                    return ['LB', 'CB', 'CB', 'RB'][playerIndex];
-                } else if (layerSize === 3) {
-                    return ['CB', 'CB', 'CB'][playerIndex];
-                } else if (layerSize === 5) {
-                    return ['LB', 'CB', 'CB', 'CB', 'RB'][playerIndex];
-                }
-                return 'CB';
-            }
-            
-            // Midfielders (middle layers)
-            if (layerSize === 1) return 'CAM';
-            if (layerSize === 2) return ['CM', 'CM'][playerIndex];
-            if (layerSize === 3) return ['LM', 'CM', 'RM'][playerIndex];
-            if (layerSize === 4) return ['LM', 'CM', 'CM', 'RM'][playerIndex];
-            if (layerSize === 5) return ['LM', 'CM', 'CM', 'CM', 'RM'][playerIndex];
-            
-            return 'CM';
-        }
 
         function getLayerY(layerIndex, totalLayers, isMyTeam) {
             // Each team uses only their half of the field
@@ -247,14 +206,17 @@
             return player;
         }
 
+        // Rest of the JavaScript functions (loadFormation, editPlayerName, shareFormation, etc.) 
+        // will be the same as 11v11 version but adapted for 7 players
+        
         function loadFormation() {
             const field = document.getElementById('field');
             
             // Use individual team formations
-            const myFormation = document.getElementById('myTeamFormation')?.value || '442';
-            const oppFormation = document.getElementById('oppTeamFormation')?.value || '442';
+            const myFormation = document.getElementById('myTeamFormation')?.value || '231';
+            const oppFormation = document.getElementById('oppTeamFormation')?.value || '231';
             
-            // Save existing input field values before clearing - organize by team and position
+            // Save existing input field values before clearing
             const existingInputValues = {};
             document.querySelectorAll('input[data-player-id]').forEach(input => {
                 const playerId = input.getAttribute('data-player-id');
@@ -263,7 +225,7 @@
                 }
             });
             
-            // Also save by sequential order for each team to handle formation changes better
+            // Also save by sequential order for each team
             const myTeamNames = [];
             const oppTeamNames = [];
             document.querySelectorAll('input[data-player-id^="my-team-"]').forEach(input => {
@@ -287,8 +249,7 @@
             F.forEach((layer, layerIndex) => {
                 layer.forEach((x, playerIndex) => {
                     const y = getPlayerY(layerIndex, playerIndex, F.length, layer.length, true);
-                    const position = getPlayerPosition(layerIndex, playerIndex, F.length, layer.length);
-                    const player = createPlayer(x, y, position, 'my-team', layerIndex * 10 + playerIndex);
+                    const player = createPlayer(x, y, 'P', 'my-team', layerIndex * 10 + playerIndex);
                     field.appendChild(player);
                 });
             });
@@ -297,8 +258,7 @@
             O.forEach((layer, layerIndex) => {
                 layer.forEach((x, playerIndex) => {
                     const y = getPlayerY(layerIndex, playerIndex, O.length, layer.length, false);
-                    const position = getPlayerPosition(layerIndex, playerIndex, O.length, layer.length);
-                    const player = createPlayer(x, y, position, 'opp-team', layerIndex * 10 + playerIndex);
+                    const player = createPlayer(x, y, 'P', 'opp-team', layerIndex * 10 + playerIndex);
                     field.appendChild(player);
                 });
             });
@@ -321,7 +281,6 @@
             const myTeamInputs = document.querySelectorAll('input[data-player-id^="my-team-"]');
             let myTeamIndex = 0;
             myTeamInputs.forEach(input => {
-                // Fill empty inputs OR inputs with default values (MT1, MT2, etc.)
                 if ((!input.value.trim() || input.value.startsWith('MT')) && myTeamIndex < myTeamNames.length) {
                     input.value = myTeamNames[myTeamIndex];
                     const playerId = input.getAttribute('data-player-id');
@@ -333,7 +292,6 @@
             const oppTeamInputs = document.querySelectorAll('input[data-player-id^="opp-team-"]');
             let oppTeamIndex = 0;
             oppTeamInputs.forEach(input => {
-                // Fill empty inputs OR inputs with default values (OPP1, OPP2, etc.)
                 if ((!input.value.trim() || input.value.startsWith('OPP')) && oppTeamIndex < oppTeamNames.length) {
                     input.value = oppTeamNames[oppTeamIndex];
                     const playerId = input.getAttribute('data-player-id');
@@ -341,10 +299,6 @@
                     oppTeamIndex++;
                 }
             });
-            
-            // Update input labels with positions
-            updateInputLabels('myTeamInputs', F, 'My Team');
-            updateInputLabels('oppTeamInputs', O, 'Opposition');
         }
 
         function createPlayerInputs(containerId, formation, teamName) {
@@ -400,36 +354,12 @@
             });
         }
 
-        function updateInputLabels(containerId, formation, teamName) {
-            const container = document.getElementById(containerId);
-            if (!container) return;
-            
-            const inputs = container.querySelectorAll('.player-input');
-            let playerCount = 0;
-            
-            formation.forEach((layer, layerIndex) => {
-                layer.forEach((x, playerIndex) => {
-                    const position = getPlayerPosition(layerIndex, playerIndex, formation.length, layer.length);
-                    const playerNumber = playerCount + 1;
-                    const input = inputs[playerCount];
-                    if (input) {
-                        const label = input.parentElement.querySelector('span');
-                        if (label) {
-                            label.innerHTML = `#${playerNumber} <span class="input-position">${position}</span>`;
-                        }
-                    }
-                    playerCount++;
-                });
-            });
-        }
-
         function updatePlayerName(playerId, newName) {
             const playerElement = document.querySelector(`[data-player-id="${playerId}"]`);
             if (playerElement) {
-                const oldNameElement = playerElement.querySelector('.player-name');
-                if (oldNameElement) {
-                    // Just update the text content - don't recreate the element
-                    oldNameElement.textContent = newName;
+                const nameElement = playerElement.querySelector('.player-name');
+                if (nameElement) {
+                    nameElement.textContent = newName;
                 }
             }
         }
@@ -483,8 +413,8 @@
 
         function shareFormation() {
             // Collect all formation data
-            const myFormation = document.getElementById('myTeamFormation')?.value || '442';
-            const oppFormation = document.getElementById('oppTeamFormation')?.value || '442';
+            const myFormation = document.getElementById('myTeamFormation')?.value || '231';
+            const oppFormation = document.getElementById('oppTeamFormation')?.value || '231';
             
             // Collect all player names
             const myTeamNames = [];
@@ -510,8 +440,8 @@
             
             if (navigator.share) {
                 navigator.share({
-                    title: 'Football Formation Builder',
-                    text: 'Check out this football formation!',
+                    title: '7-a-side Football Formation Builder',
+                    text: 'Check out this 7v7 football formation!',
                     url: url
                 }).catch(() => {
                     copyToClipboard(url);
@@ -536,6 +466,42 @@
             });
         }
 
+        function downloadImage() {
+            const field = document.getElementById('field');
+            
+            // Use html2canvas to capture the field as an image
+            if (typeof html2canvas !== 'undefined') {
+                html2canvas(field, {
+                    backgroundColor: '#0f5132',
+                    scale: 2, // Higher quality
+                    useCORS: true
+                }).then(canvas => {
+                    // Create download link
+                    const link = document.createElement('a');
+                    link.download = '7s-football-formation.png';
+                    link.href = canvas.toDataURL();
+                    link.click();
+                });
+            } else {
+                // Fallback: Load html2canvas library and try again
+                const script = document.createElement('script');
+                script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+                script.onload = () => {
+                    html2canvas(field, {
+                        backgroundColor: '#0f5132',
+                        scale: 2,
+                        useCORS: true
+                    }).then(canvas => {
+                        const link = document.createElement('a');
+                        link.download = '7s-football-formation.png';
+                        link.href = canvas.toDataURL();
+                        link.click();
+                    });
+                };
+                document.head.appendChild(script);
+            }
+        }
+
         function loadFromURL() {
             const hash = window.location.hash;
             if (hash.startsWith('#formation=')) {
@@ -545,10 +511,10 @@
                     
                     // Set formations
                     if (document.getElementById('myTeamFormation')) {
-                        document.getElementById('myTeamFormation').value = formationData.myFormation || '442';
+                        document.getElementById('myTeamFormation').value = formationData.myFormation || '231';
                     }
                     if (document.getElementById('oppTeamFormation')) {
-                        document.getElementById('oppTeamFormation').value = formationData.oppFormation || '442';
+                        document.getElementById('oppTeamFormation').value = formationData.oppFormation || '231';
                     }
                     
                     // Load the formation first
@@ -587,42 +553,6 @@
                 } catch (e) {
                     console.error('Error loading formation from URL:', e);
                 }
-            }
-        }
-
-        function downloadImage() {
-            const field = document.getElementById('field');
-            
-            // Use html2canvas to capture the field as an image
-            if (typeof html2canvas !== 'undefined') {
-                html2canvas(field, {
-                    backgroundColor: '#0f5132',
-                    scale: 2, // Higher quality
-                    useCORS: true
-                }).then(canvas => {
-                    // Create download link
-                    const link = document.createElement('a');
-                    link.download = 'football-formation.png';
-                    link.href = canvas.toDataURL();
-                    link.click();
-                });
-            } else {
-                // Fallback: Load html2canvas library and try again
-                const script = document.createElement('script');
-                script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
-                script.onload = () => {
-                    html2canvas(field, {
-                        backgroundColor: '#0f5132',
-                        scale: 2,
-                        useCORS: true
-                    }).then(canvas => {
-                        const link = document.createElement('a');
-                        link.download = 'football-formation.png';
-                        link.href = canvas.toDataURL();
-                        link.click();
-                    });
-                };
-                document.head.appendChild(script);
             }
         }
 
