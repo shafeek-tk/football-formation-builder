@@ -4,6 +4,20 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Football Formation Builder</title>
+    
+    <!-- Open Graph meta tags for social media previews -->
+    <meta property="og:title" content="Football Formation Builder">
+    <meta property="og:description" content="Create and share tactical football formations with custom player names and positions">
+    <meta property="og:image" content="https://shafeek-tk.github.io/football-formation-builder/formation-preview.png">
+    <meta property="og:url" content="https://shafeek-tk.github.io/football-formation-builder/">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Football Formation Builder">
+    
+    <!-- Twitter Card meta tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Football Formation Builder">
+    <meta name="twitter:description" content="Create and share tactical football formations">
+    <meta name="twitter:image" content="https://shafeek-tk.github.io/football-formation-builder/formation-preview.png">
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
         body{font-family:system-ui,sans-serif;background:#1a1a1a;color:#fff;padding:10px}
@@ -466,38 +480,6 @@
         }
 
         function shareFormation() {
-            // Check if we can use the Web Share API with files (for mobile)
-            if (navigator.share && navigator.canShare) {
-                // Generate image and share it
-                generateFormationImage().then(blob => {
-                    const file = new File([blob], 'football-formation.png', { type: 'image/png' });
-                    
-                    if (navigator.canShare({ files: [file] })) {
-                        navigator.share({
-                            title: 'Football Formation',
-                            text: 'Check out this football formation!',
-                            files: [file]
-                        }).catch(err => {
-                            console.log('Error sharing image:', err);
-                            // Fallback to URL sharing
-                            shareURL();
-                        });
-                    } else {
-                        // Fallback to URL sharing
-                        shareURL();
-                    }
-                }).catch(err => {
-                    console.log('Error generating image:', err);
-                    // Fallback to URL sharing
-                    shareURL();
-                });
-            } else {
-                // Fallback to URL sharing for desktop
-                shareURL();
-            }
-        }
-
-        function shareURL() {
             // Collect all formation data
             const myFormation = document.getElementById('myTeamFormation')?.value || '442';
             const oppFormation = document.getElementById('oppTeamFormation')?.value || '442';
@@ -526,47 +508,15 @@
             
             if (navigator.share) {
                 navigator.share({
-                    title: 'Football Formation',
+                    title: 'Football Formation Builder',
                     text: 'Check out this football formation!',
                     url: url
-                }).catch(err => {
-                    // Fallback to clipboard
+                }).catch(() => {
                     copyToClipboard(url);
                 });
             } else {
                 copyToClipboard(url);
             }
-        }
-
-        function generateFormationImage() {
-            return new Promise((resolve, reject) => {
-                const field = document.getElementById('field');
-                
-                if (typeof html2canvas !== 'undefined') {
-                    html2canvas(field, {
-                        backgroundColor: '#0f5132',
-                        scale: 2,
-                        useCORS: true
-                    }).then(canvas => {
-                        canvas.toBlob(resolve, 'image/png');
-                    }).catch(reject);
-                } else {
-                    // Load html2canvas library
-                    const script = document.createElement('script');
-                    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
-                    script.onload = () => {
-                        html2canvas(field, {
-                            backgroundColor: '#0f5132',
-                            scale: 2,
-                            useCORS: true
-                        }).then(canvas => {
-                            canvas.toBlob(resolve, 'image/png');
-                        }).catch(reject);
-                    };
-                    script.onerror = reject;
-                    document.head.appendChild(script);
-                }
-            });
         }
 
         function copyToClipboard(url) {
