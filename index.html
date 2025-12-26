@@ -60,6 +60,15 @@
     <meta name="twitter:title" content="Football Formation Builder">
     <meta name="twitter:description" content="Create and share tactical football formations">
     <meta name="twitter:image" content="https://shafeek-tk.github.io/football-formation-builder/formation-preview.png">
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-XXXXXXXXXX');
+    </script>
+    
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
         body{font-family:system-ui,sans-serif;background:#1a1a1a;color:#fff;padding:10px}
@@ -552,6 +561,15 @@
         }
 
         function switchMode(page) {
+            // Track mode switch
+            if (typeof gtag !== 'undefined') {
+                const targetMode = page.includes('7s') ? '7v7' : page.includes('6s') ? '6v6' : '11v11';
+                gtag('event', 'switch_mode', {
+                    'event_category': 'navigation',
+                    'event_label': targetMode
+                });
+            }
+            
             // Save current names to localStorage for this mode
             const currentMode = window.location.pathname.includes('7s') ? '7v7' : 
                                window.location.pathname.includes('6s') ? '6v6' : '11v11';
@@ -570,6 +588,14 @@
         }
 
         function shareFormation() {
+            // Track share event
+            if (typeof gtag !== 'undefined') {
+                gtag('event', 'share_formation', {
+                    'event_category': 'engagement',
+                    'event_label': '11v11'
+                });
+            }
+            
             // Collect all formation data
             const myFormation = document.getElementById('myTeamFormation')?.value || '442';
             const oppFormation = document.getElementById('oppTeamFormation')?.value || '442';
@@ -682,6 +708,14 @@
         }
 
         function downloadImage() {
+            // Track download event
+            if (typeof gtag !== 'undefined') {
+                gtag('event', 'download_image', {
+                    'event_category': 'engagement',
+                    'event_label': '11v11'
+                });
+            }
+            
             const field = document.getElementById('field');
             
             // Check if mobile device
