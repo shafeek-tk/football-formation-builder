@@ -93,8 +93,8 @@
             <button onclick="downloadImage()">Download</button>
         </div>
         <div class="mode-toggle">
-            <button class="mode-btn" onclick="window.location.href='index.html'">11v11</button>
-            <button class="mode-btn" onclick="window.location.href='7s.html'">7v7</button>
+            <button class="mode-btn" onclick="switchMode('index.html')">11v11</button>
+            <button class="mode-btn" onclick="switchMode('7s.html')">7v7</button>
             <button class="mode-btn active">6v6</button>
         </div>
     </div>
@@ -413,6 +413,21 @@
             input.select();
         }
 
+        function switchMode(page) {
+            // Collect current player names
+            const playerNames = {};
+            document.querySelectorAll('.player-input').forEach(input => {
+                const playerId = input.getAttribute('data-player-id');
+                if (input.value.trim()) {
+                    playerNames[playerId] = input.value.trim();
+                }
+            });
+            
+            // Create URL with names
+            const encodedNames = btoa(JSON.stringify(playerNames));
+            window.location.href = `${page}?names=${encodedNames}`;
+        }
+
         function shareFormation() {
             const myFormation = document.getElementById('myTeamFormation')?.value || '221';
             const oppFormation = document.getElementById('oppTeamFormation')?.value || '221';
@@ -552,10 +567,35 @@
 
         document.addEventListener('DOMContentLoaded', function() {
             loadFromURL();
+            loadNamesFromURL(); // Load names from URL parameter
             if (!window.location.hash.startsWith('#formation=')) {
                 loadFormation();
             }
         });
+
+        function loadNamesFromURL() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const namesData = urlParams.get('names');
+            
+            if (namesData) {
+                try {
+                    const playerNames = JSON.parse(atob(namesData));
+                    
+                    // Wait a bit for inputs to be created
+                    setTimeout(() => {
+                        Object.entries(playerNames).forEach(([playerId, name]) => {
+                            const input = document.querySelector(`input[data-player-id="${playerId}"]`);
+                            if (input) {
+                                input.value = name;
+                                updatePlayerName(input);
+                            }
+                        });
+                    }, 100);
+                } catch (e) {
+                    console.error('Error loading player names:', e);
+                }
+            }
+        }
     </script>
 </body>
 </html>
