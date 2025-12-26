@@ -414,7 +414,9 @@
         }
 
         function switchMode(page) {
-            // Collect current player names
+            // Save current names to localStorage for this mode
+            const currentMode = window.location.pathname.includes('7s') ? '7v7' : 
+                               window.location.pathname.includes('6s') ? '6v6' : '11v11';
             const playerNames = {};
             document.querySelectorAll('.player-input').forEach(input => {
                 const playerId = input.getAttribute('data-player-id');
@@ -422,8 +424,9 @@
                     playerNames[playerId] = input.value.trim();
                 }
             });
+            localStorage.setItem(`footballLineup_${currentMode}`, JSON.stringify(playerNames));
             
-            // Create URL with names
+            // Create URL with names for immediate transfer
             const encodedNames = btoa(JSON.stringify(playerNames));
             window.location.href = `${page}?names=${encodedNames}`;
         }
@@ -574,27 +577,46 @@
         });
 
         function loadNamesFromURL() {
+            const currentMode = window.location.pathname.includes('7s') ? '7v7' : 
+                               window.location.pathname.includes('6s') ? '6v6' : '11v11';
+            
+            // First try URL parameter (immediate transfer)
             const urlParams = new URLSearchParams(window.location.search);
             const namesData = urlParams.get('names');
             
+            let playerNames = {};
+            
             if (namesData) {
                 try {
-                    const playerNames = JSON.parse(atob(namesData));
-                    
-                    // Wait a bit for inputs to be created
-                    setTimeout(() => {
-                        Object.entries(playerNames).forEach(([playerId, name]) => {
-                            const input = document.querySelector(`input[data-player-id="${playerId}"]`);
-                            if (input) {
-                                input.value = name;
-                                // Update the visual player on the field
-                                updatePlayerName(playerId, name);
-                            }
-                        });
-                    }, 100);
+                    playerNames = JSON.parse(atob(namesData));
                 } catch (e) {
-                    console.error('Error loading player names:', e);
+                    console.error('Error loading player names from URL:', e);
                 }
+            }
+            
+            // Then load stored names for this mode (fills in missing names)
+            try {
+                const storedNames = localStorage.getItem(`footballLineup_${currentMode}`);
+                if (storedNames) {
+                    const stored = JSON.parse(storedNames);
+                    // Merge stored names with URL names (URL takes priority)
+                    playerNames = { ...stored, ...playerNames };
+                }
+            } catch (e) {
+                console.error('Error loading stored names:', e);
+            }
+            
+            // Apply names to inputs and field
+            if (Object.keys(playerNames).length > 0) {
+                setTimeout(() => {
+                    Object.entries(playerNames).forEach(([playerId, name]) => {
+                        const input = document.querySelector(`input[data-player-id="${playerId}"]`);
+                        if (input) {
+                            input.value = name;
+                            updatePlayerName(playerId, name);
+                        }
+                    });
+                }, 100);
             }
         }
     </script>
