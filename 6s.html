@@ -587,7 +587,8 @@
                             const input = document.querySelector(`input[data-player-id="${playerId}"]`);
                             if (input) {
                                 input.value = name;
-                                updatePlayerName(input);
+                                // Update the visual player on the field
+                                updatePlayerName(playerId, name);
                             }
                         });
                     }, 100);
