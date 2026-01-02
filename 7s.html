@@ -149,7 +149,7 @@
         <div class="formation-container">
             <div class="formation-group">
                 <span class="formation-label">Home:</span>
-                <select id="formation" onchange="changeFormation()" class="formation-select">
+                <select id="myTeamFormation" onchange="changeFormation()" class="formation-select">
                     <option value="322">3-2-2</option>
                     <option value="331">3-3-1</option>
                     <option value="313">3-1-3</option>
@@ -159,7 +159,7 @@
             </div>
             <div class="formation-group">
                 <span class="formation-label">Away:</span>
-                <select id="awayFormation" onchange="changeAwayFormation()" class="formation-select">
+                <select id="oppTeamFormation" onchange="changeAwayFormation()" class="formation-select">
                     <option value="322">3-2-2</option>
                     <option value="331">3-3-1</option>
                     <option value="313">3-1-3</option>
@@ -217,7 +217,12 @@
             '132': [[50], [50], [20, 50, 80], [35, 65]], // 1-3-2: GK, 1 defender, 3 midfielders, 2 strikers
             '222': [[50], [25, 75], [25, 75], [25, 75]], // 2-2-2: GK, 2 defenders, 2 midfielders, 2 strikers
             '141': [[50], [50], [15, 30, 50, 70, 85], [50]], // 1-4-1: GK, 1 defender, 4 midfielders, 1 striker
-            '312': [[50], [20, 50, 80], [50], [35, 65]] // 3-1-2: GK, 3 defenders, 1 midfielder, 2 strikers
+            '312': [[50], [20, 50, 80], [50], [35, 65]], // 3-1-2: GK, 3 defenders, 1 midfielder, 2 strikers
+            '322': [[50], [20, 50, 80], [35, 65], [35, 65]], // 3-2-2: GK, 3 defenders, 2 midfielders, 2 strikers
+            '331': [[50], [20, 50, 80], [20, 50, 80], [50]], // 3-3-1: GK, 3 defenders, 3 midfielders, 1 striker
+            '313': [[50], [20, 50, 80], [50], [20, 50, 80]], // 3-1-3: GK, 3 defenders, 1 midfielder, 3 strikers
+            '241': [[50], [25, 75], [15, 35, 65, 85], [50]], // 2-4-1: GK, 2 defenders, 4 midfielders, 1 striker
+            '232': [[50], [25, 75], [20, 50, 80], [35, 65]] // 2-3-2: GK, 2 defenders, 3 midfielders, 2 strikers
         };
 
         function getLayerY(layerIndex, totalLayers, isMyTeam) {
@@ -329,6 +334,12 @@
             const F = formations[myFormation];
             const O = formations[oppFormation];
             
+            // Safety check for formations
+            if (!F || !O) {
+                console.error('Formation not found:', myFormation, oppFormation);
+                return;
+            }
+            
             // Create field players first
             // My team
             let sequentialCounter = 0;
@@ -439,6 +450,10 @@
                     playerCount++;
                 });
             });
+        }
+
+        function changeFormation() {
+            loadFormation();
         }
 
         function changeAwayFormation() {

@@ -254,7 +254,11 @@
             '4213': [[50], [12.5, 37.5, 62.5, 87.5], [37.5, 62.5], [50], [16.7, 50, 83.3]],
             '343': [[50], [25, 50, 75], [12.5, 37.5, 62.5, 87.5], [16.7, 50, 83.3]],
             '532': [[50], [8.3, 29.2, 50, 70.8, 91.7], [25, 50, 75], [37.5, 62.5]],
-            '541': [[50], [8.3, 29.2, 50, 70.8, 91.7], [12.5, 37.5, 62.5, 87.5], [50]]
+            '541': [[50], [8.3, 29.2, 50, 70.8, 91.7], [12.5, 37.5, 62.5, 87.5], [50]],
+            '4321': [[50], [12.5, 37.5, 62.5, 87.5], [25, 50, 75], [37.5, 62.5], [50]],
+            '4141': [[50], [12.5, 37.5, 62.5, 87.5], [50], [12.5, 37.5, 62.5, 87.5], [50]],
+            '3412': [[50], [25, 50, 75], [12.5, 37.5, 62.5, 87.5], [50], [37.5, 62.5]],
+            '4312': [[50], [12.5, 37.5, 62.5, 87.5], [25, 50, 75], [50], [37.5, 62.5]]
         };
 
         function getPlayerPosition(layerIndex, playerIndex, totalLayers, layerSize) {
@@ -393,6 +397,12 @@
             
             const F = formations[myFormation];
             const O = formations[oppFormation];
+            
+            // Safety check for formations
+            if (!F || !O) {
+                console.error('Formation not found:', myFormation, oppFormation);
+                return;
+            }
             
             // Create field players first
             // My team
@@ -549,7 +559,7 @@
             
             // Collect formation data with optimized structure
             const h = document.getElementById('myTeamFormation')?.value || '442';
-            const a = document.getElementById('oppTeamFormation')?.value || '442';
+            const a = document.getElementById('awayTeamFormation')?.value || '442';
             
             // Collect only non-default names to reduce size
             const hn = [];
@@ -703,8 +713,8 @@
                     if (document.getElementById('myTeamFormation')) {
                         document.getElementById('myTeamFormation').value = formationData.myFormation || '442';
                     }
-                    if (document.getElementById('oppTeamFormation')) {
-                        document.getElementById('oppTeamFormation').value = formationData.oppFormation || '442';
+                    if (document.getElementById('awayTeamFormation')) {
+                        document.getElementById('awayTeamFormation').value = formationData.oppFormation || '442';
                     }
                     
                     // Load the formation first

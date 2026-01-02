@@ -148,7 +148,7 @@
         <div class="formation-container">
             <div class="formation-group">
                 <span class="formation-label">Home:</span>
-                <select id="formation" onchange="changeFormation()" class="formation-select">
+                <select id="myTeamFormation" onchange="changeFormation()" class="formation-select">
                     <option value="221">2-2-1</option>
                     <option value="212">2-1-2</option>
                     <option value="311">3-1-1</option>
@@ -158,7 +158,7 @@
             </div>
             <div class="formation-group">
                 <span class="formation-label">Away:</span>
-                <select id="awayFormation" onchange="changeAwayFormation()" class="formation-select">
+                <select id="oppTeamFormation" onchange="changeAwayFormation()" class="formation-select">
                     <option value="221">2-2-1</option>
                     <option value="212">2-1-2</option>
                     <option value="311">3-1-1</option>
@@ -412,6 +412,10 @@
                     playerCount++;
                 });
             });
+        }
+
+        function changeFormation() {
+            loadFormation();
         }
 
         function changeAwayFormation() {
