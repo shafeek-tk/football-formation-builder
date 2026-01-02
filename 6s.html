@@ -455,14 +455,12 @@
             if (hn.some(n => n)) data.push(hn);
             if (an.some(n => n)) data.push(an);
             
-            // Add LZ-string compression for even smaller URLs
-            // Ultra-compact encoding using custom base36
+            // Ultra-compact encoding using LZ-string URI encoding
             let finalData;
             if (typeof LZString !== 'undefined') {
-                const compressed = LZString.compress(JSON.stringify(data));
-                finalData = toBase36(compressed);
+                finalData = LZString.compressToEncodedURIComponent(JSON.stringify(data));
             } else {
-                finalData = toBase36(JSON.stringify(data));
+                finalData = btoa(JSON.stringify(data));
             }
             
             const url = (window.location.origin !== 'null' ? window.location.origin : 'https://easyfootballlineup.com') + window.location.pathname + '#f=' + finalData;
