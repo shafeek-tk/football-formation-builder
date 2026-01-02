@@ -661,18 +661,45 @@
             
             const encodedData = btoa(JSON.stringify(data));
             
-            // Add LZ-string compression for even smaller URLs
+            // Ultra-compact encoding using custom base62
             let finalData;
             if (typeof LZString !== 'undefined') {
-                finalData = LZString.compressToEncodedURIComponent(JSON.stringify(data));
+                const compressed = LZString.compress(JSON.stringify(data));
+                finalData = toBase36(compressed);
             } else {
-                // Fallback to base64 if LZ-string not loaded
-                finalData = encodedData;
+                finalData = toBase36(JSON.stringify(data));
             }
             
             const url = (window.location.origin !== 'null' ? window.location.origin : 'https://easyfootballlineup.com') + window.location.pathname + '#f=' + finalData;
             
             shareURL(url);
+        }
+
+        // Custom base36 encoding (uppercase + numbers only)
+        function toBase36(str) {
+            const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            let result = '';
+            for (let i = 0; i < str.length; i++) {
+                const code = str.charCodeAt(i);
+                result += chars[code % 36] + chars[Math.floor(code / 36) % 36];
+            }
+            // Remove any non-alphanumeric characters and convert to uppercase
+            return result.replace(/[^A-Z0-9]/g, '').toUpperCase();
+        }
+
+        function fromBase36(str) {
+            const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            // Clean input - only uppercase letters and numbers
+            const cleaned = str.replace(/[^A-Z0-9]/g, '').toUpperCase();
+            let result = '';
+            for (let i = 0; i < cleaned.length; i += 2) {
+                const a = chars.indexOf(cleaned[i]);
+                const b = chars.indexOf(cleaned[i + 1] || '0');
+                if (a >= 0 && b >= 0) {
+                    result += String.fromCharCode(a + b * 36);
+                }
+            }
+            return result;
         }
 
 
@@ -721,14 +748,21 @@
                     const encodedData = hash.startsWith('#f=') ? hash.substring(3) : hash.substring(11);
                     let data;
                     
-                    // Try LZ-string decompression first, fallback to base64
+                    // Try base62 + LZ-string decompression first
                     if (typeof LZString !== 'undefined') {
                         try {
-                            const decompressed = LZString.decompressFromEncodedURIComponent(encodedData);
+                            const decoded = fromBase36(encodedData);
+                            const decompressed = LZString.decompress(decoded);
                             data = JSON.parse(decompressed);
                         } catch (e) {
-                            // Fallback to base64 if LZ-string fails
-                            data = JSON.parse(atob(encodedData));
+                            // Fallback to old LZ-string format
+                            try {
+                                const decompressed = LZString.decompressFromEncodedURIComponent(encodedData);
+                                data = JSON.parse(decompressed);
+                            } catch (e2) {
+                                // Fallback to base64
+                                data = JSON.parse(atob(encodedData));
+                            }
                         }
                     } else {
                         data = JSON.parse(atob(encodedData));
