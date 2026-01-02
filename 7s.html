@@ -44,6 +44,9 @@
     <!-- Common Pitch Styles -->
     <link rel="stylesheet" href="pitch-styles.css?v=5&t=1735778000">
     <script src="pitch-common.js?v=5&t=1735778000"></script>
+    
+    <!-- LZ-string compression library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.4.4/lz-string.min.js"></script>
 
     
     <!-- Schema.org structured data -->
@@ -531,33 +534,68 @@
                 });
             }
             
-            // Collect all formation data
-            const myFormation = document.getElementById('myTeamFormation')?.value || '231';
-            const oppFormation = document.getElementById('oppTeamFormation')?.value || '231';
+            // Collect formation data with optimized structure
+            const h = document.getElementById('myTeamFormation')?.value || '231';
+            const a = document.getElementById('oppTeamFormation')?.value || '231';
             
-            // Collect all player names
-            const myTeamNames = [];
-            const oppTeamNames = [];
+            // Collect only non-default names to reduce size
+            const hn = [];
+            const an = [];
             
-            document.querySelectorAll('.my-team .player-name').forEach(nameEl => {
-                myTeamNames.push(nameEl.textContent);
+            document.querySelectorAll('.my-team .player-name').forEach((nameEl, i) => {
+                const name = nameEl.textContent;
+                const defaultNames = ['NEUER', 'MBAPPE', 'RUDIGER', 'RONALDO', 'PEDRI', 'MODRIC', 'YAMAL'];
+                if (name && !defaultNames.includes(name) && !name.startsWith('Player ')) {
+                    hn[i] = name;
+                }
             });
             
-            document.querySelectorAll('.opp-team .player-name').forEach(nameEl => {
-                oppTeamNames.push(nameEl.textContent);
+            document.querySelectorAll('.opp-team .player-name').forEach((nameEl, i) => {
+                const name = nameEl.textContent;
+                if (name && name.trim() && !name.startsWith('OPP') && !name.startsWith('Player ')) {
+                    an[i] = name;
+                }
             });
             
-            const formationData = {
-                myFormation: myFormation,
-                oppFormation: oppFormation,
-                myTeamNames: myTeamNames,
-                oppTeamNames: oppTeamNames
-            };
+            // Ultra-compact format: only include non-empty arrays
+            const data = [h, a];
+            if (hn.some(n => n)) data.push(hn);
+            if (an.some(n => n)) data.push(an);
             
-            const encodedData = btoa(JSON.stringify(formationData));
-            const url = window.location.origin + window.location.pathname + '#formation=' + encodedData;
+            // Add LZ-string compression for even smaller URLs
+            let finalData;
+            if (typeof LZString !== 'undefined') {
+                finalData = LZString.compressToEncodedURIComponent(JSON.stringify(data));
+            } else {
+                finalData = btoa(JSON.stringify(data));
+            }
             
-            // Check if mobile device
+            const url = (window.location.origin !== 'null' ? window.location.origin : 'https://easyfootballlineup.com') + window.location.pathname + '#f=' + finalData;
+            
+            // If URL is still long (>100 chars), try TinyURL
+            if (url.length > 100) {
+                shortenWithTinyURL(url);
+            } else {
+                shareURL(url);
+            }
+        }
+
+        async function shortenWithTinyURL(longUrl) {
+            try {
+                const response = await fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(longUrl)}`);
+                const shortUrl = await response.text();
+                
+                if (shortUrl.startsWith('https://tinyurl.com/')) {
+                    shareURL(shortUrl);
+                } else {
+                    shareURL(longUrl);
+                }
+            } catch (error) {
+                shareURL(longUrl);
+            }
+        }
+
+        function shareURL(url) {
             const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
             
             if (isMobile && navigator.share) {
