@@ -22,6 +22,9 @@
     <link rel="stylesheet" href="pitch-styles.css?v=5&t=1735778000">
     <script src="pitch-common.js?v=5&t=1735778000"></script>
     
+    <!-- LZ-string compression library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.4.4/lz-string.min.js"></script>
+    
     <!-- Open Graph meta tags for social media previews -->
     <meta property="og:title" content="Easy Football Lineup - Free Soccer Formation Builder">
     <meta property="og:description" content="Create professional football formations and soccer lineups online. Free tactical board for coaches and players. Support for 11v11, 7v7, and 6v6 formats.">
@@ -630,32 +633,71 @@
                 });
             }
             
-            // Collect all formation data
-            const myFormation = document.getElementById('myTeamFormation')?.value || '442';
-            const oppFormation = document.getElementById('oppTeamFormation')?.value || '442';
+            // Collect formation data with optimized structure
+            const h = document.getElementById('myTeamFormation')?.value || '442';
+            const a = document.getElementById('oppTeamFormation')?.value || '442';
             
-            // Collect all player names
-            const myTeamNames = [];
-            const oppTeamNames = [];
+            // Collect only non-default names to reduce size
+            const hn = [];
+            const an = [];
             
-            document.querySelectorAll('.my-team .player-name').forEach(nameEl => {
-                myTeamNames.push(nameEl.textContent);
+            document.querySelectorAll('.my-team .player-name').forEach((nameEl, i) => {
+                const name = nameEl.textContent;
+                const defaultNames = ['NEUER', 'MBAPPE', 'RUDIGER', 'RONALDO', 'PEDRI', 'MODRIC', 'YAMAL', 'DE BRUYNE', 'MESSI', 'HAALAND', 'SALAH'];
+                if (name && !defaultNames.includes(name) && !name.startsWith('Player ')) {
+                    hn[i] = name;
+                }
             });
             
-            document.querySelectorAll('.opp-team .player-name').forEach(nameEl => {
-                oppTeamNames.push(nameEl.textContent);
+            document.querySelectorAll('.opp-team .player-name').forEach((nameEl, i) => {
+                const name = nameEl.textContent;
+                if (name && name.trim() && !name.startsWith('OPP') && !name.startsWith('Player ')) {
+                    an[i] = name;
+                }
             });
             
-            const formationData = {
-                myFormation: myFormation,
-                oppFormation: oppFormation,
-                myTeamNames: myTeamNames,
-                oppTeamNames: oppTeamNames
-            };
+            // Ultra-compact format: only include non-empty arrays
+            const data = [h, a];
+            if (hn.some(n => n)) data.push(hn);
+            if (an.some(n => n)) data.push(an);
             
-            const encodedData = btoa(JSON.stringify(formationData));
-            const url = window.location.origin + window.location.pathname + '#formation=' + encodedData;
+            const encodedData = btoa(JSON.stringify(data));
             
+            // Add LZ-string compression for even smaller URLs
+            let finalData;
+            if (typeof LZString !== 'undefined') {
+                finalData = LZString.compressToEncodedURIComponent(JSON.stringify(data));
+            } else {
+                // Fallback to base64 if LZ-string not loaded
+                finalData = encodedData;
+            }
+            
+            const url = (window.location.origin !== 'null' ? window.location.origin : 'https://easyfootballlineup.com') + window.location.pathname + '#f=' + finalData;
+            
+            // If URL is still long (>100 chars), try TinyURL
+            if (url.length > 100) {
+                shortenWithTinyURL(url);
+            } else {
+                shareURL(url);
+            }
+        }
+
+        async function shortenWithTinyURL(longUrl) {
+            try {
+                const response = await fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(longUrl)}`);
+                const shortUrl = await response.text();
+                
+                if (shortUrl.startsWith('https://tinyurl.com/')) {
+                    shareURL(shortUrl);
+                } else {
+                    shareURL(longUrl); // Fallback
+                }
+            } catch (error) {
+                shareURL(longUrl); // Fallback on error
+            }
+        }
+
+        function shareURL(url) {
             // Check if mobile device
             const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
             
@@ -689,14 +731,42 @@
 
         function loadFromURL() {
             const hash = window.location.hash;
-            if (hash.startsWith('#formation=')) {
+            if (hash.startsWith('#formation=') || hash.startsWith('#f=')) {
                 // Show loading indicator
                 const loadingEl = document.getElementById('loadingIndicator');
                 if (loadingEl) loadingEl.style.display = 'block';
                 
                 try {
-                    const encodedData = hash.substring(11); // Remove '#formation='
-                    const formationData = JSON.parse(atob(encodedData));
+                    const encodedData = hash.startsWith('#f=') ? hash.substring(3) : hash.substring(11);
+                    let data;
+                    
+                    // Try LZ-string decompression first, fallback to base64
+                    if (typeof LZString !== 'undefined') {
+                        try {
+                            const decompressed = LZString.decompressFromEncodedURIComponent(encodedData);
+                            data = JSON.parse(decompressed);
+                        } catch (e) {
+                            // Fallback to base64 if LZ-string fails
+                            data = JSON.parse(atob(encodedData));
+                        }
+                    } else {
+                        data = JSON.parse(atob(encodedData));
+                    }
+                    
+                    let formationData;
+                    // Handle both old and new formats
+                    if (Array.isArray(data)) {
+                        // New compact format: [homeFormation, awayFormation, homeNames?, awayNames?]
+                        formationData = {
+                            myFormation: data[0] || '442',
+                            oppFormation: data[1] || '442',
+                            myTeamNames: data[2] || [],
+                            oppTeamNames: data[3] || []
+                        };
+                    } else {
+                        // Old format compatibility
+                        formationData = data;
+                    }
                     
                     // Set formations
                     if (document.getElementById('myTeamFormation')) {
@@ -818,7 +888,7 @@
             initializePitch(); // Load common pitch markings
             loadFromURL(); // Load from URL first if available
             loadNamesFromURL(); // Load names from URL parameter
-            if (!window.location.hash.startsWith('#formation=')) {
+            if (!window.location.hash.startsWith('#formation=') && !window.location.hash.startsWith('#f=')) {
                 loadFormation(); // Only load default if no URL data
             }
         });
