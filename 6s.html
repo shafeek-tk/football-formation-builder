@@ -589,10 +589,50 @@
 
         function loadFromURL() {
             const hash = window.location.hash;
-            if (hash.startsWith('#formation=')) {
+            const urlParams = new URLSearchParams(window.location.search);
+            const queryF = urlParams.get('f');
+            
+            if (hash.startsWith('#formation=') || hash.startsWith('#f=') || queryF) {
                 try {
-                    const encodedData = hash.substring(11);
-                    const formationData = JSON.parse(atob(encodedData));
+                    let encodedData;
+                    if (queryF) {
+                        encodedData = queryF;
+                    } else {
+                        encodedData = hash.startsWith('#f=') ? hash.substring(3) : hash.substring(11);
+                    }
+                    
+                    let data;
+                    
+                    // Try LZ-string decompression
+                    if (typeof LZString !== 'undefined') {
+                        try {
+                            const decompressed = LZString.decompressFromEncodedURIComponent(encodedData);
+                            if (!decompressed) {
+                                throw new Error('LZ URI decompression failed');
+                            }
+                            data = JSON.parse(decompressed);
+                        } catch (e) {
+                            // Fallback to base64
+                            data = JSON.parse(atob(encodedData));
+                        }
+                    } else {
+                        data = JSON.parse(atob(encodedData));
+                    }
+                    
+                    let formationData;
+                    // Handle both old and new formats
+                    if (Array.isArray(data)) {
+                        // New compact format: [homeFormation, awayFormation, homeNames?, awayNames?]
+                        formationData = {
+                            myFormation: data[0] || '221',
+                            oppFormation: data[1] || '221',
+                            myTeamNames: data[2] || [],
+                            oppTeamNames: data[3] || []
+                        };
+                    } else {
+                        // Old format compatibility
+                        formationData = data;
+                    }
                     
                     if (document.getElementById('myTeamFormation')) {
                         document.getElementById('myTeamFormation').value = formationData.myFormation || '221';
@@ -608,30 +648,13 @@
                             document.querySelectorAll('.my-team .player-name').forEach((nameEl, index) => {
                                 if (formationData.myTeamNames[index]) {
                                     nameEl.textContent = formationData.myTeamNames[index];
-                                    const playerId = nameEl.parentElement.getAttribute('data-player-id');
-                                    const input = document.querySelector(`input[data-player-id="${playerId}"]`);
-                                    if (input) {
-                                        input.value = formationData.myTeamNames[index];
-                                    }
-                                }
-                            });
-                        }
-                        
-                        if (formationData.oppTeamNames) {
-                            document.querySelectorAll('.opp-team .player-name').forEach((nameEl, index) => {
-                                if (formationData.oppTeamNames[index]) {
-                                    nameEl.textContent = formationData.oppTeamNames[index];
-                                    const playerId = nameEl.parentElement.getAttribute('data-player-id');
-                                    const input = document.querySelector(`input[data-player-id="${playerId}"]`);
-                                    if (input) {
-                                        input.value = formationData.oppTeamNames[index];
-                                    }
                                 }
                             });
                         }
                     }, 100);
                 } catch (e) {
                     console.error('Error loading formation from URL:', e);
+                    loadFormation();
                 }
             }
         }
@@ -640,7 +663,11 @@
             initializePitch(); // Load common pitch markings
             loadFromURL();
             loadNamesFromURL(); // Load names from URL parameter
-            if (!window.location.hash.startsWith('#formation=')) {
+            
+            const urlParams = new URLSearchParams(window.location.search);
+            const queryF = urlParams.get('f');
+            
+            if (!window.location.hash.startsWith('#formation=') && !window.location.hash.startsWith('#f=') && !queryF) {
                 loadFormation();
             }
             initializePlayerNames(); // Initialize global player names
