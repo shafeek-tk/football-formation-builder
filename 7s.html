@@ -150,6 +150,12 @@
             <div class="formation-group">
                 <span class="formation-label">Home:</span>
                 <select id="myTeamFormation" onchange="loadFormation()" class="formation-select">
+                    <option value="231">2-3-1</option>
+                    <option value="321">3-2-1</option>
+                    <option value="132">1-3-2</option>
+                    <option value="222">2-2-2</option>
+                    <option value="141">1-4-1</option>
+                    <option value="312">3-1-2</option>
                     <option value="322">3-2-2</option>
                     <option value="331">3-3-1</option>
                     <option value="313">3-1-3</option>
@@ -160,6 +166,12 @@
             <div class="formation-group">
                 <span class="formation-label">Away:</span>
                 <select id="oppTeamFormation" onchange="changeAwayFormation()" class="formation-select">
+                    <option value="231">2-3-1</option>
+                    <option value="321">3-2-1</option>
+                    <option value="132">1-3-2</option>
+                    <option value="222">2-2-2</option>
+                    <option value="141">1-4-1</option>
+                    <option value="312">3-1-2</option>
                     <option value="322">3-2-2</option>
                     <option value="331">3-3-1</option>
                     <option value="313">3-1-3</option>
@@ -632,10 +644,41 @@
 
         function loadFromURL() {
             const hash = window.location.hash;
-            if (hash.startsWith('#formation=')) {
+            if (hash.startsWith('#formation=') || hash.startsWith('#f=')) {
                 try {
-                    const encodedData = hash.substring(11); // Remove '#formation='
-                    const formationData = JSON.parse(atob(encodedData));
+                    const encodedData = hash.startsWith('#f=') ? hash.substring(3) : hash.substring(11);
+                    let data;
+                    
+                    // Try LZ-string decompression
+                    if (typeof LZString !== 'undefined') {
+                        try {
+                            const decompressed = LZString.decompressFromEncodedURIComponent(encodedData);
+                            if (!decompressed) {
+                                throw new Error('LZ URI decompression failed');
+                            }
+                            data = JSON.parse(decompressed);
+                        } catch (e) {
+                            // Fallback to base64
+                            data = JSON.parse(atob(encodedData));
+                        }
+                    } else {
+                        data = JSON.parse(atob(encodedData));
+                    }
+                    
+                    let formationData;
+                    // Handle both old and new formats
+                    if (Array.isArray(data)) {
+                        // New compact format: [homeFormation, awayFormation, homeNames?, awayNames?]
+                        formationData = {
+                            myFormation: data[0] || '231',
+                            oppFormation: data[1] || '231',
+                            myTeamNames: data[2] || [],
+                            oppTeamNames: data[3] || []
+                        };
+                    } else {
+                        // Old format compatibility
+                        formationData = data;
+                    }
                     
                     // Set formations
                     if (document.getElementById('myTeamFormation')) {
@@ -648,38 +691,9 @@
                     // Load the formation first
                     loadFormation();
                     
-                    // Then set player names after a short delay to ensure players are created
-                    setTimeout(() => {
-                        if (formationData.myTeamNames) {
-                            document.querySelectorAll('.my-team .player-name').forEach((nameEl, index) => {
-                                if (formationData.myTeamNames[index]) {
-                                    nameEl.textContent = formationData.myTeamNames[index];
-                                    // Update corresponding input
-                                    const playerId = nameEl.parentElement.getAttribute('data-player-id');
-                                    const input = document.querySelector(`input[data-player-id="${playerId}"]`);
-                                    if (input) {
-                                        input.value = formationData.myTeamNames[index];
-                                    }
-                                }
-                            });
-                        }
-                        
-                        if (formationData.oppTeamNames) {
-                            document.querySelectorAll('.opp-team .player-name').forEach((nameEl, index) => {
-                                if (formationData.oppTeamNames[index]) {
-                                    nameEl.textContent = formationData.oppTeamNames[index];
-                                    // Update corresponding input
-                                    const playerId = nameEl.parentElement.getAttribute('data-player-id');
-                                    const input = document.querySelector(`input[data-player-id="${playerId}"]`);
-                                    if (input) {
-                                        input.value = formationData.oppTeamNames[index];
-                                    }
-                                }
-                            });
-                        }
-                    }, 100);
                 } catch (e) {
                     console.error('Error loading formation from URL:', e);
+                    loadFormation();
                 }
             }
         }
