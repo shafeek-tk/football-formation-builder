@@ -669,28 +669,11 @@
             
             const url = (window.location.origin !== 'null' ? window.location.origin : 'https://easyfootballlineup.com') + window.location.pathname + '#f=' + finalData;
             
-            // If URL is still long (>100 chars), try TinyURL
-            if (url.length > 100) {
-                shortenWithTinyURL(url);
-            } else {
-                shareURL(url);
-            }
+            shareURL(url);
         }
 
-        async function shortenWithTinyURL(longUrl) {
-            try {
-                const response = await fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(longUrl)}`);
-                const shortUrl = await response.text();
-                
-                if (shortUrl.startsWith('https://tinyurl.com/')) {
-                    shareURL(shortUrl);
-                } else {
-                    shareURL(longUrl); // Fallback
-                }
-            } catch (error) {
-                shareURL(longUrl); // Fallback on error
-            }
-        }
+
+
 
         function shareURL(url) {
             // Check if mobile device
