@@ -596,7 +596,7 @@
                 const a = chars.indexOf(cleaned[i]);
                 const b = chars.indexOf(cleaned[i + 1] || '0');
                 if (a >= 0 && b >= 0) {
-                    result += String.fromCharCode(a + b * 36);
+                    result += String.fromCharCode(a * 36 + b);
                 }
             }
             return result;
