@@ -581,7 +581,7 @@
             let result = '';
             for (let i = 0; i < str.length; i++) {
                 const code = str.charCodeAt(i);
-                result += chars[code % 36] + chars[Math.floor(code / 36) % 36];
+                result += chars[Math.floor(code / 36)] + chars[code % 36];
             }
             // Remove any non-alphanumeric characters and convert to uppercase
             return result.replace(/[^A-Z0-9]/g, '').toUpperCase();
