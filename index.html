@@ -561,13 +561,12 @@
             
             const encodedData = btoa(JSON.stringify(data));
             
-            // Ultra-compact encoding using custom base62
+            // Ultra-compact encoding using LZ-string URI encoding
             let finalData;
             if (typeof LZString !== 'undefined') {
-                const compressed = LZString.compress(JSON.stringify(data));
-                finalData = toBase36(compressed);
+                finalData = LZString.compressToEncodedURIComponent(JSON.stringify(data));
             } else {
-                finalData = toBase36(JSON.stringify(data));
+                finalData = btoa(JSON.stringify(data));
             }
             
             const url = (window.location.origin !== 'null' ? window.location.origin : 'https://easyfootballlineup.com') + window.location.pathname + '#f=' + finalData;
@@ -581,22 +580,23 @@
             let result = '';
             for (let i = 0; i < str.length; i++) {
                 const code = str.charCodeAt(i);
-                result += chars[Math.floor(code / 36)] + chars[code % 36];
+                // Convert to base 36, pad with leading zero if needed
+                const encoded = code.toString(36).toUpperCase().padStart(2, '0');
+                result += encoded;
             }
-            // Remove any non-alphanumeric characters and convert to uppercase
-            return result.replace(/[^A-Z0-9]/g, '').toUpperCase();
+            return result;
         }
 
         function fromBase36(str) {
-            const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-            // Clean input - only uppercase letters and numbers
             const cleaned = str.replace(/[^A-Z0-9]/g, '').toUpperCase();
             let result = '';
             for (let i = 0; i < cleaned.length; i += 2) {
-                const a = chars.indexOf(cleaned[i]);
-                const b = chars.indexOf(cleaned[i + 1] || '0');
-                if (a >= 0 && b >= 0) {
-                    result += String.fromCharCode(a * 36 + b);
+                const pair = cleaned.substr(i, 2);
+                if (pair.length === 2) {
+                    const code = parseInt(pair, 36);
+                    if (!isNaN(code)) {
+                        result += String.fromCharCode(code);
+                    }
                 }
             }
             return result;
