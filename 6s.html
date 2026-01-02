@@ -148,7 +148,7 @@
         <div class="formation-container">
             <div class="formation-group">
                 <span class="formation-label">Home:</span>
-                <select id="myTeamFormation" onchange="changeFormation()" class="formation-select">
+                <select id="myTeamFormation" onchange="loadFormation()" class="formation-select">
                     <option value="221">2-2-1</option>
                     <option value="212">2-1-2</option>
                     <option value="311">3-1-1</option>
@@ -414,12 +414,8 @@
             });
         }
 
-        function changeFormation() {
-            loadFormation();
-        }
-
         function changeAwayFormation() {
-            changeFormation();
+            loadFormation();
         }
 
         function shareFormation() {
@@ -497,21 +493,6 @@
                 }
             }
             return result;
-        }
-
-        async function shortenWithTinyURL(longUrl) {
-            try {
-                const response = await fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(longUrl)}`);
-                const shortUrl = await response.text();
-                
-                if (shortUrl.startsWith('https://tinyurl.com/')) {
-                    shareURL(shortUrl);
-                } else {
-                    shareURL(longUrl);
-                }
-            } catch (error) {
-                shareURL(longUrl);
-            }
         }
 
         function shareURL(url) {
@@ -597,10 +578,15 @@
         }
 
         function downloadCanvas(canvas, filename) {
-            const link = document.createElement('a');
-            link.download = filename;
-            link.href = canvas.toDataURL();
-            link.click();
+            try {
+                const link = document.createElement('a');
+                link.download = filename;
+                link.href = canvas.toDataURL();
+                link.click();
+            } catch (error) {
+                console.error('Download failed:', error);
+                alert('Download failed. Please use a web server (not file://) to enable image downloads.');
+            }
         }
 
         function loadFromURL() {

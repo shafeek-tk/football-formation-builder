@@ -461,10 +461,6 @@
                     oppTeamIndex++;
                 }
             });
-            
-            // Update input labels with positions
-            updateInputLabels('myTeamInputs', F, 'My Team');
-            updateInputLabels('oppTeamInputs', O, 'Opposition');
         }
 
         function createPlayerInputs(containerId, formation, teamName) {
@@ -516,29 +512,6 @@
                     });
                     
                     container.appendChild(label);
-                    playerCount++;
-                });
-            });
-        }
-
-        function updateInputLabels(containerId, formation, teamName) {
-            const container = document.getElementById(containerId);
-            if (!container) return;
-            
-            const inputs = container.querySelectorAll('.player-input');
-            let playerCount = 0;
-            
-            formation.forEach((layer, layerIndex) => {
-                layer.forEach((x, playerIndex) => {
-                    const position = getPlayerPosition(layerIndex, playerIndex, formation.length, layer.length);
-                    const playerNumber = playerCount + 1;
-                    const input = inputs[playerCount];
-                    if (input) {
-                        const label = input.parentElement.querySelector('span');
-                        if (label) {
-                            label.innerHTML = `#${playerNumber} <span class="input-position">${position}</span>`;
-                        }
-                    }
                     playerCount++;
                 });
             });
@@ -795,15 +768,15 @@
                                     files: [file]
                                 }).catch(() => {
                                     // Fallback to download if share fails
-                                    downloadCanvas(canvas);
+                                    downloadCanvas(canvas, 'football-formation-11v11.png');
                                 });
                             } else {
-                                downloadCanvas(canvas);
+                                downloadCanvas(canvas, 'football-formation-11v11.png');
                             }
                         });
                     } else {
                         // Desktop: Download image
-                        downloadCanvas(canvas);
+                        downloadCanvas(canvas, 'football-formation-11v11.png');
                     }
                 });
             } else {
@@ -817,11 +790,16 @@
             }
         }
 
-        function downloadCanvas(canvas) {
-            const link = document.createElement('a');
-            link.download = 'football-formation.png';
-            link.href = canvas.toDataURL();
-            link.click();
+        function downloadCanvas(canvas, filename) {
+            try {
+                const link = document.createElement('a');
+                link.download = filename || 'football-formation.png';
+                link.href = canvas.toDataURL();
+                link.click();
+            } catch (error) {
+                console.error('Download failed:', error);
+                alert('Download failed. Please use a web server (not file://) to enable image downloads.');
+            }
         }
 
         // Initialize
