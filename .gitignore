@@ -3,3 +3,12 @@ package.json
 package-lock.json
 *.log
 .DS_Store
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.bmp
+*.tiff
+*.webp
+Screenshot*
+WhatsApp*
