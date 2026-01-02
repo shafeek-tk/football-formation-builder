@@ -656,6 +656,7 @@
                             if (!decompressed) {
                                 throw new Error('LZ decompression failed');
                             }
+                            console.log('Base36+LZ decompressed:', decompressed.substring(0, 100) + '...');
                             data = JSON.parse(decompressed);
                         } catch (e) {
                             console.log('Base36+LZ failed, trying old LZ format:', e.message);
@@ -665,11 +666,55 @@
                                 if (!decompressed) {
                                     throw new Error('LZ URI decompression failed');
                                 }
+                                console.log('Old LZ decompressed:', decompressed.substring(0, 100) + '...');
                                 data = JSON.parse(decompressed);
                             } catch (e2) {
                                 console.log('Old LZ failed, trying base64:', e2.message);
                                 // Fallback to base64
-                                data = JSON.parse(atob(encodedData));
+                                const decoded64 = atob(encodedData);
+                                console.log('Base64 decoded:', decoded64.substring(0, 100) + '...');
+                                // Try to clean the JSON if it has extra characters
+                                let cleanedJson = decoded64.trim();
+                                // Find the end of the first complete JSON object/array
+                                let braceCount = 0;
+                                let bracketCount = 0;
+                                let inString = false;
+                                let escaped = false;
+                                let jsonEnd = -1;
+                                
+                                for (let i = 0; i < cleanedJson.length; i++) {
+                                    const char = cleanedJson[i];
+                                    if (escaped) {
+                                        escaped = false;
+                                        continue;
+                                    }
+                                    if (char === '\\') {
+                                        escaped = true;
+                                        continue;
+                                    }
+                                    if (char === '"') {
+                                        inString = !inString;
+                                        continue;
+                                    }
+                                    if (inString) continue;
+                                    
+                                    if (char === '{') braceCount++;
+                                    else if (char === '}') braceCount--;
+                                    else if (char === '[') bracketCount++;
+                                    else if (char === ']') bracketCount--;
+                                    
+                                    if (braceCount === 0 && bracketCount === 0 && (char === '}' || char === ']')) {
+                                        jsonEnd = i + 1;
+                                        break;
+                                    }
+                                }
+                                
+                                if (jsonEnd > 0) {
+                                    cleanedJson = cleanedJson.substring(0, jsonEnd);
+                                    console.log('Cleaned JSON:', cleanedJson);
+                                }
+                                
+                                data = JSON.parse(cleanedJson);
                             }
                         }
                     } else {
