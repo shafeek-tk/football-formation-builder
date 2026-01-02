@@ -3,12 +3,7 @@ package.json
 package-lock.json
 *.log
 .DS_Store
-*.png
-*.jpg
-*.jpeg
-*.gif
-*.bmp
-*.tiff
-*.webp
 Screenshot*
 WhatsApp*
+!blue-jersey.png
+!red-jersey.png
