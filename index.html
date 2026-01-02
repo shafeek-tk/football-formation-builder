@@ -653,13 +653,21 @@
                         try {
                             const decoded = fromBase36(encodedData);
                             const decompressed = LZString.decompress(decoded);
+                            if (!decompressed) {
+                                throw new Error('LZ decompression failed');
+                            }
                             data = JSON.parse(decompressed);
                         } catch (e) {
+                            console.log('Base36+LZ failed, trying old LZ format:', e.message);
                             // Fallback to old LZ-string format
                             try {
                                 const decompressed = LZString.decompressFromEncodedURIComponent(encodedData);
+                                if (!decompressed) {
+                                    throw new Error('LZ URI decompression failed');
+                                }
                                 data = JSON.parse(decompressed);
                             } catch (e2) {
+                                console.log('Old LZ failed, trying base64:', e2.message);
                                 // Fallback to base64
                                 data = JSON.parse(atob(encodedData));
                             }
