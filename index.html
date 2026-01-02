@@ -21,6 +21,7 @@
     <!-- Common Pitch Styles -->
     <link rel="stylesheet" href="pitch-styles.css?v=8&t=1735781500">
     <script src="pitch-common.js?v=8&t=1735781500"></script>
+    <script src="player-names.js"></script>
     
     <!-- LZ-string compression library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.4.4/lz-string.min.js"></script>
@@ -533,93 +534,8 @@
             });
         }
 
-        function updatePlayerName(playerId, newName) {
-            const playerElement = document.querySelector(`[data-player-id="${playerId}"]`);
-            if (playerElement) {
-                const oldNameElement = playerElement.querySelector('.player-name');
-                if (oldNameElement) {
-                    // Just update the text content - don't recreate the element
-                    oldNameElement.textContent = newName.toUpperCase();
-                }
-            }
-        }
-
         function loadAwayFormation() {
             loadFormation();
-        }
-
-        function editPlayerName(element) {
-            const currentName = element.textContent;
-            const playerId = element.getAttribute('data-player-id') || element.parentElement.getAttribute('data-player-id');
-            const input = document.createElement('input');
-            input.className = 'player-name-input';
-            input.value = currentName;
-            
-            input.onblur = () => {
-                element.textContent = (input.value || currentName).toUpperCase();
-                element.style.display = 'block';
-                input.remove();
-                
-                // Update corresponding input field
-                if (playerId) {
-                    const inputField = document.querySelector(`input[data-player-id="${playerId}"]`);
-                    if (inputField) {
-                        inputField.value = (input.value || currentName).toUpperCase();
-                    }
-                }
-            };
-            
-            input.onkeydown = (e) => {
-                if (e.key === 'Enter') {
-                    input.blur();
-                } else if (e.key === 'Tab' && playerId) {
-                    e.preventDefault();
-                    input.blur();
-                    
-                    // Find next player in the same team to edit
-                    const currentTeam = playerId.split('-')[0] + '-' + playerId.split('-')[1];
-                    const allTeamPlayers = document.querySelectorAll(`[data-player-id^="${currentTeam}"] .player-name`);
-                    const currentIndex = Array.from(allTeamPlayers).indexOf(element);
-                    const nextIndex = (currentIndex + 1) % allTeamPlayers.length;
-                    
-                    // Edit the next player
-                    setTimeout(() => {
-                        editPlayerName(allTeamPlayers[nextIndex]);
-                    }, 50);
-                }
-            };
-            
-            element.style.display = 'none';
-            element.parentNode.appendChild(input);
-            input.focus();
-            input.select();
-        }
-
-        function switchMode(page) {
-            // Track mode switch
-            if (typeof gtag !== 'undefined') {
-                const targetMode = page.includes('7s') ? '7v7' : page.includes('6s') ? '6v6' : '11v11';
-                gtag('event', 'switch_mode', {
-                    'event_category': 'navigation',
-                    'event_label': targetMode
-                });
-            }
-            
-            // Save current names to localStorage for this mode
-            const currentMode = window.location.pathname.includes('7s') ? '7v7' : 
-                               window.location.pathname.includes('6s') ? '6v6' : '11v11';
-            const playerNames = {};
-            document.querySelectorAll('.player-input').forEach(input => {
-                const playerId = input.getAttribute('data-player-id');
-                if (input.value.trim()) {
-                    playerNames[playerId] = input.value.trim();
-                }
-            });
-            localStorage.setItem(`footballLineup_${currentMode}`, JSON.stringify(playerNames));
-            
-            // Create URL with names for immediate transfer
-            const encodedNames = btoa(JSON.stringify(playerNames));
-            window.location.href = `${page}?names=${encodedNames}`;
         }
 
         function shareFormation() {
@@ -906,6 +822,7 @@
             if (!window.location.hash.startsWith('#formation=') && !window.location.hash.startsWith('#f=')) {
                 loadFormation(); // Only load default if no URL data
             }
+            initializePlayerNames(); // Initialize global player names
         });
 
         function loadNamesFromURL() {
