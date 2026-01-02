@@ -17,6 +17,10 @@
     <!-- Favicon -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚽</text></svg>">
     
+    <!-- Common Pitch Styles -->
+    <link rel="stylesheet" href="pitch-styles.css?v=4&t=1735776810">
+    <script src="pitch-common.js?v=4&t=1735776810"></script>
+    
     <!-- Open Graph meta tags for social media previews -->
     <meta property="og:title" content="Easy Football Lineup - Free Soccer Formation Builder">
     <meta property="og:description" content="Create professional football formations and soccer lineups online. Free tactical board for coaches and players. Support for 11v11, 7v7, and 6v6 formats.">
@@ -71,41 +75,38 @@
     
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
-        body{font-family:system-ui,sans-serif;background:#1a1a1a;color:#fff;padding:10px}
+        body{font-family:system-ui,sans-serif;background:#1a1a1a;color:#fff;padding:10px;letter-spacing:0.5px}
         
         .header{text-align:center;margin-bottom:20px}
-        .header h1{font-size:24px;margin-bottom:15px}
+        .header h1{font-size:24px;margin-bottom:15px;letter-spacing:2px}
         .controls{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:20px}
         .controls select,.controls button{padding:8px 12px;background:#333;color:#fff;border:1px solid #555;border-radius:4px;font-size:14px}
         .controls button{background:#007acc;cursor:pointer}
         .controls button:hover{background:#005a99}
         
-        .field-container{display:flex;justify-content:center;margin-bottom:20px}
-        .field{width:min(90vw,400px);height:min(80vh,600px);background:#0f5132;border:2px solid #fff;position:relative;border-radius:8px}
-        .field::before{content:'';position:absolute;top:50%;left:0;right:0;height:2px;background:#fff}
-        .field::after{content:'';position:absolute;top:50%;left:50%;width:80px;height:80px;border:2px solid #fff;border-radius:50%;transform:translate(-50%,-50%)}
+        .formation-container{display:flex;gap:15px;justify-content:center;margin-bottom:30px;flex-wrap:wrap}
+        .formation-group{display:flex;align-items:center;gap:10px}
+        .formation-label{font-size:14px;color:#aaa;font-weight:500;letter-spacing:0.5px;white-space:nowrap}
+        .formation-select{padding:10px 35px 10px 14px;background:#333;color:#fff;border:1px solid #555;border-radius:6px;font-family:'Oswald',sans-serif;font-size:15px;font-weight:500;cursor:pointer;transition:all 0.2s ease;appearance:none;background-image:url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%23aaa' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;min-width:120px}
+        .formation-select:hover{border-color:#007acc;background-color:#3a3a3a}
+        .formation-select:focus{outline:none;border-color:#007acc;box-shadow:0 0 0 2px rgba(0,122,204,0.2)}
+        .formation-select option{background:#2a2a2a;color:#fff;padding:10px}
         
-        .penalty-area{position:absolute;width:30%;height:20%;left:50%;transform:translateX(-50%);border:2px solid #fff}
-        .penalty-area.top{top:0}
-        .penalty-area.bottom{bottom:0}
-        .goal-area{position:absolute;width:15%;height:8%;left:50%;transform:translateX(-50%);border:2px solid #fff}
-        .goal-area.top{top:0}
-        .goal-area.bottom{bottom:0}
-        
-        .player{position:absolute;transform:translate(-50%,-50%);text-align:center;cursor:pointer}
+        .player{position:absolute;transform:translate(-50%,-50%);text-align:center;cursor:pointer;z-index:10}
         .player-icon{width:min(6vw,24px);height:min(6vw,24px);margin:0 auto;background-size:contain;background-repeat:no-repeat;background-position:center}
         .my-team .player-icon{background-image:url('blue-jersey.png')}
         .opp-team .player-icon{background-image:url('red-jersey.png')}
         .player-number{position:absolute;top:30%;left:50%;transform:translate(-50%,-50%);font-size:min(1.8vw,7px);font-weight:bold;color:#fff;text-shadow:1px 1px 1px rgba(0,0,0,0.8)}
-        .player-name{font-size:min(2.2vw,9px);margin-top:0px;padding:2px 5px;background:linear-gradient(135deg,rgba(0,0,0,0.9),rgba(0,0,0,0.7));border-radius:4px;color:#fff;font-weight:bold;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border:1px solid rgba(255,255,255,0.2);box-shadow:0 1px 3px rgba(0,0,0,0.5);text-shadow:1px 1px 2px rgba(0,0,0,0.8);transition:all 0.2s ease;min-height:16px;display:block}
-        .player-name:hover{background:linear-gradient(135deg,rgba(0,0,0,0.95),rgba(0,0,0,0.8));border-color:rgba(255,255,255,0.4);box-shadow:0 2px 5px rgba(0,0,0,0.7);transform:scale(1.05)}
+        .player-name{font-size:min(2.2vw,9px);margin-top:0px;padding:2px 5px;background:linear-gradient(135deg,rgba(0,0,0,0.9),rgba(0,0,0,0.7));border-radius:4px;color:#fff;font-weight:bold;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border:1px solid rgba(255,255,255,0.2);box-shadow:0 1px 3px rgba(0,0,0,0.5);text-shadow:1px 1px 2px rgba(0,0,0,0.8);transition:all 0.2s ease;min-height:16px;display:block;cursor:pointer}
+        .player-name:hover{background:linear-gradient(135deg,rgba(0,0,0,0.95),rgba(0,0,0,0.8));border-color:rgba(255,255,255,0.4);box-shadow:0 2px 5px rgba(0,0,0,0.7);transform:scale(1.05);border-color:#4CAF50}
+        .player-name:hover::after{content:" ✏️";font-size:8px;opacity:0.8}
         .player-name-input{font-size:10px;margin-top:2px;padding:1px 3px;background:#fff;border-radius:2px;border:1px solid #007acc;color:#000;width:40px;text-align:center}
         
         .footer{position:fixed;bottom:5px;right:5px;font-size:10px;color:#aaa;opacity:0.8}
         .footer a{color:#aaa;text-decoration:none}
         
-        .mode-toggle{position:fixed;top:20px;right:20px;z-index:1000;display:flex;gap:5px}
-        .mode-btn{padding:6px 12px;background:#007acc;color:#fff;border:none;border-radius:20px;font-size:12px;font-weight:bold;box-shadow:0 2px 8px rgba(0,0,0,0.3);transition:all 0.2s ease;cursor:pointer}
+        .mode-toggle{position:fixed;top:20px;right:20px;z-index:1000;display:flex;gap:8px}
+        .mode-btn{padding:12px 24px;background:#007acc;color:#fff;border:none;border-radius:8px;font-size:16px;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,0.3);transition:all 0.2s ease;cursor:pointer;min-width:80px;letter-spacing:1px}
         .mode-btn:hover{background:#005a99;transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,0.4)}
         .mode-btn.active{background:#28a745;box-shadow:0 2px 8px rgba(40,167,69,0.4)}
         
@@ -121,20 +122,78 @@
         @media (max-width:768px){
             .controls{flex-direction:column;align-items:center}
             .controls select,.controls button{width:200px}
-            .field{width:95vw;height:70vh}
             .player-controls{grid-template-columns:1fr;gap:15px}
             .mode-toggle{position:relative;top:auto;right:auto;margin-top:15px;justify-content:center}
-            .mode-btn{padding:6px 12px;font-size:12px}
+            .mode-btn{padding:10px 20px;font-size:14px}
+        }
+        
+        #loadingIndicator span {
+            animation: bounce 1s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        
+        .field:hover .player-name {
+            border-color: #4CAF50 !important;
+            box-shadow: 0 0 8px rgba(76, 175, 80, 0.4) !important;
+        }
+        
+        .field:hover .player-name::after {
+            content: " ✏️";
+            font-size: 8px;
+            opacity: 0.8;
         }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>Easy Football Lineup</h1>
+        <h1>EASY FOOTBALL LINEUP</h1>
         <p style="color:#ccc;font-size:16px;margin-bottom:15px;max-width:600px;margin-left:auto;margin-right:auto;">Build your team formation and get an instant shareable link. No saving, no accounts - just share.</p>
+        <div id="loadingIndicator" style="display:none;color:#4CAF50;font-size:14px;margin:10px 0;">
+            <span>⚽</span> Loading formation...
+        </div>
         <div class="controls">
-            <button onclick="shareFormation()">Share</button>
-            <button onclick="downloadImage()">Download</button>
+            <button onclick="shareFormation()">SHARE FORMATION</button>
+            <button onclick="downloadImage()">DOWNLOAD IMAGE</button>
+        </div>
+        <div class="formation-container">
+            <div class="formation-group">
+                <span class="formation-label">Home:</span>
+                <select id="myTeamFormation" onchange="loadFormation()" class="formation-select">
+                    <option value="442">4-4-2</option>
+                    <option value="433">4-3-3</option>
+                    <option value="352">3-5-2</option>
+                    <option value="451">4-5-1</option>
+                    <option value="343">3-4-3</option>
+                    <option value="532">5-3-2</option>
+                    <option value="541">5-4-1</option>
+                    <option value="4231">4-2-3-1</option>
+                    <option value="4141">4-1-4-1</option>
+                    <option value="4321">4-3-2-1</option>
+                    <option value="3412">3-4-1-2</option>
+                    <option value="4312">4-3-1-2</option>
+                </select>
+            </div>
+            <div class="formation-group">
+                <span class="formation-label">Away:</span>
+                <select id="awayTeamFormation" onchange="loadAwayFormation()" class="formation-select">
+                    <option value="442">4-4-2</option>
+                    <option value="433">4-3-3</option>
+                    <option value="352">3-5-2</option>
+                    <option value="451">4-5-1</option>
+                    <option value="343">3-4-3</option>
+                    <option value="532">5-3-2</option>
+                    <option value="541">5-4-1</option>
+                    <option value="4231">4-2-3-1</option>
+                    <option value="4141">4-1-4-1</option>
+                    <option value="4321">4-3-2-1</option>
+                    <option value="3412">3-4-1-2</option>
+                    <option value="4312">4-3-1-2</option>
+                </select>
+            </div>
         </div>
         <div class="mode-toggle">
             <button class="mode-btn active">11v11</button>
@@ -145,47 +204,11 @@
     
     <div class="field-container">
         <div class="field" id="field">
-            <div class="penalty-area top"></div>
-            <div class="goal-area top"></div>
-            <div class="penalty-area bottom"></div>
-            <div class="goal-area bottom"></div>
         </div>
     </div>
     
-    <div class="player-controls">
-        <div class="team-section">
-            <h3>Home Team (Blue)</h3>
-            <select id="myTeamFormation" onchange="loadFormation()">
-                <option value="442">4-4-2</option>
-                <option value="433">4-3-3</option>
-                <option value="352">3-5-2</option>
-                <option value="451">4-5-1</option>
-                <option value="4231">4-2-3-1</option>
-                <option value="4123">4-1-2-3</option>
-                <option value="4213">4-2-1-3</option>
-                <option value="343">3-4-3</option>
-                <option value="532">5-3-2</option>
-                <option value="541">5-4-1</option>
-            </select>
-            <div id="myTeamInputs"></div>
-        </div>
-        
-        <div class="team-section">
-            <h3>Away Team (Red)</h3>
-            <select id="oppTeamFormation" onchange="loadFormation()">
-                <option value="442">4-4-2</option>
-                <option value="433">4-3-3</option>
-                <option value="352">3-5-2</option>
-                <option value="451">4-5-1</option>
-                <option value="4231">4-2-3-1</option>
-                <option value="4123">4-1-2-3</option>
-                <option value="4213">4-2-1-3</option>
-                <option value="343">3-4-3</option>
-                <option value="532">5-3-2</option>
-                <option value="541">5-4-1</option>
-            </select>
-            <div id="oppTeamInputs"></div>
-        </div>
+    <div style="text-align:center;color:#ccc;font-size:14px;margin:15px 0;background:rgba(0,0,0,0.3);padding:8px;border-radius:6px;max-width:300px;margin:15px auto;letter-spacing:0.5px;">
+        💡 Click on player names to edit them directly
     </div>
     
     <div style="text-align:center;padding:20px;background:#2a2a2a;margin:20px auto;max-width:800px;border-radius:8px;">
@@ -307,7 +330,7 @@
             return baseY;
         }
 
-        function createPlayer(x, y, position, team, index) {
+        function createPlayer(x, y, position, team, index, sequentialIndex = null) {
             const player = document.createElement('div');
             player.className = `player ${team}`;
             player.style.left = x + '%';
@@ -315,7 +338,8 @@
             const playerId = `${team}-${index}`;
             const playerNumber = Math.floor(index/10) + (index%10) + 1;
             const teamPrefix = team === 'my-team' ? 'MT' : 'OPP';
-            const playerName = team === 'my-team' ? `${teamPrefix}${playerNumber}` : '';
+            const bestPlayers = ['NEUER', 'MBAPPE', 'RUDIGER', 'RONALDO', 'PEDRI', 'MODRIC', 'YAMAL', 'DE BRUYNE', 'MESSI', 'HAALAND', 'SALAH'];
+            const playerName = team === 'my-team' ? (bestPlayers[sequentialIndex !== null ? sequentialIndex : index] || `Player ${playerNumber}`) : '';
             player.setAttribute('data-player-id', playerId);
             player.innerHTML = `
                 <div class="player-icon">
@@ -331,7 +355,7 @@
             
             // Use individual team formations
             const myFormation = document.getElementById('myTeamFormation')?.value || '442';
-            const oppFormation = document.getElementById('oppTeamFormation')?.value || '442';
+            const oppFormation = document.getElementById('awayTeamFormation')?.value || '442';
             
             // Save existing input field values before clearing - organize by team and position
             const existingInputValues = {};
@@ -363,12 +387,14 @@
             
             // Create field players first
             // My team
+            let playerCounter = 0;
             F.forEach((layer, layerIndex) => {
                 layer.forEach((x, playerIndex) => {
                     const y = getPlayerY(layerIndex, playerIndex, F.length, layer.length, true);
                     const position = getPlayerPosition(layerIndex, playerIndex, F.length, layer.length);
-                    const player = createPlayer(x, y, position, 'my-team', layerIndex * 10 + playerIndex);
+                    const player = createPlayer(x, y, position, 'my-team', layerIndex * 10 + playerIndex, playerCounter);
                     field.appendChild(player);
+                    playerCounter++;
                 });
             });
             
@@ -381,10 +407,6 @@
                     field.appendChild(player);
                 });
             });
-            
-            // Create input fields AFTER field players exist
-            createPlayerInputs('myTeamInputs', F, 'Home Team');
-            createPlayerInputs('oppTeamInputs', O, 'Away Team');
             
             // Restore input field values and sync to field players
             // First try exact ID matches
@@ -401,7 +423,7 @@
             let myTeamIndex = 0;
             myTeamInputs.forEach(input => {
                 // Fill empty inputs OR inputs with default values (MT1, MT2, etc.)
-                if ((!input.value.trim() || input.value.startsWith('MT')) && myTeamIndex < myTeamNames.length) {
+                if ((!input.value.trim() || input.value.startsWith('MT') || input.value.startsWith('Player')) && myTeamIndex < myTeamNames.length) {
                     input.value = myTeamNames[myTeamIndex];
                     const playerId = input.getAttribute('data-player-id');
                     updatePlayerName(playerId, myTeamNames[myTeamIndex]);
@@ -413,7 +435,7 @@
             let oppTeamIndex = 0;
             oppTeamInputs.forEach(input => {
                 // Fill empty inputs OR inputs with default values (OPP1, OPP2, etc.)
-                if ((!input.value.trim() || input.value.startsWith('OPP')) && oppTeamIndex < oppTeamNames.length) {
+                if ((!input.value.trim() || input.value.startsWith('OPP') || input.value.startsWith('Player')) && oppTeamIndex < oppTeamNames.length) {
                     input.value = oppTeamNames[oppTeamIndex];
                     const playerId = input.getAttribute('data-player-id');
                     updatePlayerName(playerId, oppTeamNames[oppTeamIndex]);
@@ -437,10 +459,11 @@
                 layer.forEach((x, playerIndex) => {
                     const playerNumber = playerCount + 1;
                     const displayPrefix = teamName.toLowerCase().includes('home') ? 'MT' : 'OPP';
-                    const defaultValue = teamName.toLowerCase().includes('home') ? `${displayPrefix}${playerNumber}` : '';
+                    const bestPlayers = ['NEUER', 'MBAPPE', 'RUDIGER', 'RONALDO', 'PEDRI', 'MODRIC', 'YAMAL', 'DE BRUYNE', 'MESSI', 'HAALAND', 'SALAH'];
+                    const defaultValue = teamName.toLowerCase().includes('home') ? (bestPlayers[playerCount] || `Player ${playerNumber}`) : '';
                     const input = document.createElement('input');
                     input.className = 'player-input';
-                    input.placeholder = `${displayPrefix}${playerNumber}`;
+                    input.placeholder = bestPlayers[playerCount] || `Player ${playerNumber}`;
                     input.value = defaultValue;
                     const teamPrefix = teamName.toLowerCase().includes('home') ? 'my-team' : 'opp-team';
                     const playerId = `${teamPrefix}-${layerIndex * 10 + playerIndex}`;
@@ -508,9 +531,13 @@
                 const oldNameElement = playerElement.querySelector('.player-name');
                 if (oldNameElement) {
                     // Just update the text content - don't recreate the element
-                    oldNameElement.textContent = newName;
+                    oldNameElement.textContent = newName.toUpperCase();
                 }
             }
+        }
+
+        function loadAwayFormation() {
+            loadFormation();
         }
 
         function editPlayerName(element) {
@@ -521,7 +548,7 @@
             input.value = currentName;
             
             input.onblur = () => {
-                element.textContent = input.value || currentName;
+                element.textContent = (input.value || currentName).toUpperCase();
                 element.style.display = 'block';
                 input.remove();
                 
@@ -529,7 +556,7 @@
                 if (playerId) {
                     const inputField = document.querySelector(`input[data-player-id="${playerId}"]`);
                     if (inputField) {
-                        inputField.value = input.value || currentName;
+                        inputField.value = (input.value || currentName).toUpperCase();
                     }
                 }
             };
@@ -656,6 +683,10 @@
         function loadFromURL() {
             const hash = window.location.hash;
             if (hash.startsWith('#formation=')) {
+                // Show loading indicator
+                const loadingEl = document.getElementById('loadingIndicator');
+                if (loadingEl) loadingEl.style.display = 'block';
+                
                 try {
                     const encodedData = hash.substring(11); // Remove '#formation='
                     const formationData = JSON.parse(atob(encodedData));
@@ -700,9 +731,16 @@
                                 }
                             });
                         }
+                        
+                        // Hide loading indicator
+                        const loadingEl = document.getElementById('loadingIndicator');
+                        if (loadingEl) loadingEl.style.display = 'none';
                     }, 100);
                 } catch (e) {
                     console.error('Error loading formation from URL:', e);
+                    // Hide loading indicator on error
+                    const loadingEl = document.getElementById('loadingIndicator');
+                    if (loadingEl) loadingEl.style.display = 'none';
                 }
             }
         }
@@ -770,6 +808,7 @@
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
+            initializePitch(); // Load common pitch markings
             loadFromURL(); // Load from URL first if available
             loadNamesFromURL(); // Load names from URL parameter
             if (!window.location.hash.startsWith('#formation=')) {
