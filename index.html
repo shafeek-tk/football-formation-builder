@@ -383,16 +383,26 @@
             // Also save by sequential order for each team to handle formation changes better
             const myTeamNames = [];
             const oppTeamNames = [];
-            document.querySelectorAll('input[data-player-id^="my-team-"]').forEach(input => {
-                if (input.value.trim()) {
-                    myTeamNames.push(input.value);
+            document.querySelectorAll('.my-team .player-name').forEach(nameEl => {
+                const name = nameEl.textContent;
+                if (name && name.trim() && !name.startsWith('MT') && !name.startsWith('Player')) {
+                    myTeamNames.push(name);
                 }
             });
-            document.querySelectorAll('input[data-player-id^="opp-team-"]').forEach(input => {
-                if (input.value.trim()) {
-                    oppTeamNames.push(input.value);
+            document.querySelectorAll('.opp-team .player-name').forEach(nameEl => {
+                const name = nameEl.textContent;
+                if (name && name.trim() && !name.startsWith('OPP') && !name.startsWith('Player')) {
+                    oppTeamNames.push(name);
                 }
             });
+            
+            // Store names in localStorage for cross-format preservation
+            if (myTeamNames.length > 0) {
+                localStorage.setItem('homeTeamNames', JSON.stringify(myTeamNames));
+            }
+            if (oppTeamNames.length > 0) {
+                localStorage.setItem('awayTeamNames', JSON.stringify(oppTeamNames));
+            }
             
             field.querySelectorAll('.player').forEach(p => p.remove());
             
@@ -451,14 +461,13 @@
                 }
             });
             
-            const oppTeamInputs = document.querySelectorAll('input[data-player-id^="opp-team-"]');
+            const oppTeamElements = document.querySelectorAll('.opp-team .player-name');
             let oppTeamIndex = 0;
-            oppTeamInputs.forEach(input => {
-                // Fill empty inputs OR inputs with default values (OPP1, OPP2, etc.)
-                if ((!input.value.trim() || input.value.startsWith('OPP') || input.value.startsWith('Player')) && oppTeamIndex < oppTeamNames.length) {
-                    input.value = oppTeamNames[oppTeamIndex];
-                    const playerId = input.getAttribute('data-player-id');
-                    updatePlayerName(playerId, oppTeamNames[oppTeamIndex]);
+            oppTeamElements.forEach((nameEl, index) => {
+                const currentName = nameEl.textContent;
+                // Fill empty elements OR elements with default values (OPP1, OPP2, etc.)
+                if ((!currentName || currentName.startsWith('OPP') || currentName.startsWith('Player')) && oppTeamIndex < oppTeamNames.length) {
+                    nameEl.textContent = oppTeamNames[oppTeamIndex];
                     oppTeamIndex++;
                 }
             });
@@ -556,8 +565,15 @@
             
             // Ultra-compact format: only include non-empty arrays
             const data = [h, a];
-            if (hn.some(n => n)) data.push(hn);
-            if (an.some(n => n)) data.push(an);
+            const hasHomeNames = hn.some(n => n);
+            const hasAwayNames = an.some(n => n);
+            
+            if (hasHomeNames || hasAwayNames) {
+                data.push(hasHomeNames ? hn : []);
+                if (hasAwayNames) {
+                    data.push(an);
+                }
+            }
             
             const encodedData = btoa(JSON.stringify(data));
             
@@ -863,9 +879,43 @@
             loadNamesFromURL(); // Load names from URL parameter
             if (!window.location.hash.startsWith('#formation=') && !window.location.hash.startsWith('#f=')) {
                 loadFormation(); // Only load default if no URL data
+                restoreNamesFromStorage(); // Restore names from localStorage if no URL data
             }
             initializePlayerNames(); // Initialize global player names
         });
+
+        function restoreNamesFromStorage() {
+            setTimeout(() => {
+                try {
+                    const savedHomeNames = localStorage.getItem('homeTeamNames');
+                    const savedAwayNames = localStorage.getItem('awayTeamNames');
+                    
+                    if (savedHomeNames) {
+                        const homeNames = JSON.parse(savedHomeNames);
+                        document.querySelectorAll('input[data-player-id^="my-team-"]').forEach((input, index) => {
+                            if (index < homeNames.length && (!input.value.trim() || input.value.startsWith('MT') || input.value.startsWith('Player'))) {
+                                input.value = homeNames[index];
+                                const playerId = input.getAttribute('data-player-id');
+                                updatePlayerName(playerId, homeNames[index]);
+                            }
+                        });
+                    }
+                    
+                    if (savedAwayNames) {
+                        const awayNames = JSON.parse(savedAwayNames);
+                        document.querySelectorAll('input[data-player-id^="opp-team-"]').forEach((input, index) => {
+                            if (index < awayNames.length && (!input.value.trim() || input.value.startsWith('OPP') || input.value.startsWith('Player'))) {
+                                input.value = awayNames[index];
+                                const playerId = input.getAttribute('data-player-id');
+                                updatePlayerName(playerId, awayNames[index]);
+                            }
+                        });
+                    }
+                } catch (e) {
+                    console.error('Error restoring names from storage:', e);
+                }
+            }, 200);
+        }
 
         function loadNamesFromURL() {
             const currentMode = window.location.pathname.includes('7s') ? '7v7' : 

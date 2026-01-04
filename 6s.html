@@ -108,9 +108,21 @@
         .my-team .player-icon{background-image:url('blue-jersey.png')}
         .opp-team .player-icon{background-image:url('red-jersey.png')}
         .player-number{position:absolute;top:30%;left:50%;transform:translate(-50%,-50%);font-size:min(1.6vw,6px);font-weight:bold;color:#fff;text-shadow:1px 1px 1px rgba(0,0,0,0.8)}
-        .player-name{font-size:min(2vw,8px);margin-top:0px;padding:2px 4px;background:linear-gradient(135deg,rgba(0,0,0,0.9),rgba(0,0,0,0.7));border-radius:3px;color:#fff;font-weight:bold;max-width:70px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border:1px solid rgba(255,255,255,0.2);box-shadow:0 1px 3px rgba(0,0,0,0.5);text-shadow:1px 1px 2px rgba(0,0,0,0.8);transition:all 0.2s ease;min-height:14px;display:block}
-        .player-name:hover{background:linear-gradient(135deg,rgba(0,0,0,0.95),rgba(0,0,0,0.8));border-color:rgba(255,255,255,0.4);box-shadow:0 2px 5px rgba(0,0,0,0.7);transform:scale(1.05)}
+        .player-name{font-size:min(2vw,8px);margin-top:0px;padding:2px 4px;background:linear-gradient(135deg,rgba(0,0,0,0.9),rgba(0,0,0,0.7));border-radius:3px;color:#fff;font-weight:bold;max-width:70px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border:1px solid rgba(255,255,255,0.2);box-shadow:0 1px 3px rgba(0,0,0,0.5);text-shadow:1px 1px 2px rgba(0,0,0,0.8);transition:all 0.2s ease;min-height:14px;display:block;cursor:pointer}
+        .player-name:hover{background:linear-gradient(135deg,rgba(0,0,0,0.95),rgba(0,0,0,0.8));border-color:rgba(255,255,255,0.4);box-shadow:0 2px 5px rgba(0,0,0,0.7);transform:scale(1.05);border-color:#4CAF50}
+        .player-name:hover::after{content:" ✏️";font-size:7px;opacity:0.8}
         .player-name-input{font-size:9px;margin-top:2px;padding:1px 3px;background:#fff;border-radius:2px;border:1px solid #007acc;color:#000;width:35px;text-align:center}
+        
+        .field:hover .player-name {
+            border-color: #4CAF50 !important;
+            box-shadow: 0 0 8px rgba(76, 175, 80, 0.4) !important;
+        }
+        
+        .field:hover .player-name::after {
+            content: " ✏️";
+            font-size: 7px;
+            opacity: 0.8;
+        }
         
         .footer{position:fixed;bottom:5px;right:5px;font-size:10px;color:#aaa;opacity:0.8}
         .footer a{color:#aaa;text-decoration:none}
@@ -295,16 +307,26 @@
             
             const myTeamNames = [];
             const oppTeamNames = [];
-            document.querySelectorAll('input[data-player-id^="my-team-"]').forEach(input => {
-                if (input.value.trim()) {
-                    myTeamNames.push(input.value);
+            document.querySelectorAll('.my-team .player-name').forEach(nameEl => {
+                const name = nameEl.textContent;
+                if (name && name.trim() && !name.startsWith('MT') && !name.startsWith('Player')) {
+                    myTeamNames.push(name);
                 }
             });
-            document.querySelectorAll('input[data-player-id^="opp-team-"]').forEach(input => {
-                if (input.value.trim()) {
-                    oppTeamNames.push(input.value);
+            document.querySelectorAll('.opp-team .player-name').forEach(nameEl => {
+                const name = nameEl.textContent;
+                if (name && name.trim() && !name.startsWith('OPP') && !name.startsWith('Player')) {
+                    oppTeamNames.push(name);
                 }
             });
+            
+            // Store names in localStorage for cross-format preservation
+            if (myTeamNames.length > 0) {
+                localStorage.setItem('homeTeamNames', JSON.stringify(myTeamNames));
+            }
+            if (oppTeamNames.length > 0) {
+                localStorage.setItem('awayTeamNames', JSON.stringify(oppTeamNames));
+            }
             
             field.querySelectorAll('.player').forEach(p => p.remove());
             
@@ -342,24 +364,22 @@
                 }
             });
             
-            const myTeamInputs = document.querySelectorAll('input[data-player-id^="my-team-"]');
+            const myTeamElements = document.querySelectorAll('.my-team .player-name');
             let myTeamIndex = 0;
-            myTeamInputs.forEach(input => {
-                if ((!input.value.trim() || input.value.startsWith('MT')) && myTeamIndex < myTeamNames.length) {
-                    input.value = myTeamNames[myTeamIndex];
-                    const playerId = input.getAttribute('data-player-id');
-                    updatePlayerName(playerId, myTeamNames[myTeamIndex]);
+            myTeamElements.forEach(nameEl => {
+                const currentName = nameEl.textContent;
+                if ((!currentName || currentName.startsWith('MT') || currentName.startsWith('Player')) && myTeamIndex < myTeamNames.length) {
+                    nameEl.textContent = myTeamNames[myTeamIndex];
                     myTeamIndex++;
                 }
             });
             
-            const oppTeamInputs = document.querySelectorAll('input[data-player-id^="opp-team-"]');
+            const oppTeamElements = document.querySelectorAll('.opp-team .player-name');
             let oppTeamIndex = 0;
-            oppTeamInputs.forEach(input => {
-                if ((!input.value.trim() || input.value.startsWith('OPP')) && oppTeamIndex < oppTeamNames.length) {
-                    input.value = oppTeamNames[oppTeamIndex];
-                    const playerId = input.getAttribute('data-player-id');
-                    updatePlayerName(playerId, oppTeamNames[oppTeamIndex]);
+            oppTeamElements.forEach(nameEl => {
+                const currentName = nameEl.textContent;
+                if ((!currentName || currentName.startsWith('OPP') || currentName.startsWith('Player')) && oppTeamIndex < oppTeamNames.length) {
+                    nameEl.textContent = oppTeamNames[oppTeamIndex];
                     oppTeamIndex++;
                 }
             });
@@ -452,8 +472,15 @@
             
             // Ultra-compact format: only include non-empty arrays
             const data = [h, a];
-            if (hn.some(n => n)) data.push(hn);
-            if (an.some(n => n)) data.push(an);
+            const hasHomeNames = hn.some(n => n);
+            const hasAwayNames = an.some(n => n);
+            
+            if (hasHomeNames || hasAwayNames) {
+                data.push(hasHomeNames ? hn : []);
+                if (hasAwayNames) {
+                    data.push(an);
+                }
+            }
             
             // Ultra-compact encoding using LZ-string URI encoding
             let finalData;
@@ -651,6 +678,13 @@
                                 }
                             });
                         }
+                        if (formationData.oppTeamNames) {
+                            document.querySelectorAll('.opp-team .player-name').forEach((nameEl, index) => {
+                                if (formationData.oppTeamNames[index]) {
+                                    nameEl.textContent = formationData.oppTeamNames[index];
+                                }
+                            });
+                        }
                     }, 100);
                 } catch (e) {
                     console.error('Error loading formation from URL:', e);
@@ -669,9 +703,39 @@
             
             if (!window.location.hash.startsWith('#formation=') && !window.location.hash.startsWith('#f=') && !queryF) {
                 loadFormation();
+                restoreNamesFromStorage(); // Restore names from localStorage if no URL data
             }
             initializePlayerNames(); // Initialize global player names
         });
+
+        function restoreNamesFromStorage() {
+            setTimeout(() => {
+                try {
+                    const savedHomeNames = localStorage.getItem('homeTeamNames');
+                    const savedAwayNames = localStorage.getItem('awayTeamNames');
+                    
+                    if (savedHomeNames) {
+                        const homeNames = JSON.parse(savedHomeNames);
+                        document.querySelectorAll('.my-team .player-name').forEach((nameEl, index) => {
+                            if (index < homeNames.length && (!nameEl.textContent || nameEl.textContent.startsWith('MT') || nameEl.textContent.startsWith('Player'))) {
+                                nameEl.textContent = homeNames[index];
+                            }
+                        });
+                    }
+                    
+                    if (savedAwayNames) {
+                        const awayNames = JSON.parse(savedAwayNames);
+                        document.querySelectorAll('.opp-team .player-name').forEach((nameEl, index) => {
+                            if (index < awayNames.length && (!nameEl.textContent || nameEl.textContent.startsWith('OPP') || nameEl.textContent.startsWith('Player'))) {
+                                nameEl.textContent = awayNames[index];
+                            }
+                        });
+                    }
+                } catch (e) {
+                    console.error('Error restoring names from storage:', e);
+                }
+            }, 200);
+        }
 
         function loadNamesFromURL() {
             const currentMode = window.location.pathname.includes('7s') ? '7v7' : 
