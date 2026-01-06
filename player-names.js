@@ -11,16 +11,16 @@ class PlayerNameManager {
     }
 
     initialize() {
-        // Priority: URL params > localStorage > seed names
-        const urlNames = this.getFromURL();
+        // Priority: localStorage > seed names (removed URL params)
         const storedNames = this.getFromStorage();
         
-        if (urlNames && urlNames.home) {
-            this.globalPlayerNames.home = [...urlNames.home];
-        } else if (storedNames && storedNames.home) {
+        if (storedNames && storedNames.home) {
             this.globalPlayerNames.home = [...storedNames.home];
+            if (storedNames.away) {
+                this.globalPlayerNames.away = [...storedNames.away];
+            }
         } else {
-            // Initialize with seed names
+            // Initialize with seed names (already uppercase)
             this.globalPlayerNames.home = [...this.seedNames.home];
         }
     }
@@ -49,18 +49,7 @@ class PlayerNameManager {
         }
     }
 
-    getFromURL() {
-        const params = new URLSearchParams(window.location.search);
-        const names = params.get('names');
-        if (names) {
-            try {
-                return JSON.parse(atob(names));
-            } catch (e) {
-                console.warn('Failed to decode names from URL');
-            }
-        }
-        return null;
-    }
+    // Remove getFromURL method since we're not using URL parameters anymore
 
     getFromStorage() {
         const stored = localStorage.getItem('footballLineup_globalNames');
@@ -88,25 +77,32 @@ class PlayerNameManager {
 
     getName(playerId) {
         const isHome = playerId.includes('my-team');
-        const index = parseInt(playerId.split('-').pop()) - 1;
+        const index = parseInt(playerId.split('-').pop());
         
         if (isHome) {
-            return this.globalPlayerNames.home[index] || this.seedNames.home[index % this.seedNames.home.length] || 'Player ' + (index + 1);
+            // For home team, return saved name or fallback to seed names
+            return this.globalPlayerNames.home[index] || this.seedNames.home[index % this.seedNames.home.length] || `PLAYER ${index + 1}`;
         } else {
-            // Away team gets empty names
-            return '';
+            // Return away team names if they exist
+            return this.globalPlayerNames.away?.[index] || '';
         }
     }
 
     setName(playerId, name) {
         const isHome = playerId.includes('my-team');
-        const index = parseInt(playerId.split('-').pop()) - 1;
+        const index = parseInt(playerId.split('-').pop());
         
         if (isHome) {
-            this.globalPlayerNames.home[index] = name;
+            this.globalPlayerNames.home[index] = name.toUpperCase();
+            this.saveToStorage();
+        } else {
+            // Initialize away team array if it doesn't exist
+            if (!this.globalPlayerNames.away) {
+                this.globalPlayerNames.away = [];
+            }
+            this.globalPlayerNames.away[index] = name.toUpperCase();
             this.saveToStorage();
         }
-        // Don't save away team names
     }
 
     saveToStorage() {
@@ -173,12 +169,8 @@ class PlayerNameManager {
     }
 
     switchMode(page) {
-        // Save current names before switching
-        this.saveToStorage();
-        
-        // Create URL with global names for transfer
-        const encodedNames = btoa(JSON.stringify(this.globalPlayerNames));
-        window.location.href = `${page}?names=${encodedNames}`;
+        // Just navigate to the page - localStorage will handle persistence
+        window.location.href = page;
     }
 
     // Initialize player names for current mode

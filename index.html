@@ -15,7 +15,7 @@
     
     <!-- Redirect www to non-www and enforce HTTPS -->
     <script>
-        if (window.location.hostname === 'www.easyfootballlineup.com' || window.location.protocol === 'http:') {
+        if ((window.location.hostname === 'www.easyfootballlineup.com' || window.location.protocol === 'http:') && !window.location.hostname.includes('localhost')) {
             window.location.replace('https://easyfootballlineup.com' + window.location.pathname + window.location.search + window.location.hash);
         }
     </script>
@@ -368,11 +368,14 @@
             player.className = `player ${team}`;
             player.style.left = x + '%';
             player.style.top = y + '%';
-            const playerId = `${team}-${index}`;
+            const playerId = `${team}-${sequentialIndex !== null ? sequentialIndex : index}`;
             const playerNumber = Math.floor(index/10) + (index%10) + 1;
             const teamPrefix = team === 'my-team' ? 'MT' : 'OPP';
             const bestPlayers = ['NEUER', 'MBAPPE', 'RUDIGER', 'RONALDO', 'PEDRI', 'MODRIC', 'YAMAL', 'DE BRUYNE', 'MESSI', 'HAALAND', 'SALAH'];
-            const playerName = team === 'my-team' ? (bestPlayers[sequentialIndex !== null ? sequentialIndex : index] || `Player ${playerNumber}`) : '';
+            
+            const playerName = team === 'my-team' ? 
+                (window.playerNameManager?.getName(playerId) || bestPlayers[sequentialIndex !== null ? sequentialIndex : index] || `Player ${playerNumber}`) : 
+                (window.playerNameManager?.getName(playerId) || '');
             player.setAttribute('data-player-id', playerId);
             player.innerHTML = `
                 <div class="player-icon">
@@ -448,12 +451,14 @@
             });
             
             // Opposition
+            let oppPlayerCounter = 0;
             O.forEach((layer, layerIndex) => {
                 layer.forEach((x, playerIndex) => {
                     const y = getPlayerY(layerIndex, playerIndex, O.length, layer.length, false);
                     const position = getPlayerPosition(layerIndex, playerIndex, O.length, layer.length);
-                    const player = createPlayer(x, y, position, 'opp-team', layerIndex * 10 + playerIndex);
+                    const player = createPlayer(x, y, position, 'opp-team', layerIndex * 10 + playerIndex, oppPlayerCounter);
                     field.appendChild(player);
+                    oppPlayerCounter++;
                 });
             });
             
@@ -605,6 +610,9 @@
             }
             
             const url = (window.location.origin !== 'null' ? window.location.origin : 'https://easyfootballlineup.com') + window.location.pathname + '#f=' + finalData;
+            
+            // Update the current URL hash
+            window.location.hash = '#f=' + finalData;
             
             shareURL(url);
         }
