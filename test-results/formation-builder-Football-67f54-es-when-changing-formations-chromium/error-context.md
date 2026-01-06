@@ -1,0 +1,136 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - heading "EASY FOOTBALL LINEUP" [level=1] [ref=e3]
+    - paragraph [ref=e4]: Build your team formation and get an instant shareable link. No saving, no accounts - just share.
+    - generic [ref=e5]:
+      - button "SHARE FORMATION" [ref=e6] [cursor=pointer]
+      - button "DOWNLOAD IMAGE" [ref=e7] [cursor=pointer]
+    - generic [ref=e8]:
+      - generic [ref=e9]:
+        - generic [ref=e10]: "Home:"
+        - combobox [ref=e11] [cursor=pointer]:
+          - option "4-4-2" [selected]
+          - option "4-3-3"
+          - option "3-5-2"
+          - option "4-5-1"
+          - option "3-4-3"
+          - option "5-3-2"
+          - option "5-4-1"
+          - option "4-2-3-1"
+          - option "4-1-4-1"
+          - option "4-3-2-1"
+          - option "3-4-1-2"
+          - option "4-3-1-2"
+      - generic [ref=e12]:
+        - generic [ref=e13]: "Away:"
+        - combobox [ref=e14] [cursor=pointer]:
+          - option "4-4-2" [selected]
+          - option "4-3-3"
+          - option "3-5-2"
+          - option "4-5-1"
+          - option "3-4-3"
+          - option "5-3-2"
+          - option "5-4-1"
+          - option "4-2-3-1"
+          - option "4-1-4-1"
+          - option "4-3-2-1"
+          - option "3-4-1-2"
+          - option "4-3-1-2"
+    - generic [ref=e15]:
+      - button "11v11" [ref=e16] [cursor=pointer]
+      - button "7v7" [ref=e17] [cursor=pointer]
+      - button "6v6" [ref=e18] [cursor=pointer]
+  - generic [ref=e19]: 💡 Click on player names to edit them directly
+  - generic [ref=e21]:
+    - generic [ref=e26] [cursor=pointer]:
+      - generic [ref=e28]: "1"
+      - text: ✏️
+      - textbox [active] [ref=e29]: PLAYER 0
+    - generic [ref=e30] [cursor=pointer]:
+      - generic [ref=e32]: "2"
+      - generic [ref=e33]: DE BRUYNE ✏️
+    - generic [ref=e34] [cursor=pointer]:
+      - generic [ref=e36]: "3"
+      - generic [ref=e37]: NEYMAR ✏️
+    - generic [ref=e38] [cursor=pointer]:
+      - generic [ref=e40]: "4"
+      - generic [ref=e41]: MBAPPE ✏️
+    - generic [ref=e42] [cursor=pointer]:
+      - generic [ref=e44]: "5"
+      - generic [ref=e45]: HAALAND ✏️
+    - generic [ref=e46] [cursor=pointer]:
+      - generic [ref=e48]: "3"
+      - generic [ref=e49]: SALAH ✏️
+    - generic [ref=e50] [cursor=pointer]:
+      - generic [ref=e52]: "4"
+      - generic [ref=e53]: DE BRUYNE ✏️
+    - generic [ref=e54] [cursor=pointer]:
+      - generic [ref=e56]: "5"
+      - generic [ref=e57]: NEYMAR ✏️
+    - generic [ref=e58] [cursor=pointer]:
+      - generic [ref=e60]: "6"
+      - generic [ref=e61]: MBAPPE ✏️
+    - generic [ref=e62] [cursor=pointer]:
+      - generic [ref=e64]: "4"
+      - generic [ref=e65]: BELLINGHAM ✏️
+    - generic [ref=e66] [cursor=pointer]:
+      - generic [ref=e68]: "5"
+      - generic [ref=e69]: SALAH ✏️
+    - generic [ref=e70] [cursor=pointer]:
+      - generic [ref=e72]: "1"
+      - generic [ref=e73]: ✏️
+    - generic [ref=e74] [cursor=pointer]:
+      - generic [ref=e76]: "2"
+      - generic [ref=e77]: ✏️
+    - generic [ref=e78] [cursor=pointer]:
+      - generic [ref=e80]: "3"
+      - generic [ref=e81]: ✏️
+    - generic [ref=e82] [cursor=pointer]:
+      - generic [ref=e84]: "4"
+      - generic [ref=e85]: ✏️
+    - generic [ref=e86] [cursor=pointer]:
+      - generic [ref=e88]: "5"
+      - generic [ref=e89]: ✏️
+    - generic [ref=e90] [cursor=pointer]:
+      - generic [ref=e92]: "3"
+      - generic [ref=e93]: ✏️
+    - generic [ref=e94] [cursor=pointer]:
+      - generic [ref=e96]: "4"
+      - generic [ref=e97]: ✏️
+    - generic [ref=e98] [cursor=pointer]:
+      - generic [ref=e100]: "5"
+      - generic [ref=e101]: ✏️
+    - generic [ref=e102] [cursor=pointer]:
+      - generic [ref=e104]: "6"
+      - generic [ref=e105]: ✏️
+    - generic [ref=e106] [cursor=pointer]:
+      - generic [ref=e108]: "4"
+      - generic [ref=e109]: ✏️
+    - generic [ref=e110] [cursor=pointer]:
+      - generic [ref=e112]: "5"
+      - generic [ref=e113]: ✏️
+  - generic [ref=e114]:
+    - heading "Why coaches and players love this tool:" [level=3] [ref=e115]
+    - generic [ref=e116]:
+      - generic [ref=e117]:
+        - strong [ref=e118]: 🔗 Instant Shareable Links
+        - text: Create formations and get shareable links instantly - no saving needed
+      - generic [ref=e119]:
+        - strong [ref=e120]: 🚀 No Setup Required
+        - text: No saving, no accounts, no setup - just open and start creating
+      - generic [ref=e121]:
+        - strong [ref=e122]: 📱 Works Everywhere
+        - text: Use on any device - phone, tablet, or computer
+  - generic [ref=e123]:
+    - link "t shirt" [ref=e124] [cursor=pointer]:
+      - /url: https://icons8.com/icon/y1jile6KU9QN/t-shirt
+    - text: icon by
+    - link "Icons8" [ref=e125] [cursor=pointer]:
+      - /url: https://icons8.com
+    - text: "| Need help?"
+    - link "easyfootballlineup@gmail.com" [ref=e126] [cursor=pointer]:
+      - /url: mailto:easyfootballlineup@gmail.com
+```
