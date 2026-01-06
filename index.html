@@ -12,6 +12,13 @@
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://easyfootballlineup.com/">
     <meta name="language" content="English">
+    
+    <!-- Redirect www to non-www and enforce HTTPS -->
+    <script>
+        if (window.location.hostname === 'www.easyfootballlineup.com' || window.location.protocol === 'http:') {
+            window.location.replace('https://easyfootballlineup.com' + window.location.pathname + window.location.search + window.location.hash);
+        }
+    </script>
     <meta name="geo.region" content="IN, GB, US, AU, CA">
     <meta name="geo.placename" content="Global">
     
