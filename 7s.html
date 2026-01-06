@@ -103,6 +103,15 @@
         .controls button{background:#007acc;cursor:pointer}
         .controls button:hover{background:#005a99}
         
+        /* Mobile/Desktop text switching */
+        .mobile-text{display:none}
+        .desktop-text{display:inline}
+        
+        @media (max-width:768px){
+            .mobile-text{display:inline}
+            .desktop-text{display:none}
+        }
+        
         .formation-container{display:flex;gap:15px;justify-content:center;margin-bottom:30px;flex-wrap:wrap}
         .formation-group{display:flex;align-items:center;gap:10px}
         .formation-label{font-size:14px;color:#aaa;font-weight:500;letter-spacing:0.5px;white-space:nowrap}
@@ -164,7 +173,10 @@
         <p style="color:#ccc;font-size:16px;margin-bottom:15px;max-width:600px;margin-left:auto;margin-right:auto;">Build your 7-a-side formation and get an instant shareable link. No saving, no accounts - just share.</p>
         <div class="controls">
             <button onclick="shareFormation()">SHARE FORMATION</button>
-            <button onclick="downloadImage()">DOWNLOAD IMAGE</button>
+            <button onclick="downloadImage()" id="downloadBtn">
+                <span class="desktop-text">DOWNLOAD IMAGE</span>
+                <span class="mobile-text">SHARE IMAGE</span>
+            </button>
         </div>
         <div class="formation-container">
             <div class="formation-group">
