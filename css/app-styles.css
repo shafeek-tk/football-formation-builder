@@ -339,7 +339,7 @@ body {
         position: relative;
         top: auto;
         right: auto;
-        margin-top: 15px;
+        margin: 25px 0;
         justify-content: center;
         gap: 4px;
     }
