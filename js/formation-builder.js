@@ -347,7 +347,7 @@ class FormationBuilder {
                 localStorage.setItem('playerNames', JSON.stringify(this.playerNames));
             }
             
-            this.updateFormation();
+            this.loadFormation();
         } catch (e) {
             console.error('Failed to load formation from URL:', e);
         }
