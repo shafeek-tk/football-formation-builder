@@ -297,7 +297,7 @@ body {
     
     .formation-container {
         gap: 8px;
-        margin-bottom: 15px;
+        margin-bottom: 8px;
         flex-direction: row;
     }
     
@@ -339,7 +339,7 @@ body {
         position: relative;
         top: auto;
         right: auto;
-        margin: 25px 0;
+        margin: 10px 0 25px 0;
         justify-content: center;
         gap: 4px;
     }
