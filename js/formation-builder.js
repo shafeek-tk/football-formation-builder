@@ -233,14 +233,14 @@ class FormationBuilder {
 
     savePlayerName(team, index, name) {
         const key = `${team}_${index}`;
-        this.playerNames[key] = name;
+        this.playerNames[key] = name.toUpperCase();
         localStorage.setItem('playerNames', JSON.stringify(this.playerNames));
     }
 
     updatePlayerDisplay(team, index, name) {
         const players = document.querySelectorAll(`.${team} .player-name`);
         if (players[index]) {
-            players[index].textContent = name;
+            players[index].textContent = name.toUpperCase();
         }
     }
 
