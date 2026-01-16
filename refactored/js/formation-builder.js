@@ -8,12 +8,10 @@ class FormationBuilder {
     }
 
     init() {
-        console.log('FormationBuilder init() called');
-        this.restoreNamesFromStorage();
-        console.log('About to call loadFromURL, hash:', window.location.hash);
-        this.loadFromURL(); // Load URL after storage so URL takes priority
+        this.loadFromURL();
         this.setupEventListeners();
         this.loadFormation();
+        this.restoreNamesFromStorage();
     }
 
     setupEventListeners() {
@@ -263,8 +261,8 @@ class FormationBuilder {
             n: this.playerNames
         };
         
-        const compressed = LZString.compressToEncodedURIComponent(JSON.stringify(data));
-        const url = `${window.location.origin}${window.location.pathname}#f=${compressed}`;
+        const compressed = LZString.compressToBase64(JSON.stringify(data));
+        const url = `${window.location.origin}${window.location.pathname}?d=${compressed}`;
         
         this.shareURL(url);
     }
@@ -297,45 +295,13 @@ class FormationBuilder {
     }
 
     loadFromURL() {
-        const hash = window.location.hash;
-        console.log('loadFromURL - hash:', hash);
+        const urlParams = new URLSearchParams(window.location.search);
+        const compressed = urlParams.get('d');
         
-        if (!hash.startsWith('#f=') && !hash.startsWith('#formation=')) return;
-        
-        const compressed = hash.startsWith('#f=') ? hash.substring(3) : hash.substring(11);
-        console.log('loadFromURL - compressed:', compressed.substring(0, 50) + '...');
+        if (!compressed) return;
         
         try {
-            const decoded = JSON.parse(LZString.decompressFromEncodedURIComponent(compressed));
-            console.log('loadFromURL - decoded:', decoded);
-            let data;
-            
-            // Handle old array format: [homeFormation, awayFormation, homeNames, awayNames]
-            if (Array.isArray(decoded)) {
-                // Convert old array format to new flat object format
-                const playerNames = {};
-                const homeNames = decoded[2] || [];
-                const awayNames = decoded[3] || [];
-                
-                homeNames.forEach((name, i) => {
-                    playerNames[`my-team_${i}`] = name;
-                });
-                
-                awayNames.forEach((name, i) => {
-                    playerNames[`opp-team_${i}`] = name;
-                });
-                
-                data = {
-                    h: decoded[0],
-                    a: decoded[1],
-                    n: playerNames
-                };
-                console.log('loadFromURL - converted array to object:', data);
-            } else {
-                // New object format: {h, a, n}
-                data = decoded;
-                console.log('loadFromURL - using object format:', data);
-            }
+            const data = JSON.parse(LZString.decompressFromBase64(compressed));
             
             if (data.h) {
                 const homeSelect = document.getElementById('myTeamFormation');
@@ -349,11 +315,8 @@ class FormationBuilder {
             
             if (data.n) {
                 this.playerNames = data.n;
-                console.log('loadFromURL - set playerNames:', this.playerNames);
                 localStorage.setItem('playerNames', JSON.stringify(this.playerNames));
             }
-            
-            this.updateFormation();
         } catch (e) {
             console.error('Failed to load formation from URL:', e);
         }
