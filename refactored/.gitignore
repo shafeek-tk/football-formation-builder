@@ -1,9 +1,0 @@
-node_modules/
-package.json
-package-lock.json
-*.log
-.DS_Store
-Screenshot*
-WhatsApp*
-!blue-jersey.png
-!red-jersey.png
