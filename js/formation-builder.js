@@ -302,7 +302,20 @@ class FormationBuilder {
         const compressed = hash.startsWith('#f=') ? hash.substring(3) : hash.substring(11);
         
         try {
-            const data = JSON.parse(LZString.decompressFromEncodedURIComponent(compressed));
+            const decoded = JSON.parse(LZString.decompressFromEncodedURIComponent(compressed));
+            let data;
+            
+            // Handle old array format: [homeFormation, awayFormation, homeNames, awayNames]
+            if (Array.isArray(decoded)) {
+                data = {
+                    h: decoded[0],
+                    a: decoded[1],
+                    n: { home: decoded[2] || [], away: decoded[3] || [] }
+                };
+            } else {
+                // New object format: {h, a, n}
+                data = decoded;
+            }
             
             if (data.h) {
                 const homeSelect = document.getElementById('myTeamFormation');
