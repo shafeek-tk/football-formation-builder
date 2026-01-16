@@ -76,7 +76,9 @@ class FormationBuilder {
         name.textContent = this.getPlayerName(team, sequentialIndex !== null ? sequentialIndex : index);
         
         name.addEventListener('blur', () => {
-            this.savePlayerName(team, sequentialIndex !== null ? sequentialIndex : index, name.textContent);
+            const upperName = name.textContent.toUpperCase();
+            this.savePlayerName(team, sequentialIndex !== null ? sequentialIndex : index, upperName);
+            name.textContent = upperName;
         });
         
         name.addEventListener('keydown', (e) => {
