@@ -8,9 +8,7 @@ class FormationBuilder {
     }
 
     init() {
-        console.log('FormationBuilder init() called');
         this.restoreNamesFromStorage();
-        console.log('About to call loadFromURL, hash:', window.location.hash);
         this.loadFromURL(); // Load URL after storage so URL takes priority
         this.setupEventListeners();
         this.loadFormation();
@@ -298,16 +296,13 @@ class FormationBuilder {
 
     loadFromURL() {
         const hash = window.location.hash;
-        console.log('loadFromURL - hash:', hash);
         
         if (!hash.startsWith('#f=') && !hash.startsWith('#formation=')) return;
         
         const compressed = hash.startsWith('#f=') ? hash.substring(3) : hash.substring(11);
-        console.log('loadFromURL - compressed:', compressed.substring(0, 50) + '...');
         
         try {
             const decoded = JSON.parse(LZString.decompressFromEncodedURIComponent(compressed));
-            console.log('loadFromURL - decoded:', decoded);
             let data;
             
             // Handle old array format: [homeFormation, awayFormation, homeNames, awayNames]
@@ -330,11 +325,9 @@ class FormationBuilder {
                     a: decoded[1],
                     n: playerNames
                 };
-                console.log('loadFromURL - converted array to object:', data);
             } else {
                 // New object format: {h, a, n}
                 data = decoded;
-                console.log('loadFromURL - using object format:', data);
             }
             
             if (data.h) {
@@ -349,7 +342,6 @@ class FormationBuilder {
             
             if (data.n) {
                 this.playerNames = data.n;
-                console.log('loadFromURL - set playerNames:', this.playerNames);
                 localStorage.setItem('playerNames', JSON.stringify(this.playerNames));
             }
             
