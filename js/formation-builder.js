@@ -295,13 +295,23 @@ class FormationBuilder {
     }
 
     loadFromURL() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const compressed = urlParams.get('d');
+        const hash = window.location.hash;
+        let compressed = null;
+        
+        // Support both old (#f=) and new (?d=) formats
+        if (hash.startsWith('#f=')) {
+            compressed = hash.substring(3);
+        } else if (hash.startsWith('#formation=')) {
+            compressed = hash.substring(11);
+        } else {
+            const urlParams = new URLSearchParams(window.location.search);
+            compressed = urlParams.get('d');
+        }
         
         if (!compressed) return;
         
         try {
-            const data = JSON.parse(LZString.decompressFromBase64(compressed));
+            const data = JSON.parse(LZString.decompressFromEncodedURIComponent(compressed));
             
             if (data.h) {
                 const homeSelect = document.getElementById('myTeamFormation');
@@ -317,6 +327,8 @@ class FormationBuilder {
                 this.playerNames = data.n;
                 localStorage.setItem('playerNames', JSON.stringify(this.playerNames));
             }
+            
+            this.updateFormation();
         } catch (e) {
             console.error('Failed to load formation from URL:', e);
         }
