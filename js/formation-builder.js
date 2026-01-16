@@ -35,22 +35,32 @@ class FormationBuilder {
         const outfieldLayers = totalLayers - 1;
         const outfieldIndex = layerIndex - 1;
         
+        // Use tighter spacing for formations with more layers (9v9, 8v8)
+        let range, startPos;
+        if (outfieldLayers >= 3) {
+            // Tighter spacing for 3+ outfield layers
+            range = 24;
+            startPos = isMyTeam ? 82 : 18;
+        } else {
+            // Normal spacing for 1-2 outfield layers (11v11)
+            range = 27;
+            startPos = isMyTeam ? 85 : 15;
+        }
+        
         let y;
         if (isMyTeam) {
-            // My team (blue): bottom half only (55% to 85%)
             if (outfieldLayers === 1) {
                 y = 70;
             } else {
-                const spacing = 30 / (outfieldLayers - 1);
-                y = 85 - (spacing * outfieldIndex);
+                const spacing = range / (outfieldLayers - 1);
+                y = startPos - (spacing * outfieldIndex);
             }
         } else {
-            // Away team (red): top half only (15% to 45%) 
             if (outfieldLayers === 1) {
                 y = 30;
             } else {
-                const spacing = 30 / (outfieldLayers - 1);
-                y = 15 + (spacing * outfieldIndex);
+                const spacing = range / (outfieldLayers - 1);
+                y = startPos + (spacing * outfieldIndex);
             }
         }
         
