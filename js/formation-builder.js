@@ -261,8 +261,8 @@ class FormationBuilder {
             n: this.playerNames
         };
         
-        const compressed = LZString.compressToBase64(JSON.stringify(data));
-        const url = `${window.location.origin}${window.location.pathname}?d=${compressed}`;
+        const compressed = LZString.compressToEncodedURIComponent(JSON.stringify(data));
+        const url = `${window.location.origin}${window.location.pathname}#f=${compressed}`;
         
         this.shareURL(url);
     }
@@ -296,19 +296,10 @@ class FormationBuilder {
 
     loadFromURL() {
         const hash = window.location.hash;
-        let compressed = null;
         
-        // Support both old (#f=) and new (?d=) formats
-        if (hash.startsWith('#f=')) {
-            compressed = hash.substring(3);
-        } else if (hash.startsWith('#formation=')) {
-            compressed = hash.substring(11);
-        } else {
-            const urlParams = new URLSearchParams(window.location.search);
-            compressed = urlParams.get('d');
-        }
+        if (!hash.startsWith('#f=') && !hash.startsWith('#formation=')) return;
         
-        if (!compressed) return;
+        const compressed = hash.startsWith('#f=') ? hash.substring(3) : hash.substring(11);
         
         try {
             const data = JSON.parse(LZString.decompressFromEncodedURIComponent(compressed));
