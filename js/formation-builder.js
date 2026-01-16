@@ -37,20 +37,20 @@ class FormationBuilder {
         
         let y;
         if (isMyTeam) {
-            // My team (blue): bottom half only (52% to 88%)
+            // My team (blue): bottom half only (55% to 85%)
             if (outfieldLayers === 1) {
                 y = 70;
             } else {
-                const spacing = 36 / (outfieldLayers - 1);
-                y = 88 - (spacing * outfieldIndex);
+                const spacing = 30 / (outfieldLayers - 1);
+                y = 85 - (spacing * outfieldIndex);
             }
         } else {
-            // Away team (red): top half only (12% to 48%) 
+            // Away team (red): top half only (15% to 45%) 
             if (outfieldLayers === 1) {
                 y = 30;
             } else {
-                const spacing = 36 / (outfieldLayers - 1);
-                y = 12 + (spacing * outfieldIndex);
+                const spacing = 30 / (outfieldLayers - 1);
+                y = 15 + (spacing * outfieldIndex);
             }
         }
         
