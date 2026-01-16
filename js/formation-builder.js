@@ -8,10 +8,10 @@ class FormationBuilder {
     }
 
     init() {
-        this.loadFromURL();
+        this.restoreNamesFromStorage();
+        this.loadFromURL(); // Load URL after storage so URL takes priority
         this.setupEventListeners();
         this.loadFormation();
-        this.restoreNamesFromStorage();
     }
 
     setupEventListeners() {
