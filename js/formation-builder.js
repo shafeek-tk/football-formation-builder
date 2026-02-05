@@ -365,32 +365,39 @@ class FormationBuilder {
 
     async downloadImage() {
         const field = document.getElementById('field');
-        const container = field.parentElement;
         const loadingIndicator = document.getElementById('loadingIndicator');
         
         if (loadingIndicator) loadingIndicator.style.display = 'block';
         
         try {
-            // Temporarily remove container margin for clean capture
-            const originalMargin = container.style.marginBottom;
-            container.style.marginBottom = '0';
+            // Create a clean clone for consistent rendering
+            const clone = field.cloneNode(true);
+            clone.style.position = 'absolute';
+            clone.style.left = '-9999px';
+            clone.style.top = '0';
+            clone.style.margin = '0';
+            clone.style.padding = '0';
+            clone.style.width = '800px';  // Fixed size
+            clone.style.height = '600px'; // Fixed size
+            clone.style.border = '3px solid #fff';
+            clone.style.borderRadius = '8px';
+            clone.style.boxShadow = 'none';
             
-            const canvas = await html2canvas(container, {
-                backgroundColor: null,
-                scale: 3,
-                width: field.offsetWidth,
-                height: field.offsetHeight,
+            document.body.appendChild(clone);
+            
+            const canvas = await html2canvas(clone, {
+                backgroundColor: '#2d5a2d',
+                scale: 2,
+                width: 800,
+                height: 600,
                 x: 0,
                 y: 0,
                 useCORS: true,
                 allowTaint: false,
-                foreignObjectRendering: false,
                 logging: false
             });
             
-            // Restore original margin
-            container.style.marginBottom = originalMargin;
-            
+            document.body.removeChild(clone);
             this.downloadCanvas(canvas, `formation-${this.config.gameType}.png`);
         } catch (error) {
             console.error('Error generating image:', error);
