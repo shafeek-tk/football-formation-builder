@@ -370,20 +370,21 @@ class FormationBuilder {
         if (loadingIndicator) loadingIndicator.style.display = 'block';
         
         try {
-            // Force consistent dimensions
-            const rect = field.getBoundingClientRect();
+            // Get exact field dimensions without container margins
+            const fieldRect = field.getBoundingClientRect();
             const canvas = await html2canvas(field, {
-                backgroundColor: '#2d5a2d',
+                backgroundColor: null, // Let field's own background show
                 scale: 3,
-                width: Math.floor(rect.width),
-                height: Math.floor(rect.height),
+                width: fieldRect.width,
+                height: fieldRect.height,
                 x: 0,
                 y: 0,
                 scrollX: 0,
                 scrollY: 0,
                 useCORS: true,
                 allowTaint: false,
-                foreignObjectRendering: false
+                foreignObjectRendering: false,
+                logging: false
             });
             
             this.downloadCanvas(canvas, `formation-${this.config.gameType}.png`);
