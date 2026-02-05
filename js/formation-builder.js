@@ -365,27 +365,31 @@ class FormationBuilder {
 
     async downloadImage() {
         const field = document.getElementById('field');
+        const container = field.parentElement;
         const loadingIndicator = document.getElementById('loadingIndicator');
         
         if (loadingIndicator) loadingIndicator.style.display = 'block';
         
         try {
-            // Get exact field dimensions without container margins
-            const fieldRect = field.getBoundingClientRect();
-            const canvas = await html2canvas(field, {
-                backgroundColor: null, // Let field's own background show
+            // Temporarily remove container margin for clean capture
+            const originalMargin = container.style.marginBottom;
+            container.style.marginBottom = '0';
+            
+            const canvas = await html2canvas(container, {
+                backgroundColor: null,
                 scale: 3,
-                width: fieldRect.width,
-                height: fieldRect.height,
+                width: field.offsetWidth,
+                height: field.offsetHeight,
                 x: 0,
                 y: 0,
-                scrollX: 0,
-                scrollY: 0,
                 useCORS: true,
                 allowTaint: false,
                 foreignObjectRendering: false,
                 logging: false
             });
+            
+            // Restore original margin
+            container.style.marginBottom = originalMargin;
             
             this.downloadCanvas(canvas, `formation-${this.config.gameType}.png`);
         } catch (error) {
@@ -397,16 +401,30 @@ class FormationBuilder {
     }
 
     downloadCanvas(canvas, filename) {
-        if (/Mobi|Android/i.test(navigator.userAgent) && navigator.share) {
+        // Check if mobile and Web Share API is available
+        if (navigator.share && /Mobi|Android/i.test(navigator.userAgent)) {
             canvas.toBlob(blob => {
-                const file = new File([blob], filename, { type: 'image/png' });
-                navigator.share({ files: [file] });
-            });
+                if (blob) {
+                    const file = new File([blob], filename, { type: 'image/png' });
+                    navigator.share({ files: [file] }).catch(err => {
+                        console.log('Share failed, falling back to download:', err);
+                        this.fallbackDownload(canvas, filename);
+                    });
+                } else {
+                    this.fallbackDownload(canvas, filename);
+                }
+            }, 'image/png', 0.95);
         } else {
-            const link = document.createElement('a');
-            link.download = filename;
-            link.href = canvas.toDataURL();
-            link.click();
+            this.fallbackDownload(canvas, filename);
         }
+    }
+
+    fallbackDownload(canvas, filename) {
+        const link = document.createElement('a');
+        link.download = filename;
+        link.href = canvas.toDataURL('image/png');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     }
 }
