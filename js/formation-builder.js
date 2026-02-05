@@ -370,26 +370,13 @@ class FormationBuilder {
         if (loadingIndicator) loadingIndicator.style.display = 'block';
         
         try {
-            // Create a clean clone with proper football field ratio (3:2)
-            const clone = field.cloneNode(true);
-            clone.style.position = 'absolute';
-            clone.style.left = '-9999px';
-            clone.style.top = '0';
-            clone.style.margin = '0';
-            clone.style.padding = '0';
-            clone.style.width = '600px';  // 3:2 ratio
-            clone.style.height = '400px'; // 3:2 ratio
-            clone.style.border = '3px solid #fff';
-            clone.style.borderRadius = '8px';
-            clone.style.boxShadow = 'none';
-            
-            document.body.appendChild(clone);
-            
-            const canvas = await html2canvas(clone, {
+            // Get original field dimensions and use them
+            const rect = field.getBoundingClientRect();
+            const canvas = await html2canvas(field, {
                 backgroundColor: '#2d5a2d',
-                scale: 2,
-                width: 600,
-                height: 400,
+                scale: 3,
+                width: rect.width,
+                height: rect.height,
                 x: 0,
                 y: 0,
                 useCORS: true,
@@ -397,7 +384,6 @@ class FormationBuilder {
                 logging: false
             });
             
-            document.body.removeChild(clone);
             this.downloadCanvas(canvas, `formation-${this.config.gameType}.png`);
         } catch (error) {
             console.error('Error generating image:', error);
