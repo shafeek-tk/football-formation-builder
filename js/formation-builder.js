@@ -370,9 +370,11 @@ class FormationBuilder {
         if (loadingIndicator) loadingIndicator.style.display = 'block';
         
         try {
-            // Get original field dimensions and use them
+            // Safari-specific fix for boundary alignment
+            const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
             const rect = field.getBoundingClientRect();
-            const canvas = await html2canvas(field, {
+            
+            const options = {
                 backgroundColor: '#2d5a2d',
                 scale: 3,
                 width: rect.width,
@@ -382,8 +384,17 @@ class FormationBuilder {
                 useCORS: true,
                 allowTaint: false,
                 logging: false
-            });
+            };
             
+            // Safari needs different positioning
+            if (isSafari) {
+                options.scrollX = window.scrollX;
+                options.scrollY = window.scrollY;
+                options.windowWidth = window.innerWidth;
+                options.windowHeight = window.innerHeight;
+            }
+            
+            const canvas = await html2canvas(field, options);
             this.downloadCanvas(canvas, `formation-${this.config.gameType}.png`);
         } catch (error) {
             console.error('Error generating image:', error);
