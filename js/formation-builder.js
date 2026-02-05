@@ -365,11 +365,16 @@ class FormationBuilder {
 
     async downloadImage() {
         const field = document.getElementById('field');
+        const container = field.parentElement;
         const loadingIndicator = document.getElementById('loadingIndicator');
         
         if (loadingIndicator) loadingIndicator.style.display = 'block';
         
         try {
+            // Temporarily remove container margin to prevent boundary shift
+            const originalMargin = container.style.marginBottom;
+            container.style.marginBottom = '0';
+            
             // Safari-specific fix for boundary alignment
             const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
             const rect = field.getBoundingClientRect();
@@ -388,13 +393,15 @@ class FormationBuilder {
             
             // Safari needs different positioning
             if (isSafari) {
-                options.scrollX = window.scrollX;
-                options.scrollY = window.scrollY;
-                options.windowWidth = window.innerWidth;
-                options.windowHeight = window.innerHeight;
+                options.scrollX = 0;
+                options.scrollY = 0;
             }
             
             const canvas = await html2canvas(field, options);
+            
+            // Restore original margin
+            container.style.marginBottom = originalMargin;
+            
             this.downloadCanvas(canvas, `formation-${this.config.gameType}.png`);
         } catch (error) {
             console.error('Error generating image:', error);
