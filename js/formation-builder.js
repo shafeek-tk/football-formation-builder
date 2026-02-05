@@ -370,15 +370,15 @@ class FormationBuilder {
         if (loadingIndicator) loadingIndicator.style.display = 'block';
         
         try {
-            // Create a clean clone for consistent rendering
+            // Create a clean clone with proper football field ratio (3:2)
             const clone = field.cloneNode(true);
             clone.style.position = 'absolute';
             clone.style.left = '-9999px';
             clone.style.top = '0';
             clone.style.margin = '0';
             clone.style.padding = '0';
-            clone.style.width = '800px';  // Fixed size
-            clone.style.height = '600px'; // Fixed size
+            clone.style.width = '600px';  // 3:2 ratio
+            clone.style.height = '400px'; // 3:2 ratio
             clone.style.border = '3px solid #fff';
             clone.style.borderRadius = '8px';
             clone.style.boxShadow = 'none';
@@ -388,8 +388,8 @@ class FormationBuilder {
             const canvas = await html2canvas(clone, {
                 backgroundColor: '#2d5a2d',
                 scale: 2,
-                width: 800,
-                height: 600,
+                width: 600,
+                height: 400,
                 x: 0,
                 y: 0,
                 useCORS: true,
