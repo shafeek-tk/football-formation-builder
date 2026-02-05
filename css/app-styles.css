@@ -210,6 +210,10 @@ body {
     justify-content: center;
     cursor: pointer;
     line-height: 1;
+    vertical-align: middle;
+    text-align: center;
+    padding-top: 2px;
+    padding-bottom: 4px;
 }
 
 .player-name:hover {
