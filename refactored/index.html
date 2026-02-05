@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Football Formation Builder | Easy Football Lineup - Create Soccer Formations Online</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Free online football formation builder. Create professional soccer lineups, tactical formations for 11v11, 7v7, 6v6. No signup required. Share instantly with coaches and players worldwide.">
+    <meta name="keywords" content="football formation builder, soccer lineup creator, free formation maker, tactical board, football tactics, soccer formations, 4-4-2, 4-3-3, easy football lineup, formation creator online, soccer tactical board">
+    <meta name="author" content="Easy Football Lineup">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://easyfootballlineup.com/">
+    <meta name="language" content="English">
+    
+    <!-- Redirect www to non-www and enforce HTTPS -->
+    <script>
+        if ((window.location.hostname === 'www.easyfootballlineup.com' || window.location.protocol === 'http:') && !window.location.hostname.includes('localhost')) {
+            window.location.replace('https://easyfootballlineup.com' + window.location.pathname + window.location.search + window.location.hash);
+        }
+    </script>
+    <meta name="geo.region" content="IN, GB, US, AU, CA">
+    <meta name="geo.placename" content="Global">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚽</text></svg>">
+    
+    <!-- Styles and Scripts -->
+    <link rel="stylesheet" href="css/pitch-styles.css">
+    <link rel="stylesheet" href="css/app-styles.css">
+    
+    <!-- Open Graph meta tags -->
+    <meta property="og:title" content="Easy Football Lineup - Free Soccer Formation Builder">
+    <meta property="og:description" content="Create professional football formations and soccer lineups online. Free tactical board for coaches and players. Support for 11v11, 7v7, and 6v6 formats.">
+    <meta property="og:image" content="https://easyfootballlineup.com/formation-preview.png">
+    <meta property="og:url" content="https://easyfootballlineup.com/">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Easy Football Lineup">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:locale:alternate" content="en_GB">
+    <meta property="og:locale:alternate" content="en_IN">
+    <meta property="og:locale:alternate" content="en_AU">
+    
+    <!-- Twitter Card meta tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Easy Football Lineup - Free Soccer Formation Builder">
+    <meta name="twitter:description" content="Create professional football formations and soccer lineups online. Free tactical board for coaches and players.">
+    <meta name="twitter:image" content="https://easyfootballlineup.com/formation-preview.png">
+    <meta name="twitter:site" content="@easyfootballlineup">
+    
+    <!-- Schema.org structured data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Easy Football Lineup",
+      "description": "Free online football formation builder and soccer lineup creator",
+      "url": "https://easyfootballlineup.com",
+      "applicationCategory": "Sports",
+      "operatingSystem": "Web Browser",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "creator": {
+        "@type": "Organization",
+        "name": "Easy Football Lineup"
+      }
+    }
+    </script>
+    
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-BGH9W2K44G"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-BGH9W2K44G');
+    </script>
+</head>
+<body>
+    <div class="header">
+        <h1>EASY FOOTBALL LINEUP</h1>
+        <p class="subtitle">Build your team formation and get an instant shareable link. No saving, no accounts - just share.</p>
+        
+        <div id="loadingIndicator" class="loading-indicator">
+            <span>⚽</span> Loading formation...
+        </div>
+        
+        <div class="controls">
+            <button onclick="formationBuilder.shareFormation()">SHARE FORMATION</button>
+            <button onclick="formationBuilder.downloadImage()" id="downloadBtn">
+                <span class="desktop-text">DOWNLOAD IMAGE</span>
+                <span class="mobile-text">SHARE IMAGE</span>
+            </button>
+        </div>
+        
+        <div class="formation-container">
+            <div class="formation-group">
+                <span class="formation-label">Home:</span>
+                <select id="myTeamFormation" onchange="formationBuilder.loadFormation()" class="formation-select">
+                    <!-- Most Common -->
+                    <option value="442">4-4-2</option>
+                    <option value="433">4-3-3</option>
+                    <option value="4231">4-2-3-1</option>
+                    <option value="352">3-5-2</option>
+                    <option value="343">3-4-3</option>
+                    <option value="532">5-3-2</option>
+                    <!-- Common Variations -->
+                    <option value="451">4-5-1</option>
+                    <option value="541">5-4-1</option>
+                    <option value="4141">4-1-4-1</option>
+                    <option value="3421">3-4-2-1</option>
+                    <!-- Less Common -->
+                    <option value="4321">4-3-2-1</option>
+                    <option value="41212">4-1-2-1-2</option>
+                    <option value="4132">4-1-3-2</option>
+                    <option value="4213">4-2-1-3</option>                    <option value="523">5-2-3</option>
+                    <option value="4312">4-3-1-2</option>
+                    <option value="334">3-3-4</option>
+                    <!-- Rare/Experimental -->
+                    <option value="460">4-6-0</option>
+                    <option value="5221">5-2-2-1</option>
+                    <option value="424">4-2-4</option>
+                    <!-- Historical -->
+                    <option value="235">2-3-5</option>
+                    <option value="325">3-2-5</option>
+                    <option value="253">2-5-3</option>
+                </select>
+            </div>
+            <div class="formation-group">
+                <span class="formation-label">Away:</span>
+                <select id="awayTeamFormation" onchange="formationBuilder.loadFormation()" class="formation-select">
+                    <!-- Most Common -->
+                    <option value="442">4-4-2</option>
+                    <option value="433">4-3-3</option>
+                    <option value="4231">4-2-3-1</option>
+                    <option value="352">3-5-2</option>
+                    <option value="343">3-4-3</option>
+                    <option value="532">5-3-2</option>
+                    <!-- Common Variations -->
+                    <option value="451">4-5-1</option>
+                    <option value="541">5-4-1</option>
+                    <option value="4141">4-1-4-1</option>
+                    <option value="3421">3-4-2-1</option>
+                    <!-- Less Common -->
+                    <option value="4321">4-3-2-1</option>
+                    <option value="41212">4-1-2-1-2</option>
+                    <option value="4132">4-1-3-2</option>
+                    <option value="523">5-2-3</option>
+                    <option value="4213">4-2-1-3</option>                    <option value="4312">4-3-1-2</option>
+                    <option value="334">3-3-4</option>
+                    <!-- Rare/Experimental -->
+                    <option value="460">4-6-0</option>
+                    <option value="5221">5-2-2-1</option>
+                    <option value="424">4-2-4</option>
+                    <!-- Historical -->
+                    <option value="235">2-3-5</option>
+                    <option value="325">3-2-5</option>
+                    <option value="253">2-5-3</option>
+                </select>
+            </div>
+        </div>
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin: 15px 0; color: #ccc; font-size: 14px;">
+            💡 Click on player names to edit them directly
+        </div>
+    </div>
+
+    <div class="field-container">
+        <div id="field" class="field"></div>
+    </div>
+
+    <div id="modeToggleContainer" data-active="11v11"></div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.4.4/lz-string.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="js/pitch-common.js"></script>
+    <script src="js/formations.js"></script>
+    <script src="js/formation-builder.js"></script>
+    <script src="js/common-mode-toggle.js"></script>
+    <script src="js/common-footer.js"></script>
+    <script>
+        const formationBuilder = new FormationBuilder({
+            gameType: '11v11',
+            formations: FORMATIONS_11V11,
+            defaultNames: DEFAULT_NAMES_11V11,
+            fieldMargin: 8,
+            defaultAwayFormation: FORMATIONS_11V11['442'],
+            defaultAwayFormationKey: '442'
+        });
+    </script>
+</body>
+</html>

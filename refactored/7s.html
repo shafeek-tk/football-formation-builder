@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>7v7 Football Formation Builder | Easy Football Lineup - Create 7-a-side Soccer Formations</title>
+    
+    <!-- SEO Meta Tags -->
+    <link rel="canonical" href="https://easyfootballlineup.com/7s.html">
+    <meta name="description" content="Free 7v7 football formation builder. Create 7-a-side soccer lineups for youth football, small-sided games, and training. No signup required - start building instantly.">
+    <meta name="keywords" content="7v7 football formation, 7-a-side soccer lineup, 7v7 tactics, youth football formations, small sided football, 7 aside soccer, football 7v7 strategy">
+    <meta name="geo.region" content="GB, DE, FR, IT, ES, NL, PT, BE, AT, CH, SE, NO, DK, FI, IS, IE, PL, CZ, SK, HU, RO, BG, HR, SI, EE, LV, LT, GR, CY, MT, LU, BR, AR, CO, PE, CL, EC, UY, PY, BO, VE, GY, SR, GF, JP, KR, CN, IN, TH, VN, MY, SG, ID, PH, AU, NZ, MX, US, CA">
+    <meta name="geo.placename" content="Europe, Asia, South America, Global">
+    
+    <!-- Open Graph meta tags -->
+    <meta property="og:title" content="7v7 Football Formation Builder - Create 7-a-side Soccer Lineups">
+    <meta property="og:description" content="Free online 7v7 football formation creator. Perfect for youth football, small-sided games, and training worldwide.">
+    <meta property="og:url" content="https://easyfootballlineup.com/7s.html">
+    <meta property="og:locale" content="en_GB">
+    
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚽</text></svg>">
+    
+    <link rel="stylesheet" href="css/pitch-styles.css">
+    <link rel="stylesheet" href="css/app-styles.css">
+</head>
+<body>
+    <div class="header">
+        <h1>EASY FOOTBALL LINEUP - 7v7</h1>
+        <p class="subtitle">Build your 7-a-side team formation and get an instant shareable link.</p>
+        
+        <div id="loadingIndicator" class="loading-indicator">
+            <span>⚽</span> Loading formation...
+        </div>
+        
+        <div class="controls">
+            <button onclick="formationBuilder.shareFormation()">SHARE FORMATION</button>
+            <button onclick="formationBuilder.downloadImage()" id="downloadBtn">
+                <span class="desktop-text">DOWNLOAD IMAGE</span>
+                <span class="mobile-text">SHARE IMAGE</span>
+            </button>
+        </div>
+        
+        <div class="formation-container">
+            <div class="formation-group">
+                <span class="formation-label">Home:</span>
+                <select id="myTeamFormation" onchange="formationBuilder.loadFormation()" class="formation-select">
+                    <option value="231">2-3-1</option>
+                    <option value="321">3-2-1</option>
+                    <option value="132">1-3-2</option>
+                    <option value="222">2-2-2</option>
+                    <option value="141">1-4-1</option>
+                    <option value="312">3-1-2</option>
+                    <option value="213">2-1-3</option>
+                </select>
+            </div>
+            <div class="formation-group">
+                <span class="formation-label">Away:</span>
+                <select id="awayTeamFormation" onchange="formationBuilder.loadFormation()" class="formation-select">
+                    <option value="231">2-3-1</option>
+                    <option value="321">3-2-1</option>
+                    <option value="132">1-3-2</option>
+                    <option value="222">2-2-2</option>
+                    <option value="141">1-4-1</option>
+                    <option value="312">3-1-2</option>
+                    <option value="213">2-1-3</option>
+                </select>
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin: 15px 0; color: #ccc; font-size: 14px;">
+            💡 Click on player names to edit them directly
+        </div>
+    </div>
+
+    <div class="field-container">
+        <div id="field" class="field"></div>
+    </div>
+
+    <div id="modeToggleContainer" data-active="7v7"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.4.4/lz-string.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="js/pitch-common.js"></script>
+    <script src="js/formations.js"></script>
+    <script src="js/formation-builder.js"></script>
+    <script src="js/common-mode-toggle.js"></script>
+    <script src="js/common-footer.js"></script>
+    <script>
+        const formationBuilder = new FormationBuilder({
+            gameType: '7v7',
+            formations: FORMATIONS_7V7,
+            defaultNames: DEFAULT_NAMES_7V7,
+            fieldMargin: 12,
+            defaultAwayFormation: FORMATIONS_7V7['321'],
+            defaultAwayFormationKey: '321'
+        });
+    </script>
+</body>
+</html>

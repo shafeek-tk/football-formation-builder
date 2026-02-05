@@ -8,10 +8,10 @@ class FormationBuilder {
     }
 
     init() {
-        this.restoreNamesFromStorage();
-        this.loadFromURL(); // Load URL after storage so URL takes priority
+        this.loadFromURL();
         this.setupEventListeners();
         this.loadFormation();
+        this.restoreNamesFromStorage();
     }
 
     setupEventListeners() {
@@ -35,32 +35,22 @@ class FormationBuilder {
         const outfieldLayers = totalLayers - 1;
         const outfieldIndex = layerIndex - 1;
         
-        // Use tighter spacing for formations with more layers (9v9, 8v8)
-        let range, startPos;
-        if (outfieldLayers >= 3) {
-            // Tighter spacing for 3+ outfield layers
-            range = 24;
-            startPos = isMyTeam ? 82 : 18;
-        } else {
-            // Normal spacing for 1-2 outfield layers (11v11)
-            range = 27;
-            startPos = isMyTeam ? 85 : 15;
-        }
-        
         let y;
         if (isMyTeam) {
+            // My team (blue): bottom half only (55% to 85%)
             if (outfieldLayers === 1) {
                 y = 70;
             } else {
-                const spacing = range / (outfieldLayers - 1);
-                y = startPos - (spacing * outfieldIndex);
+                const spacing = 30 / (outfieldLayers - 1);
+                y = 85 - (spacing * outfieldIndex);
             }
         } else {
+            // Away team (red): top half only (15% to 45%) 
             if (outfieldLayers === 1) {
                 y = 30;
             } else {
-                const spacing = range / (outfieldLayers - 1);
-                y = startPos + (spacing * outfieldIndex);
+                const spacing = 30 / (outfieldLayers - 1);
+                y = 15 + (spacing * outfieldIndex);
             }
         }
         
@@ -86,9 +76,7 @@ class FormationBuilder {
         name.textContent = this.getPlayerName(team, sequentialIndex !== null ? sequentialIndex : index);
         
         name.addEventListener('blur', () => {
-            const upperName = name.textContent.toUpperCase();
-            this.savePlayerName(team, sequentialIndex !== null ? sequentialIndex : index, upperName);
-            name.textContent = upperName;
+            this.savePlayerName(team, sequentialIndex !== null ? sequentialIndex : index, name.textContent);
         });
         
         name.addEventListener('keydown', (e) => {
@@ -245,14 +233,14 @@ class FormationBuilder {
 
     savePlayerName(team, index, name) {
         const key = `${team}_${index}`;
-        this.playerNames[key] = name.toUpperCase();
+        this.playerNames[key] = name;
         localStorage.setItem('playerNames', JSON.stringify(this.playerNames));
     }
 
     updatePlayerDisplay(team, index, name) {
         const players = document.querySelectorAll(`.${team} .player-name`);
         if (players[index]) {
-            players[index].textContent = name.toUpperCase();
+            players[index].textContent = name;
         }
     }
 
@@ -273,8 +261,8 @@ class FormationBuilder {
             n: this.playerNames
         };
         
-        const compressed = LZString.compressToEncodedURIComponent(JSON.stringify(data));
-        const url = `${window.location.origin}${window.location.pathname}#f=${compressed}`;
+        const compressed = LZString.compressToBase64(JSON.stringify(data));
+        const url = `${window.location.origin}${window.location.pathname}?d=${compressed}`;
         
         this.shareURL(url);
     }
@@ -307,40 +295,13 @@ class FormationBuilder {
     }
 
     loadFromURL() {
-        const hash = window.location.hash;
+        const urlParams = new URLSearchParams(window.location.search);
+        const compressed = urlParams.get('d');
         
-        if (!hash.startsWith('#f=') && !hash.startsWith('#formation=')) return;
-        
-        const compressed = hash.startsWith('#f=') ? hash.substring(3) : hash.substring(11);
+        if (!compressed) return;
         
         try {
-            const decoded = JSON.parse(LZString.decompressFromEncodedURIComponent(compressed));
-            let data;
-            
-            // Handle old array format: [homeFormation, awayFormation, homeNames, awayNames]
-            if (Array.isArray(decoded)) {
-                // Convert old array format to new flat object format
-                const playerNames = {};
-                const homeNames = decoded[2] || [];
-                const awayNames = decoded[3] || [];
-                
-                homeNames.forEach((name, i) => {
-                    playerNames[`my-team_${i}`] = name;
-                });
-                
-                awayNames.forEach((name, i) => {
-                    playerNames[`opp-team_${i}`] = name;
-                });
-                
-                data = {
-                    h: decoded[0],
-                    a: decoded[1],
-                    n: playerNames
-                };
-            } else {
-                // New object format: {h, a, n}
-                data = decoded;
-            }
+            const data = JSON.parse(LZString.decompressFromBase64(compressed));
             
             if (data.h) {
                 const homeSelect = document.getElementById('myTeamFormation');
@@ -356,8 +317,6 @@ class FormationBuilder {
                 this.playerNames = data.n;
                 localStorage.setItem('playerNames', JSON.stringify(this.playerNames));
             }
-            
-            this.loadFormation();
         } catch (e) {
             console.error('Failed to load formation from URL:', e);
         }
@@ -370,20 +329,14 @@ class FormationBuilder {
         if (loadingIndicator) loadingIndicator.style.display = 'block';
         
         try {
-            // Force consistent dimensions
-            const rect = field.getBoundingClientRect();
+            // Convert SVG elements to canvas before capture
+            await this.convertSVGsToCanvas(field);
+            
             const canvas = await html2canvas(field, {
                 backgroundColor: '#2d5a2d',
-                scale: 3,
-                width: Math.floor(rect.width),
-                height: Math.floor(rect.height),
-                x: 0,
-                y: 0,
-                scrollX: 0,
-                scrollY: 0,
-                useCORS: true,
-                allowTaint: false,
-                foreignObjectRendering: false
+                scale: 2,
+                width: field.offsetWidth,
+                height: field.offsetHeight
             });
             
             this.downloadCanvas(canvas, `formation-${this.config.gameType}.png`);
@@ -392,6 +345,30 @@ class FormationBuilder {
             alert('Error generating image. Please try again.');
         } finally {
             if (loadingIndicator) loadingIndicator.style.display = 'none';
+        }
+    }
+
+    async convertSVGsToCanvas(container) {
+        const svgs = container.querySelectorAll('svg');
+        for (const svg of svgs) {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const svgData = new XMLSerializer().serializeToString(svg);
+            const img = new Image();
+            
+            await new Promise((resolve) => {
+                img.onload = () => {
+                    canvas.width = svg.clientWidth;
+                    canvas.height = svg.clientHeight;
+                    ctx.drawImage(img, 0, 0);
+                    svg.style.display = 'none';
+                    svg.parentNode.insertBefore(canvas, svg);
+                    canvas.className = svg.className;
+                    canvas.style.cssText = svg.style.cssText;
+                    resolve();
+                };
+                img.src = 'data:image/svg+xml;base64,' + btoa(svgData);
+            });
         }
     }
 

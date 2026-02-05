@@ -1,0 +1,39 @@
+/* Common Soccer Pitch Styling */
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&display=swap');
+*{font-family:'Oswald',system-ui,sans-serif;margin:0;padding:0;box-sizing:border-box}
+
+.field{width:min(90vw,500px);height:min(80vh,700px);background:linear-gradient(0deg,#2d5a2d 0%,#3a6b3a 25%,#2d5a2d 50%,#3a6b3a 75%,#2d5a2d 100%);background-size:100% 20%;border:3px solid #fff;position:relative;border-radius:8px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,0.5)}
+
+.field-container{display:flex;justify-content:center;margin-bottom:20px}
+
+.center-spot{position:absolute;top:50%;left:50%;width:1%;height:0.67%;background:#fff;border-radius:50%;transform:translate(-50%,-50%);pointer-events:none}
+
+.penalty-area{position:absolute;width:40%;height:16%;left:50%;transform:translateX(-50%);border:2px solid #fff;background:rgba(255,255,255,0.02)}
+.penalty-area.top{top:0;border-top:none}
+.penalty-area.bottom{bottom:0;border-bottom:none}
+.goal-area{position:absolute;width:20%;height:6%;left:50%;transform:translateX(-50%);border:2px solid #fff;background:rgba(255,255,255,0.03)}
+.goal-area.top{top:0;border-top:none}
+.goal-area.bottom{bottom:0;border-bottom:none}
+
+.penalty-spot{position:absolute;left:50%;width:1%;height:0.67%;background:#fff;border-radius:50%;transform:translateX(-50%);pointer-events:none}
+.penalty-spot.top{top:12%}
+.penalty-spot.bottom{bottom:12%}
+
+.corner-arc{position:absolute;width:5%;height:3.33%;border:2px solid #fff;border-radius:50%;pointer-events:none}
+.corner-arc.top-left{top:-1.67%;left:-2.5%;border-right:none;border-bottom:none}
+.corner-arc.top-right{top:-1.67%;right:-2.5%;border-left:none;border-bottom:none}
+.corner-arc.bottom-left{bottom:-1.67%;left:-2.5%;border-right:none;border-top:none}
+.corner-arc.bottom-right{bottom:-1.67%;right:-2.5%;border-left:none;border-top:none}
+
+.halfway-line{position:absolute;top:50%;left:0;right:0;height:2px;background:#fff;pointer-events:none}
+
+.center-circle{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none}
+
+.penalty-arc{position:absolute;left:50%;transform:translateX(-50%);pointer-events:none}
+.penalty-arc.top{top:16%}
+.penalty-arc.bottom{bottom:16%}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .field{width:95vw;height:70vh}
+}
