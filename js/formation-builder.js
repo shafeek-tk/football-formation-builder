@@ -365,43 +365,57 @@ class FormationBuilder {
 
     async downloadImage() {
         const field = document.getElementById('field');
-        const container = field.parentElement;
         const loadingIndicator = document.getElementById('loadingIndicator');
         
         if (loadingIndicator) loadingIndicator.style.display = 'block';
         
         try {
-            // Temporarily remove container margin to prevent boundary shift
-            const originalMargin = container.style.marginBottom;
-            container.style.marginBottom = '0';
+            // Create isolated clone with exact dimensions
+            const clone = field.cloneNode(true);
+            const computedStyle = window.getComputedStyle(field);
             
-            // Safari-specific fix for boundary alignment
-            const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-            const rect = field.getBoundingClientRect();
+            // Apply exact styling to eliminate browser differences
+            clone.style.cssText = `
+                position: absolute !important;
+                left: -9999px !important;
+                top: 0 !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                width: ${field.offsetWidth}px !important;
+                height: ${field.offsetHeight}px !important;
+                background: ${computedStyle.background} !important;
+                border: ${computedStyle.border} !important;
+                border-radius: ${computedStyle.borderRadius} !important;
+                box-shadow: none !important;
+                transform: none !important;
+            `;
             
-            const options = {
-                backgroundColor: '#2d5a2d',
+            document.body.appendChild(clone);
+            
+            // Force layout recalculation
+            clone.offsetHeight;
+            
+            const canvas = await html2canvas(clone, {
+                backgroundColor: null,
                 scale: 3,
-                width: rect.width,
-                height: rect.height,
+                width: field.offsetWidth,
+                height: field.offsetHeight,
                 x: 0,
                 y: 0,
                 useCORS: true,
                 allowTaint: false,
-                logging: false
-            };
+                logging: false,
+                onclone: (clonedDoc) => {
+                    // Ensure clean rendering in cloned document
+                    const clonedElement = clonedDoc.querySelector(`#${clone.id}`);
+                    if (clonedElement) {
+                        clonedElement.style.margin = '0';
+                        clonedElement.style.padding = '0';
+                    }
+                }
+            });
             
-            // Safari needs different positioning
-            if (isSafari) {
-                options.scrollX = 0;
-                options.scrollY = 0;
-            }
-            
-            const canvas = await html2canvas(field, options);
-            
-            // Restore original margin
-            container.style.marginBottom = originalMargin;
-            
+            document.body.removeChild(clone);
             this.downloadCanvas(canvas, `formation-${this.config.gameType}.png`);
         } catch (error) {
             console.error('Error generating image:', error);
