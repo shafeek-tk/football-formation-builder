@@ -405,30 +405,55 @@ class FormationBuilder {
     }
 
     downloadCanvas(canvas, filename) {
-        // Check if mobile and Web Share API is available
+        // Try multiple methods for Chrome compatibility
+        const isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
+        
         if (navigator.share && /Mobi|Android/i.test(navigator.userAgent)) {
+            // Mobile sharing
             canvas.toBlob(blob => {
                 if (blob) {
                     const file = new File([blob], filename, { type: 'image/png' });
                     navigator.share({ files: [file] }).catch(err => {
                         console.log('Share failed, falling back to download:', err);
-                        this.fallbackDownload(canvas, filename);
+                        this.forceDownload(canvas, filename);
                     });
                 } else {
-                    this.fallbackDownload(canvas, filename);
+                    this.forceDownload(canvas, filename);
                 }
             }, 'image/png', 0.95);
         } else {
-            this.fallbackDownload(canvas, filename);
+            // Desktop download with Chrome-specific handling
+            this.forceDownload(canvas, filename, isChrome);
         }
     }
 
-    fallbackDownload(canvas, filename) {
-        const link = document.createElement('a');
-        link.download = filename;
-        link.href = canvas.toDataURL('image/png');
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+    forceDownload(canvas, filename, isChrome = false) {
+        try {
+            const link = document.createElement('a');
+            link.download = filename;
+            
+            if (isChrome) {
+                // Chrome-specific: use blob URL
+                canvas.toBlob(blob => {
+                    const url = URL.createObjectURL(blob);
+                    link.href = url;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    setTimeout(() => URL.revokeObjectURL(url), 100);
+                }, 'image/png');
+            } else {
+                // Other browsers: use data URL
+                link.href = canvas.toDataURL('image/png');
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        } catch (error) {
+            console.error('Download failed:', error);
+            // Last resort: open in new tab
+            const newTab = window.open();
+            newTab.document.write(`<img src="${canvas.toDataURL()}" alt="Formation"/>`);
+        }
     }
 }
