@@ -2,7 +2,7 @@
 function createFooter() {
     return `
         <div style="text-align:center;padding:20px;background:#2a2a2a;margin:20px auto;max-width:800px;border-radius:8px;">
-            <h3 style="color:#fff;margin-bottom:15px;font-size:18px;">Why coaches and players love this tool:</h3>
+            <h3 style="color:#fff;margin-bottom:15px;font-size:18px;">Perfect for weekly kickabouts and pickup games:</h3>
             <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:15px;text-align:left;">
                 <div style="color:#ccc;">
                     <strong style="color:#fff;">🔗 Instant Shareable Links</strong><br>

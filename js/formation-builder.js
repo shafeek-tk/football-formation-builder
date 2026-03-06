@@ -4,6 +4,8 @@ class FormationBuilder {
         this.config = config;
         this.formations = config.formations;
         this.playerNames = {};
+        this.mode = 'edit';
+        this.selectedPlayer = null;
         this.init();
     }
 
@@ -11,6 +13,7 @@ class FormationBuilder {
         this.restoreNamesFromStorage();
         this.loadFromURL(); // Load URL after storage so URL takes priority
         this.setupEventListeners();
+        this.createInteractionToggle();
         this.loadFormation();
     }
 
@@ -19,6 +22,135 @@ class FormationBuilder {
             this.loadFormation();
             this.restoreNamesFromStorage();
         });
+    }
+
+    createInteractionToggle() {
+        const container = document.getElementById('interactionToggleContainer');
+        if (!container) return;
+
+        container.innerHTML = `
+            <div class="interaction-toggle">
+                <button class="toggle-pill active" data-mode="edit">EDIT NAMES</button>
+                <button class="toggle-pill" data-mode="swap">SWAP PLAYERS</button>
+            </div>
+            <div class="interaction-hint">Click on player names to edit them directly</div>
+        `;
+
+        container.querySelectorAll('.toggle-pill').forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (btn.dataset.mode === this.mode) return;
+                this.toggleMode();
+            });
+        });
+    }
+
+    toggleMode() {
+        this.mode = this.mode === 'edit' ? 'swap' : 'edit';
+        const field = document.getElementById('field');
+        const pills = document.querySelectorAll('.toggle-pill');
+        const hint = document.querySelector('.interaction-hint');
+
+        // Update toggle pills
+        pills.forEach(pill => {
+            pill.classList.toggle('active', pill.dataset.mode === this.mode);
+        });
+
+        // Update field class
+        if (field) {
+            field.classList.toggle('swap-mode', this.mode === 'swap');
+        }
+
+        // Toggle contentEditable on all player names
+        document.querySelectorAll('.player-name').forEach(el => {
+            el.contentEditable = this.mode === 'edit';
+        });
+
+        // Clear any selection when switching modes
+        this.deselectPlayer();
+
+        // Update hint text
+        if (hint) {
+            hint.textContent = this.mode === 'edit'
+                ? 'Click on player names to edit them directly'
+                : 'Tap a player, then tap another to swap them';
+        }
+    }
+
+    handlePlayerTap(playerElement) {
+        if (this.mode !== 'swap') return;
+
+        if (!this.selectedPlayer) {
+            this.selectPlayer(playerElement);
+        } else if (this.selectedPlayer === playerElement) {
+            this.deselectPlayer();
+        } else {
+            this.executeSwap(this.selectedPlayer, playerElement);
+        }
+    }
+
+    selectPlayer(playerElement) {
+        this.deselectPlayer();
+        this.selectedPlayer = playerElement;
+        playerElement.classList.add('swap-selected');
+        const hint = document.querySelector('.interaction-hint');
+        if (hint) hint.textContent = 'Now tap another player to swap';
+    }
+
+    deselectPlayer() {
+        if (this.selectedPlayer) {
+            this.selectedPlayer.classList.remove('swap-selected');
+        }
+        this.selectedPlayer = null;
+        const hint = document.querySelector('.interaction-hint');
+        if (hint && this.mode === 'swap') {
+            hint.textContent = 'Tap a player, then tap another to swap them';
+        }
+    }
+
+    executeSwap(playerA, playerB) {
+        const teamA = playerA.dataset.team;
+        const indexA = playerA.dataset.index;
+        const teamB = playerB.dataset.team;
+        const indexB = playerB.dataset.index;
+
+        const keyA = `${teamA}_${indexA}`;
+        const keyB = `${teamB}_${indexB}`;
+
+        const nameA = this.playerNames[keyA] || this.getPlayerName(teamA, parseInt(indexA));
+        const nameB = this.playerNames[keyB] || this.getPlayerName(teamB, parseInt(indexB));
+
+        // Swap in data store
+        this.playerNames[keyA] = nameB;
+        this.playerNames[keyB] = nameA;
+        localStorage.setItem('playerNames', JSON.stringify(this.playerNames));
+
+        const nameElA = playerA.querySelector('.player-name');
+        const nameElB = playerB.querySelector('.player-name');
+
+        // Add swapping class for animation
+        playerA.classList.add('swapping');
+        playerB.classList.add('swapping');
+
+        // After shrink phase, swap text
+        setTimeout(() => {
+            nameElA.textContent = nameB;
+            nameElB.textContent = nameA;
+            playerA.classList.remove('swapping');
+            playerB.classList.remove('swapping');
+            playerA.classList.add('swap-complete');
+            playerB.classList.add('swap-complete');
+
+            // Haptic feedback
+            navigator.vibrate?.(50);
+
+            // Remove completion class
+            setTimeout(() => {
+                playerA.classList.remove('swap-complete');
+                playerB.classList.remove('swap-complete');
+            }, 300);
+        }, 150);
+
+        this.deselectPlayer();
     }
 
     getLayerY(layerIndex, totalLayers, isMyTeam) {
@@ -72,6 +204,8 @@ class FormationBuilder {
         player.className = `player ${team}`;
         player.style.left = x + '%';
         player.style.top = y + '%';
+        player.dataset.team = team;
+        player.dataset.index = sequentialIndex !== null ? sequentialIndex : index;
         
         const icon = document.createElement('div');
         icon.className = 'player-icon';
@@ -120,7 +254,16 @@ class FormationBuilder {
         icon.appendChild(number);
         player.appendChild(icon);
         player.appendChild(name);
-        
+
+        // Swap mode click handler on the whole player div
+        player.addEventListener('click', (e) => {
+            if (this.mode === 'swap') {
+                e.preventDefault();
+                e.stopPropagation();
+                this.handlePlayerTap(player);
+            }
+        });
+
         return player;
     }
 
@@ -233,14 +376,17 @@ class FormationBuilder {
         if (this.playerNames[key]) {
             return this.playerNames[key];
         }
-        
-        // Default names for home team only
+
         if (team === 'my-team') {
             return this.config.defaultNames[index] || `Player ${index + 1}`;
         }
-        
-        // Away team: minimal placeholder that hints it's editable
-        return '...';
+
+        // Away team: use away defaults if provided
+        if (this.config.defaultAwayNames) {
+            return this.config.defaultAwayNames[index] || `Player ${index + 1}`;
+        }
+
+        return `Player ${index + 1}`;
     }
 
     savePlayerName(team, index, name) {

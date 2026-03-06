@@ -94,8 +94,6 @@ body {
     margin-bottom: 35px;
     flex-wrap: wrap;
 }
-    flex-wrap: wrap;
-}
 
 .formation-group {
     display: flex;
@@ -368,13 +366,122 @@ body {
     50% { transform: translateY(-5px); }
 }
 
-.field:hover .player-name {
+/* Interaction Toggle */
+.interaction-toggle {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    margin: 8px auto 4px auto;
+    max-width: 320px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #555;
+}
+
+.toggle-pill {
+    flex: 1;
+    padding: 10px 16px;
+    min-height: 44px;
+    border: none;
+    font-family: 'Oswald', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: transparent;
+    color: #aaa;
+}
+
+.toggle-pill[data-mode="edit"].active {
+    background: #4CAF50;
+    color: #fff;
+}
+
+.toggle-pill[data-mode="swap"].active {
+    background: #FFA726;
+    color: #fff;
+}
+
+.toggle-pill:not(.active):hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+}
+
+.interaction-hint {
+    text-align: center;
+    margin: 4px 0 5px 0;
+    color: #ccc;
+    font-size: 13px;
+}
+
+/* Swap Mode States */
+.swap-mode .player-name {
+    cursor: pointer;
+    user-select: none;
+}
+
+.swap-mode .player-name:hover::after {
+    content: none !important;
+}
+
+.swap-mode .player-name {
+    animation: swapPulse 2s ease-in-out infinite;
+}
+
+@keyframes swapPulse {
+    0%, 100% { border-color: rgba(255, 167, 38, 0.3); }
+    50% { border-color: rgba(255, 167, 38, 0.7); }
+}
+
+.swap-selected .player-name {
+    border-color: #FFA726 !important;
+    box-shadow: 0 0 12px rgba(255, 167, 38, 0.6) !important;
+    transform: scale(1.08);
+    animation: none !important;
+}
+
+.player.swapping {
+    transform: translate(-50%, -50%) scale(0.85);
+    opacity: 0.5;
+    transition: all 0.15s ease-in;
+}
+
+.player.swap-complete {
+    transform: translate(-50%, -50%) scale(1.0);
+    opacity: 1;
+    transition: all 0.2s ease-out;
+}
+
+.player.swap-complete .player-name {
+    border-color: #4CAF50 !important;
+    box-shadow: 0 0 12px rgba(76, 175, 80, 0.6) !important;
+    animation: none !important;
+}
+
+/* Edit mode field hover (only when not in swap mode) */
+.field:not(.swap-mode):hover .player-name {
     border-color: #4CAF50 !important;
     box-shadow: 0 0 8px rgba(76, 175, 80, 0.4) !important;
 }
 
-.field:hover .player-name::after {
+.field:not(.swap-mode):hover .player-name::after {
     content: " ✏️";
     font-size: 8px;
     opacity: 0.8;
+}
+
+@media (max-width: 768px) {
+    .interaction-toggle {
+        max-width: 280px;
+    }
+
+    .toggle-pill {
+        font-size: 12px;
+        padding: 8px 12px;
+    }
+
+    .interaction-hint {
+        font-size: 11px;
+    }
 }
