@@ -127,28 +127,35 @@ class FormationBuilder {
         const nameElA = playerA.querySelector('.player-name');
         const nameElB = playerB.querySelector('.player-name');
 
-        // Add swapping class for animation
-        playerA.classList.add('swapping');
-        playerB.classList.add('swapping');
+        // Phase 1: Fly out (names shrink + fade + slide up)
+        playerA.classList.add('swap-fly-out');
+        playerB.classList.add('swap-fly-out');
 
-        // After shrink phase, swap text
+        // Phase 2: Swap text while invisible, then fly in
         setTimeout(() => {
             nameElA.textContent = nameB;
             nameElB.textContent = nameA;
-            playerA.classList.remove('swapping');
-            playerB.classList.remove('swapping');
-            playerA.classList.add('swap-complete');
-            playerB.classList.add('swap-complete');
+            playerA.classList.remove('swap-fly-out');
+            playerB.classList.remove('swap-fly-out');
+            playerA.classList.add('swap-fly-in');
+            playerB.classList.add('swap-fly-in');
 
             // Haptic feedback
             navigator.vibrate?.(50);
 
-            // Remove completion class
+            // Phase 3: Flash green on land
             setTimeout(() => {
-                playerA.classList.remove('swap-complete');
-                playerB.classList.remove('swap-complete');
-            }, 300);
-        }, 150);
+                playerA.classList.remove('swap-fly-in');
+                playerB.classList.remove('swap-fly-in');
+                playerA.classList.add('swap-complete');
+                playerB.classList.add('swap-complete');
+
+                setTimeout(() => {
+                    playerA.classList.remove('swap-complete');
+                    playerB.classList.remove('swap-complete');
+                }, 400);
+            }, 350);
+        }, 250);
 
         this.deselectPlayer();
     }

@@ -463,7 +463,7 @@ test.describe('Football Formation Builder', () => {
     await page.locator('.toggle-pill[data-mode="swap"]').click();
     await page.locator('.my-team.player').first().click();
     await page.locator('.opp-team.player').first().click();
-    await page.waitForTimeout(400);
+    await page.waitForTimeout(700);
 
     await expect(homeNameEl).toHaveText(originalAwayName);
     await expect(awayNameEl).toHaveText(originalHomeName);
@@ -481,7 +481,7 @@ test.describe('Football Formation Builder', () => {
     await page.locator('.toggle-pill[data-mode="swap"]').click();
     await page.locator('.my-team.player').nth(0).click();
     await page.locator('.my-team.player').nth(1).click();
-    await page.waitForTimeout(400);
+    await page.waitForTimeout(700);
 
     await expect(firstNameEl).toHaveText(originalSecond);
     await expect(secondNameEl).toHaveText(originalFirst);
@@ -499,7 +499,7 @@ test.describe('Football Formation Builder', () => {
     await page.locator('.toggle-pill[data-mode="swap"]').click();
     await page.locator('.my-team.player').first().click();
     await page.locator('.opp-team.player').first().click();
-    await page.waitForTimeout(400);
+    await page.waitForTimeout(700);
 
     await page.reload();
     await page.waitForSelector('.player-name');
@@ -515,7 +515,7 @@ test.describe('Football Formation Builder', () => {
     await page.locator('.toggle-pill[data-mode="swap"]').click();
     await page.locator('.my-team.player').first().click();
     await page.locator('.opp-team.player').first().click();
-    await page.waitForTimeout(400);
+    await page.waitForTimeout(700);
 
     const swappedHome = await page.locator('.my-team .player-name').first().textContent();
     const swappedAway = await page.locator('.opp-team .player-name').first().textContent();
@@ -549,7 +549,7 @@ test.describe('Football Formation Builder', () => {
     await page.locator('.toggle-pill[data-mode="swap"]').click();
     await page.locator('.my-team.player').first().click();
     await page.locator('.opp-team.player').first().click();
-    await page.waitForTimeout(400);
+    await page.waitForTimeout(700);
 
     await expect(homeNameEl).toHaveText(originalAway);
     await expect(awayNameEl).toHaveText(originalHome);
@@ -587,7 +587,7 @@ test.describe('Football Formation Builder', () => {
     await page.locator('.toggle-pill[data-mode="swap"]').click();
     await page.locator('.my-team.player').first().click();
     await page.locator('.opp-team.player').first().click();
-    await page.waitForTimeout(400);
+    await page.waitForTimeout(700);
 
     await expect(homeNameEl).toHaveText(originalAway);
     await expect(awayNameEl).toHaveText(originalHome);
@@ -605,7 +605,7 @@ test.describe('Football Formation Builder', () => {
     await page.locator('.toggle-pill[data-mode="swap"]').click();
     await page.locator('.my-team.player').first().click();
     await page.locator('.opp-team.player').first().click();
-    await page.waitForTimeout(400);
+    await page.waitForTimeout(700);
 
     await expect(homeNameEl).toHaveText(originalAway);
     await expect(awayNameEl).toHaveText(originalHome);
