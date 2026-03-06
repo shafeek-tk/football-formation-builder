@@ -14,7 +14,19 @@
   </url>
   <url>
     <loc>https://easyfootballlineup.com/6s.html</loc>
-    <lastmod>2026-01-05</lastmod>
+    <lastmod>2026-03-06</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://easyfootballlineup.com/8s.html</loc>
+    <lastmod>2026-03-06</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://easyfootballlineup.com/9s.html</loc>
+    <lastmod>2026-03-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>

@@ -7,7 +7,7 @@
     
     <!-- SEO Meta Tags -->
     <meta name="description" content="Free online football formation builder. Create professional soccer lineups, tactical formations for 11v11, 7v7, 6v6. No signup required. Share instantly with coaches and players worldwide.">
-    <meta name="keywords" content="football formation builder, soccer lineup creator, free formation maker, tactical board, football tactics, soccer formations, 4-4-2, 4-3-3, easy football lineup, formation creator online, soccer tactical board">
+    <meta name="keywords" content="football formation builder, soccer lineup creator, free formation maker, tactical board, football tactics, soccer formations, 4-4-2, 4-3-3, easy football lineup, formation creator online, soccer tactical board, pickup soccer, kickabout, 5-a-side, 7-a-side, casual football, pick-up game, social soccer, friendly match, split teams">
     <meta name="author" content="Easy Football Lineup">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://easyfootballlineup.com/">
@@ -82,7 +82,7 @@
 <body>
     <div class="header">
         <h1>EASY FOOTBALL LINEUP</h1>
-        <p class="subtitle">Build your team formation and get an instant shareable link. No saving, no accounts - just share.</p>
+        <p class="subtitle">Split your squad, pick formations, and share. Perfect for pickup games.</p>
         
         <div id="loadingIndicator" class="loading-indicator">
             <span>⚽</span> Loading formation...
@@ -98,7 +98,7 @@
         
         <div class="formation-container">
             <div class="formation-group">
-                <span class="formation-label">Home:</span>
+                <span class="formation-label">Blue Team:</span>
                 <select id="myTeamFormation" onchange="formationBuilder.loadFormation()" class="formation-select">
                     <!-- Most Common -->
                     <option value="442">4-4-2</option>
@@ -130,7 +130,7 @@
                 </select>
             </div>
             <div class="formation-group">
-                <span class="formation-label">Away:</span>
+                <span class="formation-label">Red Team:</span>
                 <select id="awayTeamFormation" onchange="formationBuilder.loadFormation()" class="formation-select">
                     <!-- Most Common -->
                     <option value="442">4-4-2</option>
@@ -162,12 +162,8 @@
                 </select>
             </div>
         </div>
-            </div>
-        </div>
-        
-        <div style="text-align: center; margin: 8px 0 5px 0; color: #ccc; font-size: 14px;">
-            💡 Click on player names to edit them directly
-        </div>
+
+        <div id="interactionToggleContainer"></div>
     </div>
 
     <div id="modeToggleContainer" data-active="11v11"></div>
@@ -190,6 +186,7 @@
             gameType: '11v11',
             formations: FORMATIONS_11V11,
             defaultNames: DEFAULT_NAMES_11V11,
+            defaultAwayNames: DEFAULT_AWAY_NAMES_11V11,
             fieldMargin: 8,
             defaultAwayFormation: FORMATIONS_11V11['442'],
             defaultAwayFormationKey: '442'
