@@ -610,4 +610,153 @@ test.describe('Football Formation Builder', () => {
     await expect(homeNameEl).toHaveText(originalAway);
     await expect(awayNameEl).toHaveText(originalHome);
   });
+
+  // ===== PITCH RENDERING TESTS =====
+
+  test('should render penalty arcs clipped by overflow:hidden wrapper', async ({ page }) => {
+    await page.goto('http://localhost:8080/index.html');
+    await page.waitForSelector('#field');
+
+    const arcInfo = await page.evaluate(() => {
+      const topArc = document.querySelector('.penalty-arc.top');
+      const bottomArc = document.querySelector('.penalty-arc.bottom');
+      const topWrapper = document.querySelector('.penalty-arc-clip.top');
+      const bottomWrapper = document.querySelector('.penalty-arc-clip.bottom');
+      const field = document.getElementById('field');
+      const fieldRect = field.getBoundingClientRect();
+      return {
+        topExists: !!topArc,
+        bottomExists: !!bottomArc,
+        topWrapperOverflow: topWrapper ? window.getComputedStyle(topWrapper).overflow : null,
+        bottomWrapperOverflow: bottomWrapper ? window.getComputedStyle(bottomWrapper).overflow : null,
+        topWrapperHeightPct: topWrapper ? (topWrapper.getBoundingClientRect().height / fieldRect.height) * 100 : 0,
+        bottomWrapperHeightPct: bottomWrapper ? (bottomWrapper.getBoundingClientRect().height / fieldRect.height) * 100 : 0,
+      };
+    });
+
+    expect(arcInfo.topExists).toBe(true);
+    expect(arcInfo.bottomExists).toBe(true);
+    expect(arcInfo.topWrapperOverflow).toBe('hidden');
+    expect(arcInfo.bottomWrapperOverflow).toBe('hidden');
+    expect(arcInfo.topWrapperHeightPct).toBeGreaterThanOrEqual(4);
+    expect(arcInfo.bottomWrapperHeightPct).toBeGreaterThanOrEqual(4);
+  });
+
+  test('should render corner arcs with visible borders inside the field', async ({ page }) => {
+    await page.goto('http://localhost:8080/index.html');
+    await page.waitForSelector('#field');
+
+    // The corner arcs are positioned half-outside the field. Only the quadrant
+    // inside the field should have borders. The field has overflow:hidden so
+    // borders outside the field are clipped. We verify the inside-facing borders exist.
+    const borderInfo = await page.evaluate(() => {
+      const results = {};
+      const corners = ['top-left', 'top-right', 'bottom-left', 'bottom-right'];
+      corners.forEach(corner => {
+        const el = document.querySelector(`.corner-arc.${corner}`);
+        const style = window.getComputedStyle(el);
+        results[corner] = {
+          borderTop: style.borderTopWidth,
+          borderBottom: style.borderBottomWidth,
+          borderLeft: style.borderLeftWidth,
+          borderRight: style.borderRightWidth,
+        };
+      });
+      return results;
+    });
+
+    // top-left: inside field is bottom-right quadrant, so bottom + right borders must exist
+    expect(parseFloat(borderInfo['top-left'].borderBottom)).toBeGreaterThan(0);
+    expect(parseFloat(borderInfo['top-left'].borderRight)).toBeGreaterThan(0);
+
+    // top-right: inside field is bottom-left quadrant
+    expect(parseFloat(borderInfo['top-right'].borderBottom)).toBeGreaterThan(0);
+    expect(parseFloat(borderInfo['top-right'].borderLeft)).toBeGreaterThan(0);
+
+    // bottom-left: inside field is top-right quadrant
+    expect(parseFloat(borderInfo['bottom-left'].borderTop)).toBeGreaterThan(0);
+    expect(parseFloat(borderInfo['bottom-left'].borderRight)).toBeGreaterThan(0);
+
+    // bottom-right: inside field is top-left quadrant
+    expect(parseFloat(borderInfo['bottom-right'].borderTop)).toBeGreaterThan(0);
+    expect(parseFloat(borderInfo['bottom-right'].borderLeft)).toBeGreaterThan(0);
+  });
+
+  test('should have at least 7 visible grass stripes on the pitch', async ({ page }) => {
+    await page.goto('http://localhost:8080/index.html');
+    await page.waitForSelector('#field');
+
+    // Count the number of grass stripes by checking background-size
+    const stripeInfo = await page.evaluate(() => {
+      const field = document.getElementById('field');
+      const style = window.getComputedStyle(field);
+      const bgSize = style.backgroundSize;
+      const fieldHeight = field.offsetHeight;
+
+      let stripeHeightPx;
+      if (bgSize.includes('%')) {
+        const yPercent = parseFloat(bgSize.split(/\s+/)[1]);
+        stripeHeightPx = fieldHeight * (yPercent / 100);
+      } else {
+        stripeHeightPx = parseFloat(bgSize.split(/\s+/)[1]);
+      }
+
+      const stripeCount = Math.round(fieldHeight / stripeHeightPx);
+      return { stripeCount, bgSize, fieldHeight };
+    });
+
+    // At least 7 stripes for a realistic look (currently only 5)
+    expect(stripeInfo.stripeCount).toBeGreaterThanOrEqual(7);
+  });
+
+  test('should render center circle as visually circular', async ({ page }) => {
+    await page.goto('http://localhost:8080/index.html');
+    await page.waitForSelector('#field');
+
+    const circleInfo = await page.evaluate(() => {
+      const field = document.getElementById('field');
+      const style = window.getComputedStyle(field, '::after');
+      const width = parseFloat(style.width);
+      const height = parseFloat(style.height);
+      return { width, height, ratio: width / height };
+    });
+
+    // Aspect ratio between 0.9 and 1.1 means visually circular
+    expect(circleInfo.ratio).toBeGreaterThanOrEqual(0.9);
+    expect(circleInfo.ratio).toBeLessThanOrEqual(1.1);
+  });
+
+  test('should render goal indicators at top and bottom of pitch', async ({ page }) => {
+    await page.goto('http://localhost:8080/index.html');
+    await page.waitForSelector('#field');
+
+    const topGoal = page.locator('.goal.top');
+    const bottomGoal = page.locator('.goal.bottom');
+
+    await expect(topGoal).toBeVisible();
+    await expect(bottomGoal).toBeVisible();
+
+    // Goals should be centered and at edges
+    const topGoalBox = await topGoal.boundingBox();
+    const bottomGoalBox = await bottomGoal.boundingBox();
+    const fieldBox = await page.locator('#field').boundingBox();
+
+    expect(topGoalBox.y).toBeLessThanOrEqual(fieldBox.y + 5);
+    expect(bottomGoalBox.y + bottomGoalBox.height).toBeGreaterThanOrEqual(fieldBox.y + fieldBox.height - 5);
+  });
+
+  test('should render spots as circular', async ({ page }) => {
+    await page.goto('http://localhost:8080/index.html');
+    await page.waitForSelector('#field');
+    const spotInfo = await page.evaluate(() => {
+      return ['.center-spot', '.penalty-spot.top', '.penalty-spot.bottom'].map(sel => {
+        const r = document.querySelector(sel).getBoundingClientRect();
+        return { sel, ratio: r.width / r.height };
+      });
+    });
+    for (const s of spotInfo) {
+      expect(s.ratio).toBeGreaterThanOrEqual(0.8);
+      expect(s.ratio).toBeLessThanOrEqual(1.2);
+    }
+  });
 });

@@ -298,6 +298,9 @@ class FormationBuilder {
                 this.config.defaultAwayFormation;
             this.createTeam(awayFormation, 'opp-team', false);
         }
+
+        // Add penalty arcs after players so they render on top
+        addPenaltyArcs();
     }
 
     createTeam(formation, teamClass, isMyTeam) {
@@ -547,6 +550,9 @@ class FormationBuilder {
             
             // Force layout recalculation
             clone.offsetHeight;
+            
+            // Hide D-box arcs in clone (html2canvas can't render them properly)
+            clone.querySelectorAll('.penalty-arc-clip').forEach(c => c.style.display = 'none');
             
             const canvas = await html2canvas(clone, {
                 backgroundColor: null,
