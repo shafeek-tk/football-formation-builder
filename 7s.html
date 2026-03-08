@@ -2,16 +2,16 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>7v7 Football Formation Builder | Easy Football Lineup - Create 7-a-side Soccer Formations</title>
-
+    
     <!-- SEO Meta Tags -->
     <link rel="canonical" href="https://easyfootballlineup.com/7s.html">
     <meta name="description" content="Free 7v7 football formation builder. Create 7-a-side soccer lineups for youth football, small-sided games, and training. No signup required - start building instantly.">
     <meta name="keywords" content="7v7 football formation, 7-a-side soccer lineup, 7v7 tactics, youth football formations, small sided football, 7 aside soccer, football 7v7 strategy, pickup soccer, kickabout, casual football, social soccer, friendly match, pick-up game">
     <meta name="geo.region" content="GB, DE, FR, IT, ES, NL, PT, BE, AT, CH, SE, NO, DK, FI, IS, IE, PL, CZ, SK, HU, RO, BG, HR, SI, EE, LV, LT, GR, CY, MT, LU, BR, AR, CO, PE, CL, EC, UY, PY, BO, VE, GY, SR, GF, JP, KR, CN, IN, TH, VN, MY, SG, ID, PH, AU, NZ, MX, US, CA">
     <meta name="geo.placename" content="Europe, Asia, South America, Global">
-
+    
     <!-- Open Graph meta tags -->
     <meta property="og:title" content="7v7 Football Formation Builder - Create 7-a-side Soccer Lineups">
     <meta property="og:description" content="Free online 7v7 football formation creator. Perfect for youth football, small-sided games, and training worldwide.">
@@ -50,11 +50,10 @@
     </script>
 
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚽</text></svg>">
-
+    
     <link rel="stylesheet" href="css/pitch-styles.css?v=1772794196">
     <link rel="stylesheet" href="css/app-styles.css?v=1772794196">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-
+    
     <!-- Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-BGH9W2K44G"></script>
     <script>
@@ -63,101 +62,80 @@
         gtag('js', new Date());
         gtag('config', 'G-BGH9W2K44G');
     </script>
-
-    <style>
-        * {
-            font-family: 'Plus Jakarta Sans', system-ui, sans-serif !important;
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        html, body {
-            height: 100%;
-            overflow: hidden;
-            background: #1b4332;
-            color: #f0e6d3;
-        }
-        body {
-            display: flex;
-            flex-direction: column;
-            padding: 0;
-        }
-    </style>
 </head>
 <body>
-    <!-- HEADER ROW -->
     <div class="header">
-        <div class="header-left">
-            <div class="header-crest">&#9917;</div>
-            <h1>Easy Football Lineup - 7v7</h1>
+        <h1>EASY FOOTBALL LINEUP - 7v7</h1>
+        <p class="subtitle">Build your 7-a-side team formation and get an instant shareable link.</p>
+        
+        <div id="loadingIndicator" class="loading-indicator">
+            <span>⚽</span> Loading formation...
         </div>
-        <div class="header-right">
-            <button class="btn" onclick="formationBuilder.shareFormation()">SHARE</button>
-            <button class="btn" onclick="formationBuilder.downloadImage()" id="downloadBtn">
-                <span class="desktop-text">DOWNLOAD</span>
-                <span class="mobile-text">IMAGE</span>
+        
+        <div class="controls">
+            <button onclick="formationBuilder.shareFormation()">SHARE FORMATION</button>
+            <button onclick="formationBuilder.downloadImage()" id="downloadBtn">
+                <span class="desktop-text">DOWNLOAD IMAGE</span>
+                <span class="mobile-text">SHARE IMAGE</span>
             </button>
         </div>
-    </div>
-
-    <!-- CONTROLS ROW -->
-    <div class="controls-row">
-        <div class="formation-group">
-            <span class="formation-label">Blue:</span>
-            <select id="myTeamFormation" onchange="formationBuilder.loadFormation()" class="formation-select">
-                <option value="231">2-3-1</option>
-                <option value="321">3-2-1</option>
-                <option value="132">1-3-2</option>
-                <option value="222">2-2-2</option>
-                <option value="141">1-4-1</option>
-                <option value="312">3-1-2</option>
-                <option value="213">2-1-3</option>
-            </select>
+        
+        <div class="formation-container">
+            <div class="formation-group">
+                <span class="formation-label">Blue Team:</span>
+                <select id="myTeamFormation" onchange="formationBuilder.loadFormation()" class="formation-select">
+                    <option value="231">2-3-1</option>
+                    <option value="321">3-2-1</option>
+                    <option value="132">1-3-2</option>
+                    <option value="222">2-2-2</option>
+                    <option value="141">1-4-1</option>
+                    <option value="312">3-1-2</option>
+                    <option value="213">2-1-3</option>
+                </select>
+            </div>
+            <div class="formation-group">
+                <span class="formation-label">Red Team:</span>
+                <select id="awayTeamFormation" onchange="formationBuilder.loadFormation()" class="formation-select">
+                    <option value="231">2-3-1</option>
+                    <option value="321">3-2-1</option>
+                    <option value="132">1-3-2</option>
+                    <option value="222">2-2-2</option>
+                    <option value="141">1-4-1</option>
+                    <option value="312">3-1-2</option>
+                    <option value="213">2-1-3</option>
+                </select>
+            </div>
         </div>
-        <div class="formation-group">
-            <span class="formation-label">Red:</span>
-            <select id="awayTeamFormation" onchange="formationBuilder.loadFormation()" class="formation-select">
-                <option value="231">2-3-1</option>
-                <option value="321">3-2-1</option>
-                <option value="132">1-3-2</option>
-                <option value="222">2-2-2</option>
-                <option value="141">1-4-1</option>
-                <option value="312">3-1-2</option>
-                <option value="213">2-1-3</option>
-            </select>
-        </div>
-
-        <div class="divider"></div>
-
-        <div class="mode-toggle">
-            <a href="index.html" class="mode-btn">11v11</a>
-            <a href="9s.html" class="mode-btn">9v9</a>
-            <a href="8s.html" class="mode-btn">8v8</a>
-            <a href="7s.html" class="mode-btn active">7v7</a>
-            <a href="6s.html" class="mode-btn">6v6</a>
-        </div>
-
-        <div class="divider"></div>
-
+        
         <div id="interactionToggleContainer"></div>
     </div>
 
-    <div id="loadingIndicator" class="loading-indicator">
-        <span>&#9917;</span> Loading formation...
-    </div>
+    <div id="modeToggleContainer" data-active="7v7"></div>
 
-    <!-- FIELD -->
     <div class="field-container">
         <div id="field" class="field"></div>
     </div>
 
-    <!-- Scripts -->
+    <div style="max-width:800px;margin:30px auto;padding:0 20px;color:#ccc;line-height:1.7;">
+        <h2 style="color:#fff;font-size:20px;margin-bottom:12px;">Popular 7v7 Formations Explained</h2>
+        <p><strong style="color:#fff;">2-3-1</strong> - The most balanced 7v7 formation. Two defenders provide cover, three midfielders control the game, and a lone striker stretches the defense. Great for teams that like to keep possession.</p>
+        <p><strong style="color:#fff;">3-2-1</strong> - A defensive setup with three at the back. Ideal when your team needs more protection or against strong attackers. The two midfielders must work hard to support both defense and attack.</p>
+        <p><strong style="color:#fff;">1-3-2</strong> - An attacking formation with just one defender. Best used when your team dominates possession and wants to press high. Vulnerable on the counter-attack.</p>
+        <p><strong style="color:#fff;">2-2-2</strong> - A symmetrical formation that provides balance across the pitch. Easy for new players to understand their positions. Works well for pickup games and casual kickabouts.</p>
+        <p><strong style="color:#fff;">1-4-1</strong> - A midfield-heavy formation. The four midfielders can flood the center, making it ideal for teams that want to control the game. Requires a disciplined lone defender.</p>
+
+        <h2 style="color:#fff;font-size:20px;margin:24px 0 12px 0;">7v7 Football FAQ</h2>
+        <p><strong style="color:#fff;">What is the best 7v7 formation?</strong><br>The 2-3-1 is widely considered the best all-round 7v7 formation. It offers defensive stability with two defenders, midfield control with three players, and attacking threat from the striker. However, the best formation depends on your team's strengths and playing style.</p>
+        <p><strong style="color:#fff;">How many defenders should you have in 7v7?</strong><br>Most 7v7 formations use 2-3 defenders. Two defenders is the most common choice, giving enough cover while allowing more players in midfield and attack. Three defenders works well for teams that prefer a cautious approach.</p>
+        <p><strong style="color:#fff;">Is 7v7 good for youth football?</strong><br>Yes, 7v7 is excellent for youth football and is the standard format for under-9 and under-10 age groups in many countries. The smaller pitch and fewer players mean more touches on the ball, more goals, and more involvement for every player. It's also perfect for weekly pickup games, social soccer, and casual kickabouts with friends.</p>
+        <p><strong style="color:#fff;">What pitch size is used for 7v7?</strong><br>A standard 7v7 pitch is approximately 50-60 meters long and 35-45 meters wide, roughly half the size of a full 11v11 pitch. This compact size encourages quick passing and close control.</p>
+    </div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.4.4/lz-string.min.js?v=1768534621"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js?v=1768534621"></script>
     <script src="js/pitch-common.js?v=1772794196"></script>
     <script src="js/formations.js?v=1772794196"></script>
     <script src="js/formation-builder.js?v=1772794196"></script>
-    <script src="js/common-header.js?v=1772794196"></script>
     <script src="js/common-mode-toggle.js?v=1772794196"></script>
     <script src="js/common-footer.js?v=1772794196"></script>
     <script>
