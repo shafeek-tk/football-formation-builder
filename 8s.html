@@ -2,16 +2,16 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>8v8 Football Formation Builder | Easy Football Lineup - Create 8-a-side Soccer Formations</title>
-    
+
     <!-- SEO Meta Tags -->
     <link rel="canonical" href="https://easyfootballlineup.com/8s.html">
     <meta name="description" content="Free 8v8 football formation builder. Create 8-a-side soccer lineups for youth football and small-sided games. No signup required - start building instantly.">
     <meta name="keywords" content="8v8 football formation, 8-a-side soccer lineup, 8v8 tactics, youth football formations, small sided football, 8 aside soccer, football 8v8 strategy">
     <meta name="geo.region" content="GB, DE, FR, IT, ES, NL, PT, BE, AT, CH, SE, NO, DK, FI, IS, IE, PL, CZ, SK, HU, RO, BG, HR, SI, EE, LV, LT, GR, CY, MT, LU, BR, AR, CO, PE, CL, EC, UY, PY, BO, VE, GY, SR, GF, JP, KR, CN, IN, TH, VN, MY, SG, ID, PH, AU, NZ, MX, US, CA">
     <meta name="geo.placename" content="Europe, Asia, South America, Global">
-    
+
     <!-- Open Graph meta tags -->
     <meta property="og:title" content="8v8 Football Formation Builder - Create 8-a-side Soccer Lineups">
     <meta property="og:description" content="Free online 8v8 football formation creator. Perfect for youth football and small-sided games worldwide.">
@@ -50,10 +50,11 @@
     </script>
 
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚽</text></svg>">
-    
+
     <link rel="stylesheet" href="css/pitch-styles.css?v=1772794196">
     <link rel="stylesheet" href="css/app-styles.css?v=1772794196">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <!-- Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-BGH9W2K44G"></script>
     <script>
@@ -62,62 +63,97 @@
         gtag('js', new Date());
         gtag('config', 'G-BGH9W2K44G');
     </script>
+
+    <style>
+        * {
+            font-family: 'Plus Jakarta Sans', system-ui, sans-serif !important;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html, body {
+            height: 100%;
+            overflow: hidden;
+            background: #1b4332;
+            color: #f0e6d3;
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+            padding: 0;
+        }
+    </style>
 </head>
 <body>
+    <!-- HEADER ROW -->
     <div class="header">
-        <h1>EASY FOOTBALL LINEUP - 8v8</h1>
-        <p class="subtitle">Build your 8-a-side team formation and get an instant shareable link.</p>
-        
-        <div id="loadingIndicator" class="loading-indicator">
-            <span>⚽</span> Loading formation...
+        <div class="header-left">
+            <div class="header-crest">&#9917;</div>
+            <h1>Easy Football Lineup - 8v8</h1>
         </div>
-        
-        <div class="controls">
-            <button onclick="formationBuilder.shareFormation()">SHARE FORMATION</button>
-            <button onclick="formationBuilder.downloadImage()" id="downloadBtn">
-                <span class="desktop-text">DOWNLOAD IMAGE</span>
-                <span class="mobile-text">SHARE IMAGE</span>
+        <div class="header-right">
+            <button class="btn" onclick="formationBuilder.shareFormation()">SHARE</button>
+            <button class="btn" onclick="formationBuilder.downloadImage()" id="downloadBtn">
+                <span class="desktop-text">DOWNLOAD</span>
+                <span class="mobile-text">IMAGE</span>
             </button>
         </div>
-        
-        <div class="formation-container">
-            <div class="formation-group">
-                <span class="formation-label">Blue Team:</span>
-                <select id="myTeamFormation" onchange="formationBuilder.loadFormation()" class="formation-select">
-                    <option value="232">2-3-2</option>
-                    <option value="322">3-2-2</option>
-                    <option value="241">2-4-1</option>
-                    <option value="331">3-3-1</option>
-                    <option value="223">2-2-3</option>
-                </select>
-            </div>
-            <div class="formation-group">
-                <span class="formation-label">Red Team:</span>
-                <select id="awayTeamFormation" onchange="formationBuilder.loadFormation()" class="formation-select">
-                    <option value="232">2-3-2</option>
-                    <option value="322">3-2-2</option>
-                    <option value="241">2-4-1</option>
-                    <option value="331">3-3-1</option>
-                    <option value="223">2-2-3</option>
-                </select>
-            </div>
+    </div>
+
+    <!-- CONTROLS ROW -->
+    <div class="controls-row">
+        <div class="formation-group">
+            <span class="formation-label">Blue:</span>
+            <select id="myTeamFormation" onchange="formationBuilder.loadFormation()" class="formation-select">
+                <option value="232">2-3-2</option>
+                <option value="322">3-2-2</option>
+                <option value="241">2-4-1</option>
+                <option value="331">3-3-1</option>
+                <option value="223">2-2-3</option>
+            </select>
         </div>
-        
+        <div class="formation-group">
+            <span class="formation-label">Red:</span>
+            <select id="awayTeamFormation" onchange="formationBuilder.loadFormation()" class="formation-select">
+                <option value="232">2-3-2</option>
+                <option value="322">3-2-2</option>
+                <option value="241">2-4-1</option>
+                <option value="331">3-3-1</option>
+                <option value="223">2-2-3</option>
+            </select>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="mode-toggle">
+            <a href="index.html" class="mode-btn">11v11</a>
+            <a href="9s.html" class="mode-btn">9v9</a>
+            <a href="8s.html" class="mode-btn active">8v8</a>
+            <a href="7s.html" class="mode-btn">7v7</a>
+            <a href="6s.html" class="mode-btn">6v6</a>
+        </div>
+
+        <div class="divider"></div>
+
         <div id="interactionToggleContainer"></div>
     </div>
 
-    <div id="modeToggleContainer" data-active="8v8"></div>
+    <div id="loadingIndicator" class="loading-indicator">
+        <span>&#9917;</span> Loading formation...
+    </div>
 
+    <!-- FIELD -->
     <div class="field-container">
         <div id="field" class="field"></div>
     </div>
 
-
+    <!-- Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.4.4/lz-string.min.js?v=1768534621"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js?v=1768534621"></script>
     <script src="js/pitch-common.js?v=1772794196"></script>
     <script src="js/formations.js?v=1772794196"></script>
     <script src="js/formation-builder.js?v=1772794196"></script>
+    <script src="js/common-header.js?v=1772794196"></script>
     <script src="js/common-mode-toggle.js?v=1772794196"></script>
     <script src="js/common-footer.js?v=1772794196"></script>
     <script>

@@ -1,57 +1,54 @@
-// Common header component
+// Common header component - Pitch Heritage theme
 function createHeader(config) {
     const {
-        title = 'EASY FOOTBALL LINEUP',
-        subtitle = 'Build your team formation and get an instant shareable link. No saving, no accounts - just share.',
-        showFormationSelectors = true,
+        title = 'Easy Football Lineup',
         formations = [],
-        gameType = '11v11'
     } = config;
-    
+
     let formationSelectorsHTML = '';
-    if (showFormationSelectors && formations.length > 0) {
-        const options = formations.map(f => 
+    if (formations.length > 0) {
+        const options = formations.map(f =>
             `<option value="${f.value}">${f.label}</option>`
         ).join('\n                    ');
-        
+
         formationSelectorsHTML = `
-        <div class="formation-container">
-            <div class="formation-group">
-                <span class="formation-label">Home:</span>
-                <select id="myTeamFormation" onchange="formationBuilder.loadFormation()" class="formation-select">
+        <div class="formation-group">
+            <span class="formation-label">Blue:</span>
+            <select id="myTeamFormation" onchange="formationBuilder.loadFormation()" class="formation-select">
                     ${options}
-                </select>
-            </div>
-            <div class="formation-group">
-                <span class="formation-label">Away:</span>
-                <select id="awayTeamFormation" onchange="formationBuilder.loadFormation()" class="formation-select">
+            </select>
+        </div>
+        <div class="formation-group">
+            <span class="formation-label">Red:</span>
+            <select id="awayTeamFormation" onchange="formationBuilder.loadFormation()" class="formation-select">
                     ${options}
-                </select>
-            </div>
+            </select>
         </div>`;
     }
-    
+
     return `
     <div class="header">
-        <h1>${title}</h1>
-        <p class="subtitle">${subtitle}</p>
-        
-        <div id="loadingIndicator" class="loading-indicator">
-            <span>⚽</span> Loading formation...
+        <div class="header-left">
+            <div class="header-crest">&#9917;</div>
+            <h1>${title}</h1>
         </div>
-        
-        <div class="controls">
-            <button onclick="formationBuilder.shareFormation()">SHARE FORMATION</button>
-            <button onclick="formationBuilder.downloadImage()" id="downloadBtn">
-                <span class="desktop-text">DOWNLOAD IMAGE</span>
-                <span class="mobile-text">SHARE IMAGE</span>
+        <div class="header-right">
+            <button class="btn" onclick="formationBuilder.shareFormation()">SHARE</button>
+            <button class="btn" onclick="formationBuilder.downloadImage()" id="downloadBtn">
+                <span class="desktop-text">DOWNLOAD</span>
+                <span class="mobile-text">IMAGE</span>
             </button>
         </div>
+    </div>
+    <div class="controls-row">
         ${formationSelectorsHTML}
-        
-        <div style="text-align: center; margin: 15px 0; color: #ccc; font-size: 14px;">
-            💡 Click on player names to edit them directly
-        </div>
+        <div class="divider"></div>
+        <div id="modeToggleContainer"></div>
+        <div class="divider"></div>
+        <div id="interactionToggleContainer"></div>
+    </div>
+    <div id="loadingIndicator" class="loading-indicator">
+        <span>&#9917;</span> Loading formation...
     </div>`;
 }
 

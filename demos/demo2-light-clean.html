@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Football Formation Builder - Light Clean Demo</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚽</text></svg>">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Pitch rendering styles -->
+    <link rel="stylesheet" href="../css/pitch-styles.css">
+
+    <style>
+        /* ===== RESET & BASE ===== */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Inter', system-ui, sans-serif;
+            background: #ffffff;
+            color: #2d2c2b;
+        }
+
+        /* ===== LAYOUT: full viewport, no scroll ===== */
+        .app {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            height: 100dvh; /* dynamic viewport for mobile */
+            overflow: hidden;
+        }
+
+        /* ===== HEADER BAR ===== */
+        .header-bar {
+            flex-shrink: 0;
+            background: #f8f7f5;
+            border-bottom: 1px solid rgba(0,0,0,0.06);
+            padding: 6px 12px;
+        }
+
+        .header-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .brand {
+            font-family: 'Manrope', sans-serif;
+            font-weight: 800;
+            font-size: 14px;
+            letter-spacing: 0.5px;
+            color: #2d2c2b;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: nowrap;
+            min-width: 0;
+        }
+
+        /* ===== BUTTONS ===== */
+        .btn {
+            font-family: 'Manrope', sans-serif;
+            font-weight: 600;
+            font-size: 11px;
+            letter-spacing: 0.3px;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .btn-primary {
+            background: #2d2c2b;
+            color: #fff;
+        }
+        .btn-primary:hover {
+            background: #d4a69a;
+            color: #2d2c2b;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #2d2c2b;
+            border: 1px solid #ddd;
+        }
+        .btn-secondary:hover {
+            border-color: #f7d2ca;
+            background: #fdf5f3;
+        }
+
+        /* ===== CONTROLS ROW (formations + mode + toggle) ===== */
+        .controls-row {
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 5px 10px;
+            background: #fff;
+            flex-wrap: wrap;
+            max-width: 900px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .formation-pair {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .team-label {
+            font-family: 'Manrope', sans-serif;
+            font-size: 11px;
+            font-weight: 600;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .team-label.blue { color: #4a7fc4; }
+        .team-label.red { color: #c45a5a; }
+
+        .formation-select {
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            font-weight: 500;
+            padding: 4px 24px 4px 8px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background: #fff;
+            color: #2d2c2b;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%23999' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 8px center;
+            transition: border-color 0.15s;
+            min-width: 72px;
+        }
+        .formation-select:hover { border-color: #f7d2ca; }
+        .formation-select:focus {
+            outline: none;
+            border-color: #f7d2ca;
+            box-shadow: 0 0 0 2px rgba(247,210,202,0.3);
+        }
+
+        /* Divider dot */
+        .dot-sep {
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            background: #ddd;
+            flex-shrink: 0;
+        }
+
+        /* Mode pills (11v11, 7v7, 6v6) */
+        .mode-pills {
+            display: flex;
+            gap: 2px;
+            background: #f8f7f5;
+            border-radius: 6px;
+            padding: 2px;
+        }
+
+        .mode-pill {
+            font-family: 'Manrope', sans-serif;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 3px 8px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background: transparent;
+            color: #999;
+            text-decoration: none;
+            transition: all 0.15s;
+        }
+        .mode-pill:hover { color: #2d2c2b; }
+        .mode-pill.active {
+            background: #2d2c2b;
+            color: #fff;
+        }
+
+        /* Interaction toggle (Edit / Swap) */
+        .interaction-toggle {
+            display: flex;
+            gap: 0;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid #e0e0e0;
+        }
+
+        .toggle-pill {
+            font-family: 'Manrope', sans-serif;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.15s;
+            background: transparent;
+            color: #bbb;
+            min-height: 0;
+            letter-spacing: 0.3px;
+        }
+
+        .toggle-pill[data-mode="edit"].active {
+            background: #2d2c2b;
+            color: #fff;
+        }
+
+        .toggle-pill[data-mode="swap"].active {
+            background: #e8a87c;
+            color: #fff;
+        }
+
+        .toggle-pill:not(.active):hover {
+            background: #f8f7f5;
+            color: #2d2c2b;
+        }
+
+        .interaction-hint {
+            font-family: 'Inter', sans-serif;
+            font-size: 10px;
+            color: #bbb;
+            text-align: center;
+            padding: 2px 0 0 0;
+            display: none; /* hidden by default, save space */
+        }
+
+        /* ===== FIELD AREA ===== */
+        .field-area {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6px;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        /* Override pitch-styles for this theme */
+        .field {
+            width: 100% !important;
+            max-width: 500px;
+            height: 100% !important;
+            max-height: none;
+            border-radius: 12px !important;
+            border: 2px solid #fff !important;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.04) !important;
+            background: linear-gradient(0deg, #3a8c3f 0%, #43993f 50%, #3a8c3f 100%) !important;
+            background-size: 100% 12.5% !important;
+        }
+
+        /* Player name styling override for light theme */
+        .player-name {
+            font-family: 'Inter', sans-serif !important;
+            font-size: min(2.6vw, 11px) !important;
+            background: rgba(255,255,255,0.92) !important;
+            color: #2d2c2b !important;
+            border: 1px solid rgba(0,0,0,0.08) !important;
+            border-radius: 4px !important;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08) !important;
+            text-shadow: none !important;
+            font-weight: 600 !important;
+            padding: 2px 5px !important;
+        }
+
+        .player-name:hover {
+            background: rgba(255,255,255,1) !important;
+            border-color: #f7d2ca !important;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1) !important;
+            transform: scale(1.05);
+        }
+
+        /* Edit mode field hover */
+        .field:not(.swap-mode):hover .player-name {
+            border-color: #f7d2ca !important;
+            box-shadow: 0 1px 4px rgba(247,210,202,0.4) !important;
+        }
+
+        /* Swap mode overrides for light theme */
+        .swap-mode .player-name {
+            animation: swapPulseLight 2s ease-in-out infinite;
+        }
+
+        @keyframes swapPulseLight {
+            0%, 100% { border-color: rgba(232,168,124,0.3); }
+            50% { border-color: rgba(232,168,124,0.8); }
+        }
+
+        .swap-selected .player-name {
+            border: 1.5px solid #e8a87c !important;
+            box-shadow: 0 0 10px rgba(232,168,124,0.5), 0 0 2px rgba(232,168,124,0.3) inset !important;
+            background: rgba(255,240,230,0.95) !important;
+            transform: scale(1.1);
+            animation: selectedPulseLight 0.8s ease-in-out infinite !important;
+        }
+
+        @keyframes selectedPulseLight {
+            0%, 100% { box-shadow: 0 0 12px rgba(232,168,124,0.6), 0 0 3px rgba(232,168,124,0.3) inset; }
+            50% { box-shadow: 0 0 20px rgba(232,168,124,0.9), 0 0 6px rgba(232,168,124,0.5) inset; }
+        }
+
+        /* Swap complete flash - light theme green */
+        .player.swap-complete .player-name {
+            animation: swapFlashLight 0.4s ease-out forwards !important;
+        }
+
+        @keyframes swapFlashLight {
+            0% {
+                border-color: #6abf69;
+                box-shadow: 0 0 15px rgba(106,191,105,0.7);
+                background: rgba(230,255,230,0.95);
+            }
+            100% {
+                border-color: rgba(0,0,0,0.08);
+                box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+                background: rgba(255,255,255,0.92);
+            }
+        }
+
+        /* ===== LOADING ===== */
+        .loading-indicator {
+            display: none;
+            font-family: 'Inter', sans-serif;
+            color: #6abf69;
+            font-size: 12px;
+        }
+
+        /* Hide desktop/mobile text helpers */
+        .mobile-text { display: none; }
+        .desktop-text { display: inline; }
+
+        /* ===== RESPONSIVE: MOBILE ===== */
+        @media (max-width: 768px) {
+            .mobile-text { display: inline; }
+            .desktop-text { display: none; }
+
+            .header-bar {
+                padding: 5px 8px;
+            }
+
+            .brand {
+                font-size: 12px;
+            }
+
+            .btn {
+                font-size: 10px;
+                padding: 4px 8px;
+            }
+
+            .controls-row {
+                padding: 4px 8px;
+                gap: 6px;
+            }
+
+            .team-label { font-size: 10px; }
+            .formation-select {
+                font-size: 11px;
+                padding: 3px 20px 3px 6px;
+                min-width: 64px;
+            }
+
+            .mode-pill { font-size: 9px; padding: 2px 6px; }
+            .toggle-pill { font-size: 9px; padding: 3px 8px; }
+
+            .field-area {
+                padding: 4px;
+            }
+
+            .field {
+                border-radius: 10px !important;
+            }
+        }
+
+        /* Very small phones */
+        @media (max-width: 375px) {
+            .header-bar { padding: 4px 6px; }
+            .brand { font-size: 11px; }
+            .btn { font-size: 9px; padding: 3px 6px; border-radius: 5px; }
+            .controls-row { padding: 3px 6px; gap: 4px; }
+            .team-label { font-size: 9px; }
+            .formation-select { font-size: 10px; min-width: 58px; }
+            .mode-pill { font-size: 8px; padding: 2px 5px; }
+            .toggle-pill { font-size: 8px; padding: 2px 6px; }
+            .field-area { padding: 3px; }
+        }
+
+        /* ===== DESKTOP: wider layout ===== */
+        @media (min-width: 769px) {
+            .field-area {
+                padding: 10px;
+            }
+            .field {
+                max-width: 480px;
+            }
+            .brand { font-size: 15px; }
+            .controls-row { gap: 12px; }
+        }
+
+        /* Override the mode-toggle from pitch-styles / app-styles if loaded */
+        .mode-toggle {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <!-- HEADER: single compact line -->
+        <div class="header-bar">
+            <div class="header-row">
+                <span class="brand">EASY FOOTBALL LINEUP</span>
+                <div class="header-controls">
+                    <button class="btn btn-primary" onclick="formationBuilder.shareFormation()">Share</button>
+                    <button class="btn btn-secondary" onclick="formationBuilder.downloadImage()" id="downloadBtn">
+                        <span class="desktop-text">Download</span>
+                        <span class="mobile-text">Image</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- CONTROLS: formations, mode toggle, interaction toggle -->
+        <div class="controls-row">
+            <div class="formation-pair">
+                <span class="team-label blue">Blue</span>
+                <select id="myTeamFormation" onchange="formationBuilder.loadFormation()" class="formation-select">
+                    <option value="442">4-4-2</option>
+                    <option value="433">4-3-3</option>
+                    <option value="4231">4-2-3-1</option>
+                    <option value="352">3-5-2</option>
+                    <option value="343">3-4-3</option>
+                    <option value="532">5-3-2</option>
+                    <option value="451">4-5-1</option>
+                    <option value="541">5-4-1</option>
+                    <option value="4141">4-1-4-1</option>
+                    <option value="3421">3-4-2-1</option>
+                    <option value="4321">4-3-2-1</option>
+                    <option value="41212">4-1-2-1-2</option>
+                    <option value="4132">4-1-3-2</option>
+                    <option value="4213">4-2-1-3</option>
+                    <option value="523">5-2-3</option>
+                    <option value="4312">4-3-1-2</option>
+                    <option value="334">3-3-4</option>
+                    <option value="460">4-6-0</option>
+                    <option value="5221">5-2-2-1</option>
+                    <option value="424">4-2-4</option>
+                    <option value="235">2-3-5</option>
+                    <option value="325">3-2-5</option>
+                    <option value="253">2-5-3</option>
+                </select>
+            </div>
+
+            <div class="formation-pair">
+                <span class="team-label red">Red</span>
+                <select id="awayTeamFormation" onchange="formationBuilder.loadFormation()" class="formation-select">
+                    <option value="442">4-4-2</option>
+                    <option value="433">4-3-3</option>
+                    <option value="4231">4-2-3-1</option>
+                    <option value="352">3-5-2</option>
+                    <option value="343">3-4-3</option>
+                    <option value="532">5-3-2</option>
+                    <option value="451">4-5-1</option>
+                    <option value="541">5-4-1</option>
+                    <option value="4141">4-1-4-1</option>
+                    <option value="3421">3-4-2-1</option>
+                    <option value="4321">4-3-2-1</option>
+                    <option value="41212">4-1-2-1-2</option>
+                    <option value="4132">4-1-3-2</option>
+                    <option value="523">5-2-3</option>
+                    <option value="4213">4-2-1-3</option>
+                    <option value="4312">4-3-1-2</option>
+                    <option value="334">3-3-4</option>
+                    <option value="460">4-6-0</option>
+                    <option value="5221">5-2-2-1</option>
+                    <option value="424">4-2-4</option>
+                    <option value="235">2-3-5</option>
+                    <option value="325">3-2-5</option>
+                    <option value="253">2-5-3</option>
+                </select>
+            </div>
+
+            <div class="dot-sep"></div>
+
+            <div class="mode-pills">
+                <a href="../index.html" class="mode-pill active">11v11</a>
+                <a href="../9s.html" class="mode-pill">9v9</a>
+                <a href="../8s.html" class="mode-pill">8v8</a>
+                <a href="../7s.html" class="mode-pill">7v7</a>
+                <a href="../6s.html" class="mode-pill">6v6</a>
+            </div>
+
+            <div class="dot-sep"></div>
+
+            <div id="interactionToggleContainer"></div>
+        </div>
+
+        <div id="loadingIndicator" class="loading-indicator" style="text-align:center;">
+            Loading formation...
+        </div>
+
+        <!-- FIELD: takes up remaining space -->
+        <div class="field-area">
+            <div id="field" class="field"></div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.4.4/lz-string.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="../js/pitch-common.js"></script>
+    <script src="../js/formations.js"></script>
+    <script src="../js/formation-builder.js"></script>
+    <!-- Do NOT load common-header, common-mode-toggle, or common-footer -->
+    <script>
+        const formationBuilder = new FormationBuilder({
+            gameType: '11v11',
+            formations: FORMATIONS_11V11,
+            defaultNames: DEFAULT_NAMES_11V11,
+            defaultAwayNames: DEFAULT_AWAY_NAMES_11V11,
+            fieldMargin: 8,
+            defaultAwayFormation: FORMATIONS_11V11['442'],
+            defaultAwayFormationKey: '442'
+        });
+    </script>
+</body>
+</html>
