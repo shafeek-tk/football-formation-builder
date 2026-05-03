@@ -3,29 +3,27 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>6v6 Football Formation Builder | Easy Football Lineup - Create 6-a-side Soccer Formations</title>
-    
+    <title>6-a-side Formation Builder | Easy Football Lineup – Free 6v6 Soccer Formations</title>
+
     <!-- SEO Meta Tags -->
     <link rel="canonical" href="https://easyfootballlineup.com/6s.html">
-    <meta name="description" content="Free 6v6 football formation builder. Create 6-a-side soccer lineups for futsal, indoor football, and small-sided games. No signup required - start building instantly.">
+    <meta name="description" content="Create and share 6-a-side football formations in seconds. Free 6v6 lineup builder for pickup and small-sided games.">
     <meta name="keywords" content="6v6 football formation, 6-a-side soccer lineup, 6v6 tactics, futsal formations, small sided football, 6 aside soccer, football 6v6 strategy">
-    <meta name="geo.region" content="GB, DE, FR, IT, ES, NL, PT, BE, AT, CH, SE, NO, DK, FI, IS, IE, PL, CZ, SK, HU, RO, BG, HR, SI, EE, LV, LT, GR, CY, MT, LU, BR, AR, CO, PE, CL, EC, UY, PY, BO, VE, GY, SR, GF, JP, KR, CN, IN, TH, VN, MY, SG, ID, PH, AU, NZ, MX, US, CA">
-    <meta name="geo.placename" content="Europe, Asia, South America, Global">
-    
+    <meta name="robots" content="index, follow">
+
     <!-- Open Graph meta tags -->
-    <meta property="og:title" content="6v6 Football Formation Builder - Create 6-a-side Soccer Lineups">
-    <meta property="og:description" content="Free online 6v6 football formation creator. Perfect for futsal, indoor football, and small-sided games worldwide.">
+    <meta property="og:title" content="6-a-side Formation Builder | Easy Football Lineup – Free 6v6 Soccer Formations">
+    <meta property="og:description" content="Create and share 6-a-side football formations in seconds. Free 6v6 lineup builder for pickup and small-sided games.">
     <meta property="og:url" content="https://easyfootballlineup.com/6s.html">
-    <meta property="og:image" content="https://easyfootballlineup.com/formation-preview.png">
     <meta property="og:type" content="website">
+    <meta property="og:image" content="https://easyfootballlineup.com/og-image.png">
     <meta property="og:site_name" content="Easy Football Lineup">
-    <meta property="og:locale" content="en_GB">
 
     <!-- Twitter Card meta tags -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="6v6 Football Formation Builder - Create 6-a-side Soccer Lineups">
-    <meta name="twitter:description" content="Free online 6v6 football formation creator. Perfect for futsal, indoor football, and small-sided games.">
-    <meta name="twitter:image" content="https://easyfootballlineup.com/formation-preview.png">
+    <meta name="twitter:title" content="6-a-side Formation Builder | Easy Football Lineup – Free 6v6 Soccer Formations">
+    <meta name="twitter:description" content="Create and share 6-a-side football formations in seconds. Free 6v6 lineup builder for pickup and small-sided games.">
+    <meta name="twitter:image" content="https://easyfootballlineup.com/og-image.png">
 
     <!-- Schema.org structured data -->
     <script type="application/ld+json">
@@ -50,10 +48,10 @@
     </script>
 
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚽</text></svg>">
-    
+
     <link rel="stylesheet" href="css/pitch-styles.css?v=1772794196">
     <link rel="stylesheet" href="css/app-styles.css?v=1772794196">
-    
+
     <!-- Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-BGH9W2K44G"></script>
     <script>
@@ -65,24 +63,18 @@
 </head>
 <body>
     <div class="header">
-        <h1>EASY FOOTBALL LINEUP - 6v6</h1>
+        <h1><strong>6-a-Side Formation Builder</strong> – Free Lineup Maker</h1>
         <p class="subtitle">Build your 6-a-side team formation and get an instant shareable link.</p>
-        
+
+        <div id="modeToggleContainer" data-active="6v6"></div>
+
         <div id="loadingIndicator" class="loading-indicator">
             <span>⚽</span> Loading formation...
         </div>
-        
-        <div class="controls">
-            <button onclick="formationBuilder.shareFormation()">SHARE FORMATION</button>
-            <button onclick="formationBuilder.downloadImage()" id="downloadBtn">
-                <span class="desktop-text">DOWNLOAD IMAGE</span>
-                <span class="mobile-text">SHARE IMAGE</span>
-            </button>
-        </div>
-        
+
         <div class="formation-container">
             <div class="formation-group">
-                <span class="formation-label">Blue Team:</span>
+                <span class="formation-label home-label">Home:</span>
                 <select id="myTeamFormation" onchange="formationBuilder.loadFormation()" class="formation-select">
                     <option value="221">2-2-1</option>
                     <option value="131">1-3-1</option>
@@ -92,7 +84,7 @@
                 </select>
             </div>
             <div class="formation-group">
-                <span class="formation-label">Red Team:</span>
+                <span class="formation-label away-label">Away:</span>
                 <select id="awayTeamFormation" onchange="formationBuilder.loadFormation()" class="formation-select">
                     <option value="221">2-2-1</option>
                     <option value="131">1-3-1</option>
@@ -102,16 +94,42 @@
                 </select>
             </div>
         </div>
-        
+
         <div id="interactionToggleContainer"></div>
     </div>
 
-    <div id="modeToggleContainer" data-active="6v6"></div>
+    <div class="share-bar">
+        <button class="share-btn" id="copyLinkBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+            Copy Link
+        </button>
+        <button class="share-btn" id="downloadBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Save Image
+        </button>
+        <button class="share-btn share-btn--whatsapp" id="whatsappBtn">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+            WhatsApp
+        </button>
+    </div>
+
+    <div class="toast" id="toast"></div>
 
     <div class="field-container">
         <div id="field" class="field"></div>
     </div>
 
+    <div class="info-section">
+        <h2>Best 6-a-Side Formations Explained</h2>
+        <p><strong>2-2-1</strong> – The most balanced 6-a-side formation. Two defenders, two midfielders, and a striker. Gives you width in midfield and a clear outlet up top. The default choice for most 6-a-side teams.</p>
+        <p><strong>1-3-1</strong> – One defender, three midfielders, one striker. Dominates the middle of the pitch with numbers. Works well when your team wants to keep the ball and play through the centre. Requires a disciplined sole defender.</p>
+        <p><strong>2-1-2</strong> – Two defenders, one midfielder, two strikers. A direct formation that stretches the opposition with two forwards. The lone midfielder links play between defence and attack.</p>
+        <p><strong>3-1-1</strong> – Three defenders, one midfielder, one striker. A defensive setup for protecting a lead or frustrating a stronger side. The packed defence makes it hard for opponents to find space.</p>
+
+        <h2>6-a-Side Football FAQ</h2>
+        <p><strong>What is the best 6-a-side formation?</strong><br>The 2-2-1 is the most popular and balanced option. It offers defensive stability with two at the back, control through two midfielders, and a target up front. Adjust based on your team's strengths.</p>
+        <p><strong>How big is a 6-a-side pitch?</strong><br>A standard 6-a-side pitch is roughly 45m x 30m, slightly larger than 5-a-side but still compact enough to encourage quick passing and high-tempo football.</p>
+    </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.4.4/lz-string.min.js?v=1768534621"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js?v=1768534621"></script>
@@ -129,6 +147,29 @@
             fieldMargin: 15,
             defaultAwayFormation: FORMATIONS_6V6['221'],
             defaultAwayFormationKey: '221'
+        });
+
+        function showToast(msg) {
+            var t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('visible');
+            setTimeout(function() { t.classList.remove('visible'); }, 2500);
+        }
+
+        document.getElementById('copyLinkBtn').addEventListener('click', function() {
+            formationBuilder.shareFormation();
+        });
+
+        document.getElementById('downloadBtn').addEventListener('click', function() {
+            formationBuilder.downloadImage();
+        });
+
+        document.getElementById('whatsappBtn').addEventListener('click', function() {
+            formationBuilder.shareFormation();
+            setTimeout(function() {
+                var text = encodeURIComponent("Here's my lineup for today 👇 " + window.location.href);
+                window.open('https://wa.me/?text=' + text, '_blank');
+            }, 100);
         });
     </script>
 </body>

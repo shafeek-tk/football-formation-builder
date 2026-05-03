@@ -174,14 +174,14 @@ class FormationBuilder {
         const outfieldLayers = totalLayers - 1;
         const outfieldIndex = layerIndex - 1;
         
-        // Use tighter spacing for formations with more layers (9v9, 8v8)
         let range, startPos;
-        if (outfieldLayers >= 3) {
-            // Tighter spacing for 3+ outfield layers
+        if (this.config.gameType === '5v5') {
+            range = 18;
+            startPos = isMyTeam ? 80 : 20;
+        } else if (outfieldLayers >= 3) {
             range = 24;
             startPos = isMyTeam ? 82 : 18;
         } else {
-            // Normal spacing for 1-2 outfield layers (11v11)
             range = 27;
             startPos = isMyTeam ? 85 : 15;
         }
