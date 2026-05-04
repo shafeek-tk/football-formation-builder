@@ -59,20 +59,16 @@ body {
 .mode-toggle {
     display: inline-flex;
     justify-content: center;
-    gap: 0;
+    gap: 5px;
     margin-bottom: 10px;
-    border-radius: 6px;
-    overflow: hidden;
-    border: 1px solid #3d4460;
-    background: #242938;
 }
 
 .mode-btn {
     padding: 7px 14px;
-    background: transparent;
+    background: #242938;
     color: #b0b8c9;
-    border: none;
-    border-radius: 0;
+    border: 1px solid #3d4460;
+    border-radius: 5px;
     font-size: 13px;
     font-weight: 600;
     cursor: pointer;
@@ -85,11 +81,13 @@ body {
 
 .mode-btn:hover {
     background: #2f3447;
+    border-color: #5a6380;
     color: #fff;
 }
 
 .mode-btn.active {
     background: #22c55e;
+    border-color: #22c55e;
     color: #fff;
 }
 
@@ -402,13 +400,13 @@ body {
         display: flex;
         flex-wrap: nowrap;
         width: 100%;
-        border-radius: 6px;
+        gap: 4px;
     }
 
     .mode-btn {
         flex: 1;
         padding: 9px 0;
-        font-size: 13px;
+        font-size: 12px;
         white-space: nowrap;
         text-align: center;
     }
