@@ -10,3 +10,6 @@ WhatsApp*
 DEVELOPMENT_WORKFLOW.md
 backup-*/
 refactored/
+playwright-report/
+test-results/
+docs/
