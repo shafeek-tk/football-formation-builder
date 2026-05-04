@@ -59,16 +59,21 @@ body {
 .mode-toggle {
     display: inline-flex;
     justify-content: center;
-    gap: 5px;
+    gap: 0;
     margin-bottom: 10px;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid #3d4460;
+    background: #242938;
 }
 
 .mode-btn {
     padding: 7px 14px;
-    background: #242938;
+    background: transparent;
     color: #b0b8c9;
-    border: 1px solid #3d4460;
-    border-radius: 5px;
+    border: none;
+    border-right: 1px solid #3d4460;
+    border-radius: 0;
     font-size: 13px;
     font-weight: 600;
     cursor: pointer;
@@ -79,15 +84,17 @@ body {
     letter-spacing: 0.3px;
 }
 
+.mode-btn:last-child {
+    border-right: none;
+}
+
 .mode-btn:hover {
     background: #2f3447;
-    border-color: #5a6380;
     color: #fff;
 }
 
 .mode-btn.active {
     background: #22c55e;
-    border-color: #22c55e;
     color: #fff;
 }
 
@@ -400,7 +407,6 @@ body {
         display: flex;
         flex-wrap: nowrap;
         width: 100%;
-        gap: 4px;
     }
 
     .mode-btn {
