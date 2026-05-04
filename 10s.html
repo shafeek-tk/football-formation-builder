@@ -162,12 +162,26 @@
             formationBuilder.downloadImage();
         });
 
-        document.getElementById('whatsappBtn').addEventListener('click', function() {
-            formationBuilder.shareFormation();
-            setTimeout(function() {
-                var text = encodeURIComponent("Here's my lineup for today 👇 " + window.location.href);
-                window.open('https://wa.me/?text=' + text, '_blank');
-            }, 100);
+        document.getElementById('whatsappBtn').addEventListener('click', async function() {
+            var homeFormation = document.getElementById('myTeamFormation').value;
+            var awayFormation = document.getElementById('awayTeamFormation') ? document.getElementById('awayTeamFormation').value : '';
+            var data = { h: homeFormation, a: awayFormation, n: formationBuilder.playerNames };
+            var compressed = LZString.compressToEncodedURIComponent(JSON.stringify(data));
+            var shareUrl = window.location.origin + window.location.pathname + '#f=' + compressed;
+
+            if (navigator.share && /Mobi|Android/i.test(navigator.userAgent)) {
+                try {
+                    var field = document.getElementById('field');
+                    var canvas = await html2canvas(field, { backgroundColor: null, scale: 2, useCORS: true, logging: false });
+                    var blob = await new Promise(function(r) { canvas.toBlob(r, 'image/png'); });
+                    var file = new File([blob], 'lineup.png', { type: 'image/png' });
+                    await navigator.share({ text: "Here's my lineup for today 👇 " + shareUrl, files: [file] });
+                } catch (e) {
+                    window.open('https://wa.me/?text=' + encodeURIComponent("Here's my lineup for today 👇 " + shareUrl), '_blank');
+                }
+            } else {
+                window.open('https://wa.me/?text=' + encodeURIComponent("Here's my lineup for today 👇 " + shareUrl), '_blank');
+            }
         });
     </script>
 </body>
