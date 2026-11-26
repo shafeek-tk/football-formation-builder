@@ -262,8 +262,6 @@
 }
 
 /* Wide screens: setting up on the left, the pitch in the centre, sharing on the right */
-.ly-preview { display: none; }
-
 @media (min-width: 1100px) {
     body.is-wide .header { margin-bottom: 6px; }
     body.is-wide .mode-toggle { margin-bottom: 4px; }
@@ -337,29 +335,7 @@
     body.is-wide .st-squad-row { grid-template-columns: 1fr; gap: 8px; }
     body.is-wide .tool-btn.ly-squad-btn { justify-content: flex-start; padding: 10px 14px; min-height: 46px; font-size: 15px; }
 
-    /* Share: preview, then the buttons */
-    body.is-wide .ly-preview {
-        display: block;
-        margin: 0 0 14px;
-        width: 100%;
-    }
-    .ly-preview-canvas {
-        display: block;
-        width: 100%;
-        max-height: min(340px, calc(100vh - 520px));
-        object-fit: contain;
-        min-height: 120px;
-        border-radius: 12px;
-        background: rgba(255, 255, 255, 0.04);
-        box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08), 0 16px 36px rgba(0, 0, 0, 0.45);
-    }
-    .ly-preview figcaption {
-        margin-top: 8px;
-        font-size: 12px;
-        color: var(--muted, #9aa9a1);
-        text-align: center;
-    }
-
+    /* Share */
     body.is-wide .st-share .share-bar {
         display: grid;
         grid-template-columns: 1fr 1fr;

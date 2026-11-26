@@ -63,14 +63,8 @@
                 }
             }
 
-            // Team name tag on the pitch
+            // Team names are shown beside the pitch and on the image header, not on the grass
             field.querySelectorAll(`.team-tag.${team}`).forEach(el => el.remove());
-            if (get(team).n && field.querySelector(`.player.${team}`)) {
-                const tag = document.createElement('div');
-                tag.className = `team-tag ${team}`;
-                tag.textContent = get(team).n;
-                field.appendChild(tag);
-            }
         });
         document.querySelector('.home-label')?.replaceChildren(`${EFL.teamName('my-team')}:`);
         document.querySelector('.away-label')?.replaceChildren(`${EFL.teamName('opp-team')}:`);

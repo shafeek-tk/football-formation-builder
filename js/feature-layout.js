@@ -6,10 +6,9 @@
 //   4. Share   - link, image, WhatsApp (a bar fixed to the bottom on phones)
 // Everything else (image options, copy as text, recent, reset, help, install)
 // lives in the More menu. On wide screens the pitch is the centrepiece:
-// setting up (formations, squad) on its left, sharing on its right with a
-// live preview of the image people will get. Buttons are moved, never rebuilt, so every feature keeps
+// setting up (formations, squad) on its left, sharing on its right. Buttons are moved, never rebuilt, so every feature keeps
 // working with its own button.
-EFL.css('css/feature-layout.css?v=1795676037');
+EFL.css('css/feature-layout.css?v=1795676619');
 
 (function () {
     const SQUAD = [
@@ -114,25 +113,21 @@ EFL.css('css/feature-layout.css?v=1795676037');
         placeTools();
 
         // Wide screens: the pitch in the centre, setting up on the left and
-        // sharing (with a live preview of the image) on the right
+        // sharing on the right
         const right = el('aside', 'studio-side studio-right');
         studio.appendChild(right);
-        const preview = el('figure', 'ly-preview', '<canvas class="ly-preview-canvas" aria-label="Preview of the shared image"></canvas><figcaption>Live preview of your image</figcaption>');
         const extras = el('div', 'ly-share-extras');
         const arrange = () => {
             if (WIDE.matches) {
                 share.querySelector('.st-head').textContent = 'Share your lineup';
-                share.insertBefore(preview, share.querySelector('.st-head').nextSibling);
                 share.appendChild(extras);
                 ['imageOptionsBtn', 'copyTextBtn'].forEach(id => { const b = document.getElementById(id); if (b) extras.appendChild(b); });
                 right.appendChild(share);
                 document.body.classList.add('is-wide');
-                schedulePreview();
             } else {
                 share.querySelector('.st-head').textContent = 'Share';
                 document.body.classList.remove('is-wide');
                 placeTools(true); // image options and copy-as-text go back into the More menu
-                preview.remove();
                 extras.remove();
                 side.appendChild(share);
             }
@@ -150,43 +145,6 @@ EFL.css('css/feature-layout.css?v=1795676037');
     }
 
     /** Move each tool button from the old row to its place. */
-    // ---- Live preview of the shared image (wide screens) ----
-    let previewTimer = 0, previewBusy = false, previewAgain = false;
-
-    function schedulePreview() {
-        if (!WIDE.matches) return;
-        clearTimeout(previewTimer);
-        previewTimer = setTimeout(drawPreview, 450);
-    }
-
-    async function drawPreview() {
-        const canvas = document.querySelector('.ly-preview-canvas');
-        const builder = window.formationBuilder;
-        if (!canvas || !builder || !builder.renderExport || !WIDE.matches) return;
-        if (document.body.classList.contains('efl-dragging')) { schedulePreview(); return; }
-        if (previewBusy) { previewAgain = true; return; }
-        previewBusy = true;
-        try {
-            if (document.fonts) await document.fonts.ready;
-            const full = await builder.renderExport();
-            const w = canvas.clientWidth || 260;
-            const ratio = window.devicePixelRatio || 1;
-            canvas.width = Math.round(w * ratio);
-            canvas.height = Math.round(w * ratio * full.height / full.width);
-            const ctx = canvas.getContext('2d');
-            ctx.imageSmoothingQuality = 'high';
-            ctx.drawImage(full, 0, 0, canvas.width, canvas.height);
-            canvas.dataset.ready = '1';
-        } catch (e) { /* the preview is a nicety; never break the page for it */ }
-        previewBusy = false;
-        if (previewAgain) { previewAgain = false; schedulePreview(); }
-    }
-
-    EFL.on('render', schedulePreview);
-    EFL.on('change', schedulePreview);
-    document.addEventListener('input', e => { if (e.target.closest && e.target.closest('#field .player-name, .efl-panel')) schedulePreview(); });
-    document.addEventListener('click', e => { if (e.target.closest && e.target.closest('.efl-panel')) schedulePreview(); });
-
     function placeTools(force) {
         const tools = document.getElementById('toolsBar');
         if (!tools || !more) return;

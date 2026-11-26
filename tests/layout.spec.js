@@ -30,7 +30,7 @@ test.describe('Page layout', () => {
     await expect(page.locator('.efl-panel')).toBeVisible();
   });
 
-  test('wide screens: setting up on the left, pitch in the centre, sharing with a live preview on the right', async ({ page }) => {
+  test('wide screens: setting up on the left, pitch in the centre, sharing on the right', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await openFresh(page, 'index.html');
     const field = await page.locator('#field').boundingBox();
@@ -45,19 +45,12 @@ test.describe('Page layout', () => {
     for (const id of ['downloadBtn', 'copyLinkBtn', 'whatsappBtn', 'imageOptionsBtn', 'copyTextBtn']) {
       await expect(page.locator(`.studio-right #${id}`)).toBeVisible();
     }
-    // The preview is drawn, and redrawn after a change
-    const canvas = page.locator('.ly-preview-canvas');
-    await expect(canvas).toHaveAttribute('data-ready', '1', { timeout: 10000 });
-    const before = await canvas.evaluate(c => c.toDataURL());
-    await page.selectOption('#myTeamFormation', '433');
-    await expect.poll(() => canvas.evaluate(c => c.toDataURL()), { timeout: 10000 }).not.toBe(before);
   });
 
   test('going narrow puts the controls back in the page', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await openFresh(page, 'index.html');
     await page.setViewportSize({ width: 800, height: 900 });
-    await expect(page.locator('.ly-preview')).toHaveCount(0);
     await page.locator('#moreBtn').click();
     await expect(page.locator('#moreMenu #imageOptionsBtn')).toBeVisible();
     await page.keyboard.press('Escape');

@@ -16,7 +16,8 @@ test.describe('Team names, kits and captains', () => {
     // Dark numbers on a light kit
     await expect(page.locator('.my-team .player-number').first()).toHaveCSS('color', 'rgb(17, 24, 39)');
     await expect(page.locator('.my-team[data-index="3"] .captain-badge')).toHaveCount(1);
-    await expect(page.locator('.team-tag.my-team')).toHaveText('Bibs');
+    // The name is shown beside the pitch, never on the grass
+    await expect(page.locator('.team-tag')).toHaveCount(0);
     await expect(page.locator('.home-label')).toHaveText('Bibs:');
 
     const state = await shareState(page);
@@ -25,7 +26,7 @@ test.describe('Team names, kits and captains', () => {
 
     await page.evaluate(() => localStorage.clear());
     await openState(page, '7s.html', state);
-    await expect(page.locator('.team-tag.opp-team')).toHaveText('Shirts');
+    await expect(page.locator('.away-label')).toHaveText('Shirts:');
     await expect(page.locator('.my-team[data-index="3"] .captain-badge')).toHaveCount(1);
   });
 
