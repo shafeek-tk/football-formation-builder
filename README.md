@@ -1,70 +1,39 @@
-# Refactored Football Formation Builder
+# Easy Football Lineup
 
-This is a completely refactored version of the Easy Football Lineup project with **zero code duplication**.
+[easyfootballlineup.com](https://easyfootballlineup.com) is a free football lineup builder: pick a format (5-a-side to 11-a-side), choose formations, add names, and share the lineup as a link or an image. No account, no server: plain HTML, CSS and JavaScript on GitHub Pages.
 
-## Key Improvements
-
-### 🚀 Zero Duplication
-- **Single FormationBuilder class** handles all game types (11v11, 7v7, 6v6)
-- **Shared formation data** in separate module
-- **Common styles** split into pitch-styles.css and app-styles.css
-- **Reusable components** for all functionality
-
-### 📁 Clean Architecture
-```
-refactored/
-├── index.html          # 11v11 (22 players)
-├── 7s.html            # 7v7 (7 players)  
-├── 6s.html            # 6v6 (6 players)
-├── css/
-│   ├── pitch-styles.css    # Pitch rendering
-│   └── app-styles.css      # UI components
-├── js/
-│   ├── formation-builder.js # Core logic
-│   ├── formations.js       # Formation data
-│   └── pitch-common.js     # Pitch initialization
-└── tests/
-    └── formation-builder.spec.js # Unified tests
-```
-
-### 🔧 Configuration-Driven
-Each page initializes with specific config:
-```javascript
-const formationBuilder = new FormationBuilder({
-    gameType: '11v11',
-    formations: FORMATIONS_11V11,
-    defaultNames: DEFAULT_NAMES_11V11,
-    fieldMargin: 8
-});
-```
-
-### ✅ Improved Testing
-- **Single test suite** covers all game types
-- **Graceful exit** - tests run and exit properly
-- **Better error handling** with console output
-- **Timeout protection** prevents hanging
-
-## Usage
+## Run it locally
 
 ```bash
-cd refactored
 npm install
-npm test        # Run tests with auto-exit
-./run-tests.sh  # Run with timeout protection
+python3 -m http.server 8080     # then open http://localhost:8080
 ```
 
-## Features Maintained
-- ✅ All original functionality preserved
-- ✅ Same visual design and UX
-- ✅ URL sharing with compression
-- ✅ Image download/sharing
-- ✅ Player name editing
-- ✅ Formation switching
-- ✅ Mobile responsive
-- ✅ Local storage persistence
+## Tests
 
-## Code Reduction
-- **~70% less code** through elimination of duplication
-- **Single source of truth** for all logic
-- **Maintainable** - changes in one place affect all pages
-- **Extensible** - easy to add new game types
+```bash
+npx playwright install chromium   # first time only
+npx playwright test               # all tests, desktop + mobile Chrome
+npx playwright test tests/drag-drop.spec.js   # one file
+npx playwright show-report        # last report
+```
+
+Tests also run on GitHub Actions for every push to `main` and every pull request (`.github/workflows/tests.yml`).
+
+## How the code is organised
+
+| Path | What it is |
+| --- | --- |
+| `index.html`, `5s.html` … `10s.html` | One page per format. Each sets up `FormationBuilder` with its formations and default names. |
+| `js/formation-builder.js` | The core: players, names, share links, the high-resolution image, and the `EFL` event bus features hook into. |
+| `js/app.js` | Share bar buttons, toast, and helpers for features (tools row, dialogs). |
+| `js/pitch-common.js` | The vector pitch used on screen and in the image. |
+| `js/formations.js` | Formation coordinates and default names. |
+| `js/feature-*.js`, `css/feature-*.css` | Optional features, one file each (see below). |
+| `tests/` | Playwright tests; `tests/<feature>.spec.js` per feature. |
+
+## Features are independent
+
+Each optional feature (team splitter, drag and drop, bench, ...) lives in its own `js/feature-<name>.js` and only talks to the core through `EFL` events, so it can be added or removed on its own. Every page has one marker comment per feature (`<!-- feature: name -->`) and the feature's `<script>` line sits right under it. To remove a feature, delete its script line, its files and its test. See `CLAUDE.md` for the list of events.
+
+Share links store the lineup in the URL hash (`#f=` + LZString-compressed JSON). Keys are only ever added, never renamed, so old links keep working.
