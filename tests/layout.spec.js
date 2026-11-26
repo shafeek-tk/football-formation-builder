@@ -42,7 +42,7 @@ test.describe('Page layout', () => {
     for (const id of ['myTeamFormationPicker', 'bulkNamesBtn', 'splitTeamsBtn', 'teamsBtn']) {
       await expect(page.locator(`.studio-side:not(.studio-right) #${id}`)).toBeVisible();
     }
-    for (const id of ['downloadBtn', 'copyLinkBtn', 'whatsappBtn', 'imageOptionsBtn', 'copyTextBtn']) {
+    for (const id of ['undoBtn', 'redoBtn', 'moreBtn', 'downloadBtn', 'copyLinkBtn', 'whatsappBtn', 'imageOptionsBtn', 'copyTextBtn']) {
       await expect(page.locator(`.studio-right #${id}`)).toBeVisible();
     }
   });

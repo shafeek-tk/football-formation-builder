@@ -8,7 +8,7 @@
 // lives in the More menu. On wide screens the pitch is the centrepiece:
 // setting up (formations, squad) on its left, sharing on its right. Buttons are moved, never rebuilt, so every feature keeps
 // working with its own button.
-EFL.css('css/feature-layout.css?v=1795676619');
+EFL.css('css/feature-layout.css?v=1795676988');
 
 (function () {
     const SQUAD = [
@@ -117,12 +117,14 @@ EFL.css('css/feature-layout.css?v=1795676619');
         const right = el('aside', 'studio-side studio-right');
         studio.appendChild(right);
         const extras = el('div', 'ly-share-extras');
+        const editCard = el('section', 'st-card st-edit', '<h2 class="st-head">Edit</h2>');
         const arrange = () => {
             if (WIDE.matches) {
                 share.querySelector('.st-head').textContent = 'Share your lineup';
                 share.appendChild(extras);
                 ['imageOptionsBtn', 'copyTextBtn'].forEach(id => { const b = document.getElementById(id); if (b) extras.appendChild(b); });
-                right.appendChild(share);
+                editCard.appendChild(actions);
+                right.append(editCard, share);
                 document.body.classList.add('is-wide');
             } else {
                 share.querySelector('.st-head').textContent = 'Share';
@@ -130,6 +132,8 @@ EFL.css('css/feature-layout.css?v=1795676619');
                 placeTools(true); // image options and copy-as-text go back into the More menu
                 extras.remove();
                 side.appendChild(share);
+                pitchBar.appendChild(actions);
+                editCard.remove();
             }
             if (more.open) closeMenu();
             window.dispatchEvent(new Event('resize'));

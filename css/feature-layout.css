@@ -294,7 +294,14 @@
         aspect-ratio: 5 / 7;
     }
 
-    body.is-wide .pitch-bar { width: 100%; margin: 6px 0 10px; }
+    body.is-wide .pitch-bar { width: 100%; justify-content: center; margin: 6px 0 10px; min-height: 38px; }
+    body.is-wide .pitch-bar #interactionToggleContainer { justify-items: center; flex: 0 1 auto; }
+    body.is-wide .pitch-bar .interaction-hint { text-align: center; font-size: 13px; }
+
+    /* Edit: undo, redo and the More menu, above Share */
+    body.is-wide .st-edit .pitch-actions { width: 100%; gap: 8px; }
+    body.is-wide .st-edit .ly-icon-btn { flex: 1 1 0; height: 44px; min-height: 44px; border-color: var(--border-strong, rgba(255, 255, 255, 0.14)); background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.015)), var(--surface, #121b17); }
+    body.is-wide .st-edit #moreBtn { flex: 1.6 1 0; }
 
     body.is-wide .st-card {
         box-sizing: border-box;
