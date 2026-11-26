@@ -10,6 +10,8 @@ export default defineConfig({
   use: {
     baseURL: 'file://' + process.cwd(),
     trace: 'on-first-retry',
+    // Tests start as returning visitors; walkthrough.spec.js tests the first visit
+    storageState: { cookies: [], origins: [{ origin: 'http://localhost:8080', localStorage: [{ name: 'eflTourSeen', value: '1' }] }] },
   },
 
   projects: [

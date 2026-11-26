@@ -131,3 +131,9 @@ test.describe('Drag players', () => {
     expect(during).toBeLessThan(before - 50);
   });
 });
+
+test('names are underlined so they look tappable', async ({ page }) => {
+  await openFresh(page, '7s.html');
+  const line = await page.locator('.player-name').first().evaluate(el => getComputedStyle(el).textDecorationStyle);
+  expect(line).toBe('dotted');
+});

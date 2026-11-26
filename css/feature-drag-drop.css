@@ -70,3 +70,23 @@ body.efl-dragging * {
 .tool-link[hidden] {
     display: none;
 }
+
+/* Names look tappable */
+#field .player-name {
+    text-decoration: underline dotted rgba(255, 255, 255, 0.45);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+}
+
+#field .player-name:focus {
+    text-decoration: none;
+}
+
+/* On touch screens a tap leaves "hover" stuck on, which put a pencil after
+   every name; the dotted underline already says names can be edited */
+@media (hover: none) {
+    .field .player-name::after,
+    .field:not(.swap-mode):hover .player-name::after {
+        content: none !important;
+    }
+}

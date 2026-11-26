@@ -18,9 +18,12 @@ test.describe('Phone layout', () => {
 
   test('the whole pitch fits above the bar without scrolling on a typical phone', async ({ page }) => {
     await openFresh(page, 'index.html');
-    const field = await page.locator('#field').boundingBox();
-    const bar = await page.locator('.share-bar').boundingBox();
-    expect(field.y + field.height).toBeLessThanOrEqual(bar.y);
+    // The pitch is fitted on the next frames (and again once fonts load)
+    await expect.poll(async () => {
+      const field = await page.locator('#field').boundingBox();
+      const bar = await page.locator('.share-bar').boundingBox();
+      return field.y + field.height - bar.y;
+    }).toBeLessThanOrEqual(0);
     await expect(page.locator('.subtitle')).toBeHidden();
   });
 

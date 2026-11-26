@@ -14,7 +14,8 @@ export const PAGES = [
 /** Open a page with clean storage. */
 export async function openFresh(page, file = 'index.html') {
   await page.goto(`${BASE}/${file}`);
-  await page.evaluate(() => localStorage.clear());
+  // Clear saved data, but keep the first-visit walkthrough out of the way
+  await page.evaluate(() => { localStorage.clear(); localStorage.setItem('eflTourSeen', '1'); });
   await page.goto(`${BASE}/${file}`);
   await page.waitForSelector('.player');
 }

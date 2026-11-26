@@ -37,6 +37,13 @@ EFL.css('css/feature-mobile-layout.css?v=1795664498');
         // Tools may be added after ready (e.g. Install app)
         const tools = document.getElementById('toolsBar');
         if (tools && window.ResizeObserver) new ResizeObserver(() => { schedule(); markEnd(); }).observe(tools);
+        // Feature stylesheets arrive after this runs and change the header and
+        // share bar sizes, so refit whenever either changes size
+        if (window.ResizeObserver) {
+            const ro = new ResizeObserver(schedule);
+            ['.header', '.share-bar'].forEach(sel => { const el = document.querySelector(sel); if (el) ro.observe(el); });
+        }
+        window.addEventListener('load', schedule);
         if (tools) tools.addEventListener('scroll', markEnd, { passive: true });
         markEnd();
     });
