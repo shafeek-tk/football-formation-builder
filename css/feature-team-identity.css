@@ -1,0 +1,81 @@
+/* Kit colours set by js/feature-team-identity.js */
+.my-team .jersey-body { fill: var(--kit-h, #1f6fe0); }
+.opp-team .jersey-body { fill: var(--kit-a, #d7263d); }
+.my-team .player-number { color: var(--kit-h-ink, #fff); text-shadow: none; }
+.opp-team .player-number { color: var(--kit-a-ink, #fff); text-shadow: none; }
+
+.captain-badge {
+    position: absolute;
+    top: -3px;
+    right: -5px;
+    width: min(3.6vw, 13px);
+    height: min(3.6vw, 13px);
+    border-radius: 50%;
+    background: #facc15;
+    border: 1.5px solid #111827;
+    color: #111827;
+    font-size: min(2.4vw, 9px);
+    font-weight: 700;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+
+.team-tag {
+    position: absolute;
+    left: 4.5%;
+    z-index: 5;
+    padding: 3px 8px 3px 9px;
+    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.55);
+    border-left: 3px solid var(--kit-h, #1f6fe0);
+    color: #fff; /* always light: sits on the pitch */
+    font-size: min(2.8vw, 12px);
+    font-weight: 600;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    pointer-events: none;
+    max-width: 40%;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.team-tag.my-team { bottom: 3.2%; }
+.team-tag.opp-team { top: 3.2%; border-left-color: var(--kit-a, #d7263d); }
+
+.team-fields {
+    border: 1px solid var(--surface-3, #2f3447);
+    border-radius: 8px;
+    padding: 10px 12px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.team-fields legend {
+    padding: 0 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text, #fff);
+}
+
+.kit-swatches {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 6px;
+}
+
+.kit-swatch {
+    height: 32px;
+    border-radius: 6px;
+    border: 2px solid var(--border, rgba(255, 255, 255, 0.15));
+    background: var(--swatch);
+    cursor: pointer;
+}
+
+.kit-swatch.is-on {
+    border-color: var(--accent, #22c55e);
+    box-shadow: 0 0 0 2px #1f2433, 0 0 0 4px var(--accent, #22c55e);
+}
