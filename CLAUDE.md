@@ -38,9 +38,9 @@ This is a zero-duplication static site. One `FormationBuilder` class powers all 
 Each HTML page includes the shared JS/CSS and initializes `FormationBuilder` with a game-type-specific config (formations, default names, etc.). Each page has its own inline `<script>` block wiring up share bar button handlers.
 
 ### Core JS (`js/`)
-- **`formation-builder.js`** - `FormationBuilder` class: player rendering, name editing, swap mode, URL sharing (LZString compression), image download (html2canvas), localStorage persistence. Contains `getLayerY()` which has a 5v5-specific tighter spacing branch.
+- **`formation-builder.js`** - `FormationBuilder` class: player rendering, name editing, swap mode, URL sharing (LZString compression), image download (native high-res canvas renderer, ~2800px long side), localStorage persistence. Contains `getLayerY()` which has a 5v5-specific tighter spacing branch.
 - **`formations.js`** - Formation data constants (`FORMATIONS_11V11`, `FORMATIONS_5V5`, `FORMATIONS_10V10`, etc.) as arrays of layers, where each layer is an array of X-coordinate percentages. Also contains default player name arrays for each format.
-- **`pitch-common.js`** - `initializePitch()` function that injects pitch markings (penalty areas, center spot, etc.) into the field div.
+- **`pitch-common.js`** - `buildPitchSVG(w, h)` builds the vector pitch (grass stripes + true-to-scale markings); `initializePitch()` injects it into the field and redraws on resize. The same SVG is used for the exported image.
 - **`common-mode-toggle.js`** - `createModeToggle()` generates the format switcher tabs (11v11, 10v10, 9v9, 8v8, 7v7, 6v6, 5v5). Renders as a segmented control.
 - **`common-footer.js`** - `createFooter()` generates feature cards, internal nav links (cross-linking all formats), and attribution footer.
 
@@ -67,7 +67,7 @@ Each HTML page includes the shared JS/CSS and initializes `FormationBuilder` wit
 ### Share Bar
 Below the pitch on every page. Three buttons with inline SVG icons:
 - **Copy Link** - calls `formationBuilder.shareFormation()` (copies URL with formation data to clipboard, or native share on mobile)
-- **Save Image** - calls `formationBuilder.downloadImage()` (renders pitch as PNG via html2canvas; uses Web Share API on mobile for native share sheet)
+- **Save Image** - calls `formationBuilder.downloadImage()` (renders a ~2800px PNG with the native canvas renderer `renderFieldToCanvas()`; uses Web Share API on mobile for native share sheet)
 - **WhatsApp** - on mobile: generates pitch image + formation URL, shares via Web Share API (which shows WhatsApp, iMessage, etc.); on desktop: opens wa.me with formation URL
 
 ### SEO

@@ -216,6 +216,7 @@ class FormationBuilder {
         
         const icon = document.createElement('div');
         icon.className = 'player-icon';
+        icon.innerHTML = `<svg class="jersey" viewBox="0 0 24 24" aria-hidden="true"><path class="jersey-body" d="${JERSEY_BODY_PATH}"/><path class="jersey-trim" d="${JERSEY_TRIM_PATH}"/></svg>`;
         
         const number = document.createElement('div');
         number.className = 'player-number';
@@ -526,61 +527,110 @@ class FormationBuilder {
         if (loadingIndicator) loadingIndicator.style.display = 'block';
         
         try {
-            // Create isolated clone with exact dimensions
-            const clone = field.cloneNode(true);
-            const computedStyle = window.getComputedStyle(field);
-            
-            // Apply exact styling to eliminate browser differences
-            clone.style.cssText = `
-                position: absolute !important;
-                left: -9999px !important;
-                top: 0 !important;
-                margin: 0 !important;
-                padding: 0 !important;
-                width: ${field.offsetWidth}px !important;
-                height: ${field.offsetHeight}px !important;
-                background: ${computedStyle.background} !important;
-                border: ${computedStyle.border} !important;
-                border-radius: ${computedStyle.borderRadius} !important;
-                box-shadow: none !important;
-                transform: none !important;
-            `;
-            
-            document.body.appendChild(clone);
-            
-            // Force layout recalculation
-            clone.offsetHeight;
-            
-            // Hide D-box arcs in clone (html2canvas can't render them properly)
-            clone.querySelectorAll('.penalty-arc-clip').forEach(c => c.style.display = 'none');
-            
-            const canvas = await html2canvas(clone, {
-                backgroundColor: null,
-                scale: 3,
-                width: field.offsetWidth,
-                height: field.offsetHeight,
-                x: 0,
-                y: 0,
-                useCORS: true,
-                allowTaint: false,
-                logging: false,
-                onclone: (clonedDoc) => {
-                    // Ensure clean rendering in cloned document
-                    const clonedElement = clonedDoc.querySelector(`#${clone.id}`);
-                    if (clonedElement) {
-                        clonedElement.style.margin = '0';
-                        clonedElement.style.padding = '0';
-                    }
-                }
-            });
-            
-            document.body.removeChild(clone);
+            if (document.fonts && document.fonts.ready) await document.fonts.ready;
+            const canvas = await this.renderFieldToCanvas(field);
             this.downloadCanvas(canvas, `formation-${this.config.gameType}.png`);
         } catch (error) {
             console.error('Error generating image:', error);
             alert('Error generating image. Please try again.');
         } finally {
             if (loadingIndicator) loadingIndicator.style.display = 'none';
+        }
+    }
+
+    /**
+     * Pixel ratio for the exported image: aim for ~2800px on the long side
+     * (sharp on any phone and after WhatsApp compression), between 3x and 6x.
+     */
+    getExportScale(width, height) {
+        return Math.min(6, Math.max(3, EXPORT_LONG_SIDE_PX / Math.max(width, height)));
+    }
+
+    /**
+     * Draw the field natively onto a high-resolution canvas: the vector pitch
+     * is rasterised at full export size, then every jersey, number and name
+     * is drawn as vector shapes/text at the positions they have on screen.
+     */
+    async renderFieldToCanvas(field) {
+        const W = field.clientWidth;
+        const H = field.clientHeight;
+        const scale = this.getExportScale(W, H);
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.round(W * scale);
+        canvas.height = Math.round(H * scale);
+        const ctx = canvas.getContext('2d');
+        ctx.scale(canvas.width / W, canvas.height / H);
+
+        const radius = parseFloat(getComputedStyle(field).borderTopLeftRadius) || 0;
+        roundedRectPath(ctx, 0, 0, W, H, radius);
+        ctx.clip();
+
+        const pitch = await loadSvgImage(buildPitchSVG(W, H), canvas.width, canvas.height);
+        ctx.drawImage(pitch, 0, 0, W, H);
+
+        const origin = field.getBoundingClientRect();
+        field.querySelectorAll('.player').forEach(player => {
+            this.drawPlayer(ctx, player, origin, scale);
+        });
+        return canvas;
+    }
+
+    drawPlayer(ctx, player, origin, scale) {
+        const rel = el => {
+            const r = el.getBoundingClientRect();
+            return { x: r.left - origin.left, y: r.top - origin.top, w: r.width, h: r.height };
+        };
+        const icon = player.querySelector('.player-icon');
+        const body = player.querySelector('.jersey-body');
+        const number = player.querySelector('.player-number');
+        const name = player.querySelector('.player-name');
+
+        if (icon && body) {
+            const r = rel(icon);
+            ctx.save();
+            ctx.translate(r.x, r.y);
+            ctx.scale(r.w / 24, r.h / 24);
+            ctx.shadowColor = 'rgba(0,0,0,0.45)';
+            ctx.shadowBlur = 1.5 * scale;
+            ctx.shadowOffsetY = 1 * scale;
+            ctx.fillStyle = getComputedStyle(body).fill;
+            ctx.fill(new Path2D(JERSEY_BODY_PATH));
+            ctx.shadowColor = 'transparent';
+            ctx.lineJoin = 'round';
+            ctx.lineCap = 'round';
+            ctx.strokeStyle = 'rgba(0,0,0,0.35)';
+            ctx.lineWidth = 0.7;
+            ctx.stroke(new Path2D(JERSEY_BODY_PATH));
+            ctx.strokeStyle = 'rgba(255,255,255,0.9)';
+            ctx.lineWidth = 1.1;
+            ctx.stroke(new Path2D(JERSEY_TRIM_PATH));
+            ctx.restore();
+        }
+        if (number) {
+            const r = rel(number);
+            drawCenteredText(ctx, number.textContent, r.x + r.w / 2, r.y + r.h / 2, getComputedStyle(number), r.w + 20, scale);
+        }
+        if (name && name.textContent.trim()) {
+            const r = rel(name);
+            const cs = getComputedStyle(name);
+            ctx.save();
+            ctx.shadowColor = 'rgba(0,0,0,0.5)';
+            ctx.shadowBlur = 3 * scale;
+            ctx.shadowOffsetY = 1 * scale;
+            const grad = ctx.createLinearGradient(r.x, r.y, r.x + r.w, r.y + r.h);
+            grad.addColorStop(0, 'rgba(0,0,0,0.9)');
+            grad.addColorStop(1, 'rgba(0,0,0,0.7)');
+            roundedRectPath(ctx, r.x, r.y, r.w, r.h, parseFloat(cs.borderTopLeftRadius) || 4);
+            ctx.fillStyle = grad;
+            ctx.fill();
+            ctx.shadowColor = 'transparent';
+            ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+            ctx.lineWidth = 1;
+            roundedRectPath(ctx, r.x + 0.5, r.y + 0.5, r.w - 1, r.h - 1, parseFloat(cs.borderTopLeftRadius) || 4);
+            ctx.stroke();
+            ctx.restore();
+            const maxW = r.w - (parseFloat(cs.paddingLeft) || 0) - (parseFloat(cs.paddingRight) || 0);
+            drawCenteredText(ctx, name.textContent.trim(), r.x + r.w / 2, r.y + r.h / 2, cs, maxW, scale);
         }
     }
 
@@ -636,4 +686,52 @@ class FormationBuilder {
             newTab.document.write(`<img src="${canvas.toDataURL()}" alt="Formation"/>`);
         }
     }
+}
+
+// Shared jersey shape (24x24 box) used by the on-screen icon and the export
+const JERSEY_BODY_PATH = 'M8.2 2.4 L4.6 3.7 L1.2 7.4 L3.9 11 L6.1 9.7 L6.1 21 Q6.1 22 7.1 22 L16.9 22 Q17.9 22 17.9 21 L17.9 9.7 L20.1 11 L22.8 7.4 L19.4 3.7 L15.8 2.4 Q14.6 4.4 12 4.4 Q9.4 4.4 8.2 2.4 Z';
+const JERSEY_TRIM_PATH = 'M8.2 2.4 Q9.4 4.4 12 4.4 Q14.6 4.4 15.8 2.4 M2.5 6.1 L5.2 9.7 M21.5 6.1 L18.8 9.7';
+const EXPORT_LONG_SIDE_PX = 2800;
+
+function roundedRectPath(ctx, x, y, w, h, r) {
+    r = Math.max(0, Math.min(r, w / 2, h / 2));
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+}
+
+function loadSvgImage(svgMarkup, width, height) {
+    // Give the SVG its export pixel size so it is rasterised sharply
+    const sized = svgMarkup.replace(/ width="[^"]*" height="[^"]*"/, ` width="${width}" height="${height}"`);
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = () => reject(new Error('Could not render pitch image'));
+        img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(sized);
+    });
+}
+
+/** Draw text centred (by cap height) on a point, using an element's computed font. */
+function drawCenteredText(ctx, text, cx, cy, cs, maxWidth, scale) {
+    ctx.save();
+    ctx.font = `${cs.fontStyle} ${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+    let label = text;
+    if (maxWidth > 0 && ctx.measureText(label).width > maxWidth) {
+        while (label.length > 1 && ctx.measureText(label + '…').width > maxWidth) label = label.slice(0, -1);
+        label += '…';
+    }
+    const capHeight = ctx.measureText('H').actualBoundingBoxAscent || parseFloat(cs.fontSize) * 0.7;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'alphabetic';
+    ctx.shadowColor = 'rgba(0,0,0,0.8)';
+    ctx.shadowBlur = 2 * scale;
+    ctx.shadowOffsetX = 0.5 * scale;
+    ctx.shadowOffsetY = 1 * scale;
+    ctx.fillStyle = cs.color || '#fff';
+    ctx.fillText(label, cx, cy + capHeight / 2);
+    ctx.restore();
 }

@@ -268,37 +268,47 @@ body {
 }
 
 .player-icon {
-    width: min(6vw, 24px);
-    height: min(6vw, 24px);
+    position: relative;
+    width: min(7.5vw, 30px);
+    height: min(7.5vw, 30px);
     margin: 0 auto;
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
+    filter: drop-shadow(0 1px 1.5px rgba(0, 0, 0, 0.45));
 }
 
-.my-team .player-icon {
-    background-image: url('../blue-jersey.png') !important;
-    background-size: contain !important;
-    background-repeat: no-repeat !important;
-    background-position: center !important;
+.player-icon .jersey {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
 }
 
-.opp-team .player-icon {
-    background-image: url('../red-jersey.png') !important;
-    background-size: contain !important;
-    background-repeat: no-repeat !important;
-    background-position: center !important;
+.jersey-body {
+    stroke: rgba(0, 0, 0, 0.35);
+    stroke-width: 0.7;
+    stroke-linejoin: round;
 }
+
+.jersey-trim {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.9);
+    stroke-width: 1.1;
+    stroke-linecap: round;
+}
+
+.my-team .jersey-body { fill: #1f6fe0; }
+.opp-team .jersey-body { fill: #d7263d; }
 
 .player-number {
     position: absolute;
-    top: 30%;
+    top: 58%;
     left: 50%;
     transform: translate(-50%, -50%);
-    font-size: min(1.8vw, 7px);
+    font-size: min(2.4vw, 10px);
     font-weight: bold;
+    line-height: 1;
     color: #fff;
-    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.6);
+    pointer-events: none;
 }
 
 .player-name {

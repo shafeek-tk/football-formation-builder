@@ -613,150 +613,126 @@ test.describe('Football Formation Builder', () => {
 
   // ===== PITCH RENDERING TESTS =====
 
-  test('should render penalty arcs clipped by overflow:hidden wrapper', async ({ page }) => {
+  test('should render the pitch as a single vector layer sized to the field', async ({ page }) => {
     await page.goto('http://localhost:8080/index.html');
-    await page.waitForSelector('#field');
+    await page.waitForSelector('#field .pitch-svg');
 
-    const arcInfo = await page.evaluate(() => {
-      const topArc = document.querySelector('.penalty-arc.top');
-      const bottomArc = document.querySelector('.penalty-arc.bottom');
-      const topWrapper = document.querySelector('.penalty-arc-clip.top');
-      const bottomWrapper = document.querySelector('.penalty-arc-clip.bottom');
+    const info = await page.evaluate(() => {
       const field = document.getElementById('field');
-      const fieldRect = field.getBoundingClientRect();
+      const svg = field.querySelector('.pitch-svg');
+      const vb = svg.viewBox.baseVal;
       return {
-        topExists: !!topArc,
-        bottomExists: !!bottomArc,
-        topWrapperOverflow: topWrapper ? window.getComputedStyle(topWrapper).overflow : null,
-        bottomWrapperOverflow: bottomWrapper ? window.getComputedStyle(bottomWrapper).overflow : null,
-        topWrapperHeightPct: topWrapper ? (topWrapper.getBoundingClientRect().height / fieldRect.height) * 100 : 0,
-        bottomWrapperHeightPct: bottomWrapper ? (bottomWrapper.getBoundingClientRect().height / fieldRect.height) * 100 : 0,
+        count: field.querySelectorAll('.pitch-svg').length,
+        vbW: vb.width, vbH: vb.height,
+        fieldW: field.clientWidth, fieldH: field.clientHeight,
       };
     });
 
-    expect(arcInfo.topExists).toBe(true);
-    expect(arcInfo.bottomExists).toBe(true);
-    expect(arcInfo.topWrapperOverflow).toBe('hidden');
-    expect(arcInfo.bottomWrapperOverflow).toBe('hidden');
-    expect(arcInfo.topWrapperHeightPct).toBeGreaterThanOrEqual(4);
-    expect(arcInfo.bottomWrapperHeightPct).toBeGreaterThanOrEqual(4);
+    expect(info.count).toBe(1);
+    expect(Math.abs(info.vbW - info.fieldW)).toBeLessThanOrEqual(1);
+    expect(Math.abs(info.vbH - info.fieldH)).toBeLessThanOrEqual(1);
   });
 
-  test('should render corner arcs with visible borders inside the field', async ({ page }) => {
+  test('should render all pitch markings', async ({ page }) => {
     await page.goto('http://localhost:8080/index.html');
-    await page.waitForSelector('#field');
+    await page.waitForSelector('#field .pitch-svg');
 
-    // The corner arcs are positioned half-outside the field. Only the quadrant
-    // inside the field should have borders. The field has overflow:hidden so
-    // borders outside the field are clipped. We verify the inside-facing borders exist.
-    const borderInfo = await page.evaluate(() => {
-      const results = {};
-      const corners = ['top-left', 'top-right', 'bottom-left', 'bottom-right'];
-      corners.forEach(corner => {
-        const el = document.querySelector(`.corner-arc.${corner}`);
-        const style = window.getComputedStyle(el);
-        results[corner] = {
-          borderTop: style.borderTopWidth,
-          borderBottom: style.borderBottomWidth,
-          borderLeft: style.borderLeftWidth,
-          borderRight: style.borderRightWidth,
-        };
-      });
-      return results;
+    const counts = await page.evaluate(() => {
+      const q = sel => document.querySelectorAll(`#field .pitch-svg ${sel}`).length;
+      return {
+        touchline: q('.touchline'), halfway: q('.halfway-line'), centreCircle: q('.centre-circle'),
+        penaltyBox: q('.penalty-box'), goalBox: q('.goal-box'), penaltyD: q('.penalty-d'),
+        corners: q('.corner-arc-line'), spots: q('.pitch-spots circle'), goals: q('.pitch-goal'),
+      };
     });
 
-    // top-left: inside field is bottom-right quadrant, so bottom + right borders must exist
-    expect(parseFloat(borderInfo['top-left'].borderBottom)).toBeGreaterThan(0);
-    expect(parseFloat(borderInfo['top-left'].borderRight)).toBeGreaterThan(0);
-
-    // top-right: inside field is bottom-left quadrant
-    expect(parseFloat(borderInfo['top-right'].borderBottom)).toBeGreaterThan(0);
-    expect(parseFloat(borderInfo['top-right'].borderLeft)).toBeGreaterThan(0);
-
-    // bottom-left: inside field is top-right quadrant
-    expect(parseFloat(borderInfo['bottom-left'].borderTop)).toBeGreaterThan(0);
-    expect(parseFloat(borderInfo['bottom-left'].borderRight)).toBeGreaterThan(0);
-
-    // bottom-right: inside field is top-left quadrant
-    expect(parseFloat(borderInfo['bottom-right'].borderTop)).toBeGreaterThan(0);
-    expect(parseFloat(borderInfo['bottom-right'].borderLeft)).toBeGreaterThan(0);
+    expect(counts).toEqual({
+      touchline: 1, halfway: 1, centreCircle: 1, penaltyBox: 2, goalBox: 2,
+      penaltyD: 2, corners: 4, spots: 3, goals: 2,
+    });
   });
 
   test('should have at least 7 visible grass stripes on the pitch', async ({ page }) => {
     await page.goto('http://localhost:8080/index.html');
-    await page.waitForSelector('#field');
-
-    // Count the number of grass stripes by checking background-size
-    const stripeInfo = await page.evaluate(() => {
-      const field = document.getElementById('field');
-      const style = window.getComputedStyle(field);
-      const bgSize = style.backgroundSize;
-      const fieldHeight = field.offsetHeight;
-
-      let stripeHeightPx;
-      if (bgSize.includes('%')) {
-        const yPercent = parseFloat(bgSize.split(/\s+/)[1]);
-        stripeHeightPx = fieldHeight * (yPercent / 100);
-      } else {
-        stripeHeightPx = parseFloat(bgSize.split(/\s+/)[1]);
-      }
-
-      const stripeCount = Math.round(fieldHeight / stripeHeightPx);
-      return { stripeCount, bgSize, fieldHeight };
-    });
-
-    // At least 7 stripes for a realistic look (currently only 5)
-    expect(stripeInfo.stripeCount).toBeGreaterThanOrEqual(7);
+    await page.waitForSelector('#field .pitch-svg');
+    const stripes = await page.locator('#field .pitch-svg .grass-stripe').count();
+    expect(stripes).toBeGreaterThanOrEqual(7);
   });
 
   test('should render center circle as visually circular', async ({ page }) => {
     await page.goto('http://localhost:8080/index.html');
-    await page.waitForSelector('#field');
-
-    const circleInfo = await page.evaluate(() => {
-      const field = document.getElementById('field');
-      const style = window.getComputedStyle(field, '::after');
-      const width = parseFloat(style.width);
-      const height = parseFloat(style.height);
-      return { width, height, ratio: width / height };
-    });
-
-    // Aspect ratio between 0.9 and 1.1 means visually circular
-    expect(circleInfo.ratio).toBeGreaterThanOrEqual(0.9);
-    expect(circleInfo.ratio).toBeLessThanOrEqual(1.1);
+    await page.waitForSelector('#field .pitch-svg');
+    const box = await page.locator('#field .centre-circle').boundingBox();
+    const ratio = box.width / box.height;
+    expect(ratio).toBeGreaterThanOrEqual(0.95);
+    expect(ratio).toBeLessThanOrEqual(1.05);
   });
 
-  test('should render goal indicators at top and bottom of pitch', async ({ page }) => {
+  test('should render goals at top and bottom of pitch', async ({ page }) => {
     await page.goto('http://localhost:8080/index.html');
-    await page.waitForSelector('#field');
+    await page.waitForSelector('#field .pitch-svg');
 
-    const topGoal = page.locator('.goal.top');
-    const bottomGoal = page.locator('.goal.bottom');
-
-    await expect(topGoal).toBeVisible();
-    await expect(bottomGoal).toBeVisible();
-
-    // Goals should be centered and at edges
-    const topGoalBox = await topGoal.boundingBox();
-    const bottomGoalBox = await bottomGoal.boundingBox();
+    const topGoalBox = await page.locator('#field .pitch-goal.top').boundingBox();
+    const bottomGoalBox = await page.locator('#field .pitch-goal.bottom').boundingBox();
     const fieldBox = await page.locator('#field').boundingBox();
 
     expect(topGoalBox.y).toBeLessThanOrEqual(fieldBox.y + 5);
     expect(bottomGoalBox.y + bottomGoalBox.height).toBeGreaterThanOrEqual(fieldBox.y + fieldBox.height - 5);
   });
 
-  test('should render spots as circular', async ({ page }) => {
+  test('should redraw the pitch when the field is resized', async ({ page }) => {
     await page.goto('http://localhost:8080/index.html');
-    await page.waitForSelector('#field');
-    const spotInfo = await page.evaluate(() => {
-      return ['.center-spot', '.penalty-spot.top', '.penalty-spot.bottom'].map(sel => {
-        const r = document.querySelector(sel).getBoundingClientRect();
-        return { sel, ratio: r.width / r.height };
-      });
-    });
-    for (const s of spotInfo) {
-      expect(s.ratio).toBeGreaterThanOrEqual(0.8);
-      expect(s.ratio).toBeLessThanOrEqual(1.2);
-    }
+    await page.waitForSelector('#field .pitch-svg');
+    await page.evaluate(() => { document.getElementById('field').style.width = '300px'; });
+    await expect.poll(() => page.evaluate(() => document.querySelector('#field .pitch-svg').viewBox.baseVal.width)).toBe(300);
   });
+
+  test('should render players with vector jerseys', async ({ page }) => {
+    await page.goto('http://localhost:8080/index.html');
+    await page.waitForSelector('#field .player');
+    const info = await page.evaluate(() => ({
+      players: document.querySelectorAll('#field .player').length,
+      jerseys: document.querySelectorAll('#field .player .player-icon svg.jersey').length,
+      home: getComputedStyle(document.querySelector('.my-team .jersey-body')).fill,
+      away: getComputedStyle(document.querySelector('.opp-team .jersey-body')).fill,
+    }));
+    expect(info.jerseys).toBe(info.players);
+    expect(info.home).not.toBe(info.away);
+  });
+
+  // ===== IMAGE EXPORT TESTS =====
+
+  for (const pageName of ['index.html', '10s.html', '9s.html', '8s.html', '7s.html', '6s.html', '5s.html']) {
+    test(`should export a sharp, high-resolution lineup image on ${pageName}`, async ({ page }) => {
+      await page.goto(`http://localhost:8080/${pageName}`);
+      await page.waitForSelector('#field .player');
+
+      const result = await page.evaluate(() => new Promise((resolve, reject) => {
+        formationBuilder.downloadCanvas = canvas => {
+          const field = document.getElementById('field');
+          const ctx = canvas.getContext('2d');
+          // Sample the centre of the first home player's jersey: it must be jersey-coloured, not grass
+          const f = field.getBoundingClientRect();
+          const icon = document.querySelector('.my-team .player-icon').getBoundingClientRect();
+          const sx = canvas.width / field.clientWidth;
+          const px = ctx.getImageData(Math.round((icon.left - f.left + icon.width / 2) * sx),
+            Math.round((icon.top - f.top + icon.height * 0.8) * sx), 1, 1).data;
+          resolve({ w: canvas.width, h: canvas.height, fw: field.clientWidth, fh: field.clientHeight, px: Array.from(px) });
+        };
+        formationBuilder.downloadImage().catch(reject);
+        setTimeout(() => reject(new Error('export timed out')), 15000);
+      }));
+
+      // At least 3x the on-screen size and ~2800px on the long side
+      expect(result.w).toBeGreaterThanOrEqual(result.fw * 3 - 1);
+      expect(Math.max(result.w, result.h)).toBeGreaterThanOrEqual(2700);
+      // Aspect ratio preserved
+      expect(Math.abs(result.w / result.h - result.fw / result.fh)).toBeLessThan(0.01);
+      // Home jersey is blue where the player stands
+      const [r, g, b] = result.px;
+      expect(b).toBeGreaterThan(150);
+      expect(b).toBeGreaterThan(r + 60);
+      expect(b).toBeGreaterThan(g + 30);
+    });
+  }
 });
