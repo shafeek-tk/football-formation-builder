@@ -1,0 +1,46 @@
+/* Players can be dragged on touch screens without scrolling the page */
+#field .player {
+    touch-action: none;
+    cursor: grab;
+}
+
+#field .player.is-dragging {
+    z-index: 50;
+    cursor: grabbing;
+    transition: none;
+}
+
+#field .player.is-dragging .player-icon {
+    transform: scale(1.25);
+    filter: drop-shadow(0 6px 8px rgba(0, 0, 0, 0.5));
+}
+
+#field .player.drop-target .player-icon {
+    transform: scale(1.15);
+}
+
+#field .player.drop-target .player-name {
+    border-color: #facc15 !important;
+    box-shadow: 0 0 0 2px rgba(250, 204, 21, 0.6) !important;
+}
+
+body.efl-dragging,
+body.efl-dragging * {
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.tool-link {
+    background: none;
+    border: none;
+    color: var(--accent, #22c55e);
+    font-size: 12px;
+    text-decoration: underline;
+    cursor: pointer;
+    margin-top: 4px;
+    min-height: 28px;
+}
+
+.tool-link[hidden] {
+    display: none;
+}
