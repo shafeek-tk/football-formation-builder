@@ -1,0 +1,44 @@
+.recent-row {
+    display: flex;
+    align-items: stretch;
+    border: 1px solid var(--surface-3, #2f3447);
+    border-radius: 8px;
+    background: var(--bg, #151926);
+}
+
+.recent-open {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 8px 12px;
+    color: var(--text, #fff);
+    text-decoration: none;
+}
+
+.recent-open:hover {
+    background: var(--surface-3, #1c2131);
+}
+
+.recent-label {
+    font-weight: 600;
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.recent-meta {
+    font-size: 11px;
+    color: var(--muted-2, #8a93a6);
+}
+
+.recent-remove {
+    background: none;
+    border: none;
+    border-left: 1px solid var(--surface-3, #2f3447);
+    color: var(--muted-2, #8a93a6);
+    font-size: 18px;
+    width: 44px;
+    cursor: pointer;
+}
