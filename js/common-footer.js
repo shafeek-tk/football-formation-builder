@@ -27,7 +27,8 @@ function createFooter() {
             <a href="8s.html">8-a-side</a><span>|</span>
             <a href="9s.html">9-a-side</a><span>|</span>
             <a href="10s.html">10-a-side</a><span>|</span>
-            <a href="index.html">11-a-side</a>
+            <a href="index.html">11-a-side</a><span>|</span>
+            <a href="formations/">Formation guides</a>
         </nav>
 
         <div class="footer">

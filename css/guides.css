@@ -1,0 +1,173 @@
+/* Formation guide pages (formations/*.html) */
+.guide {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 8px 4px 40px;
+}
+
+.guide-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.guide-nav a {
+    padding: 5px 10px;
+    border: 1px solid var(--border, #3d4460);
+    border-radius: 5px;
+    color: var(--muted, #b0b8c9);
+    text-decoration: none;
+    font-size: 13px;
+}
+
+.guide-nav a[aria-current="page"] {
+    background: var(--accent, #22c55e);
+    border-color: var(--accent, #22c55e);
+    color: var(--accent-ink, #0b1a10);
+}
+
+.guide-head {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.guide-head h1 {
+    font-size: 30px;
+    color: var(--text, #fff);
+    margin-bottom: 10px;
+}
+
+.guide-head p {
+    color: #b8c0d0;
+    line-height: 1.6;
+    max-width: 620px;
+    margin: 0 auto 16px;
+}
+
+.guide-card {
+    display: flex;
+    gap: 18px;
+    align-items: flex-start;
+    background: var(--surface-2, #242938);
+    border: 1px solid var(--surface-3, #2f3447);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 14px;
+}
+
+.guide-pitch {
+    flex: 0 0 120px;
+    width: 120px;
+    height: 170px;
+}
+
+.guide-text h2 {
+    font-size: 24px;
+    color: var(--text, #fff);
+    margin-bottom: 4px;
+}
+
+.guide-text p {
+    color: var(--text-2, #d1d5e0);
+    line-height: 1.5;
+    margin-bottom: 8px;
+}
+
+.guide-text dl {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 4px 12px;
+    font-size: 14px;
+    line-height: 1.45;
+    margin-bottom: 10px;
+}
+
+.guide-text dt {
+    color: var(--muted-2, #8a93a6);
+}
+
+.guide-text dd {
+    color: var(--text-2, #d1d5e0);
+}
+
+.guide-cta {
+    color: var(--accent, #22c55e);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.guide-cta:hover {
+    text-decoration: underline;
+}
+
+.guide-cta--main {
+    display: inline-block;
+    background: var(--accent, #22c55e);
+    color: var(--accent-ink, #0b1a10);
+    padding: 10px 18px;
+    border-radius: 6px;
+}
+
+.guide-cta--main:hover {
+    text-decoration: none;
+    background: var(--accent-hover, #2fd36b);
+}
+
+.guide-foot {
+    text-align: center;
+    color: var(--muted, #9ca3b4);
+    margin-top: 24px;
+    line-height: 1.6;
+}
+
+.guide-foot a {
+    color: var(--accent, #22c55e);
+}
+
+.guide-hub {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
+}
+
+.guide-hub-card {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    background: var(--surface-2, #242938);
+    border: 1px solid var(--surface-3, #2f3447);
+    border-radius: 10px;
+    padding: 14px 16px;
+    color: var(--text, #fff);
+    text-decoration: none;
+}
+
+.guide-hub-card:hover {
+    border-color: var(--accent, #22c55e);
+}
+
+.guide-hub-card span {
+    color: var(--muted-2, #8a93a6);
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+@media (max-width: 600px) {
+    .guide-card {
+        flex-direction: column;
+        align-items: center;
+        text-align: left;
+    }
+
+    .guide-pitch {
+        width: 140px;
+        height: 198px;
+        flex-basis: auto;
+    }
+
+    .guide-text {
+        width: 100%;
+    }
+}
