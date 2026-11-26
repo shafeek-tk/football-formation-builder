@@ -1,0 +1,95 @@
+@media (max-width: 600px) {
+    body {
+        padding-bottom: calc(76px + env(safe-area-inset-bottom));
+    }
+
+    /* One-line title, no subtitle */
+    .header h1 {
+        font-size: 0;
+        margin-bottom: 6px;
+    }
+
+    .header h1 strong {
+        font-size: 17px;
+    }
+
+    .header .subtitle {
+        display: none;
+    }
+
+    .mode-toggle {
+        margin-bottom: 8px;
+    }
+
+    .formation-container {
+        margin-bottom: 4px;
+    }
+
+    .interaction-toggle {
+        margin-bottom: 2px;
+    }
+
+    /* Tools: one row that scrolls sideways */
+    .tools-bar {
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        overflow-x: auto;
+        scrollbar-width: none;
+        margin: 6px -8px 0;
+        padding: 0 8px 2px;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .tools-bar::-webkit-scrollbar {
+        display: none;
+    }
+
+    .tool-btn {
+        flex: 0 0 auto;
+        min-height: 36px;
+    }
+
+    /* Share buttons fixed at the bottom of the screen */
+    .share-bar {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 100;
+        max-width: none;
+        margin: 0;
+        padding: 10px 10px calc(10px + env(safe-area-inset-bottom));
+        flex-wrap: nowrap;
+        background: var(--surface, rgba(20, 24, 36, 0.96));
+        border-top: 1px solid var(--surface-3, #2f3447);
+        box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.35);
+        -webkit-backdrop-filter: blur(8px);
+        backdrop-filter: blur(8px);
+    }
+
+    .share-btn {
+        min-height: 44px;
+        font-size: 13px;
+    }
+
+    /* Pitch fills the width; its height is fitted above the bottom bar by the script */
+    .field {
+        width: calc(100vw - 16px);
+        height: max(440px, min(72vh, calc(100svh - 262px)));
+    }
+
+    .field-container {
+        margin-top: 4px;
+    }
+
+    /* Credits sit in the page flow instead of floating over the pitch */
+    .footer {
+        position: static;
+        text-align: center;
+        padding: 12px 0 4px;
+    }
+
+    .toast {
+        bottom: calc(84px + env(safe-area-inset-bottom));
+    }
+}
