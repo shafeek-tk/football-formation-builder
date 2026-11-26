@@ -867,6 +867,29 @@ body {
     font-weight: 700;
 }
 
+/* Link from each builder page to its formation guide */
+.info-section p.guide-link {
+    background: none;
+    border: 0;
+    box-shadow: none;
+    padding: 4px 0;
+    text-align: center;
+}
+
+.info-section p.guide-link::before {
+    content: none;
+}
+
+.info-section p.guide-link a {
+    color: var(--accent, #22c55e);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.info-section p.guide-link a:hover {
+    text-decoration: underline;
+}
+
 /* Feature cards footer */
 .feature-cards {
     text-align: center;

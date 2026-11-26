@@ -38,7 +38,13 @@ function diagram(layers) {
     </g>${dots}</svg>`;
 }
 
-function head({ title, description, path }) {
+function head({ title, description, path, image = 'og-11v11.jpg', crumbs = [] }) {
+  const breadcrumb = JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [['Lineup builder', `${SITE}/`], ['Formation guides', `${SITE}/formations/`], ...crumbs]
+      .map(([name, item], i) => ({ '@type': 'ListItem', position: i + 1, name, item }))
+  });
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -53,9 +59,14 @@ function head({ title, description, path }) {
     <meta property="og:url" content="${SITE}/${path}">
     <meta property="og:type" content="article">
     <meta property="og:site_name" content="Easy Football Lineup">
-    <meta name="twitter:card" content="summary">
+    <meta property="og:image" content="${SITE}/images/og/${image}">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="${SITE}/images/og/${image}">
+    <script type="application/ld+json">${breadcrumb}</script>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚽</text></svg>">
-    <link rel="stylesheet" href="../css/app-styles.css?v=1795660000">
+    <link rel="stylesheet" href="../css/app-styles.css?v=1795669738">
     <link rel="stylesheet" href="../css/guides.css?v=1795660000">
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-BGH9W2K44G"></script>
     <script>
@@ -106,7 +117,7 @@ for (const fmt of FORMATS) {
             </div>
         </section>`;
   }).join('');
-  const html = `${head({ title: `${fmt.title}: ${keys.length} Shapes Explained | Easy Football Lineup`, description, path })}
+  const html = `${head({ title: `${fmt.title}: ${keys.length} Shapes Explained | Easy Football Lineup`, description, path, image: `og-${fmt.game}.jpg`, crumbs: [[fmt.title, `${SITE}/${path}`]] })}
 <body>
     <div class="guide">
         ${nav(fmt.slug)}

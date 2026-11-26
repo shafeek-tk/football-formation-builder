@@ -1,0 +1,15 @@
+# Easy Football Lineup
+
+> Free football (soccer) lineup and formation builder at https://easyfootballlineup.com. Pick a team size and formation, type in your players, split them into fair teams, and share the lineup as a link, an image or straight to WhatsApp. No sign-up, works on phones.
+
+## Lineup builders
+- [11-a-side](https://easyfootballlineup.com/): two teams, 4-4-2, 4-3-3, 4-2-3-1, 3-5-2 and more
+- [10-a-side](https://easyfootballlineup.com/10s.html)
+- [9-a-side](https://easyfootballlineup.com/9s.html)
+- [8-a-side](https://easyfootballlineup.com/8s.html)
+- [7-a-side](https://easyfootballlineup.com/7s.html): youth football and Sunday league
+- [6-a-side](https://easyfootballlineup.com/6s.html)
+- [5-a-side and futsal](https://easyfootballlineup.com/5s.html)
+
+## Formation guides
+- [All formation guides](https://easyfootballlineup.com/formations/): every formation for 5 to 11-a-side with diagrams, strengths and weaknesses

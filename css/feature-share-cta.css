@@ -1,0 +1,64 @@
+/* "Make your own" banner shown to people who open a shared lineup */
+.share-cta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    max-width: 560px;
+    margin: 10px auto 4px;
+    padding: 10px 12px;
+    border: 1px solid var(--accent, #22c55e);
+    border-radius: var(--radius-sm, 8px);
+    background: var(--surface-2, #242938);
+    color: var(--text-2, #d1d5e0);
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.share-cta p {
+    margin: 0;
+    flex: 1;
+}
+
+.share-cta strong {
+    color: var(--text, #fff);
+}
+
+.share-cta-actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
+.share-cta-btn {
+    font-family: var(--font-display, 'Oswald', system-ui, sans-serif);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    padding: 8px 12px;
+    min-height: 36px;
+    border: 0;
+    border-radius: var(--radius-sm, 6px);
+    background: var(--accent, #22c55e);
+    color: var(--accent-ink, #0b1a10);
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.share-cta-close {
+    width: 32px;
+    height: 32px;
+    border: 0;
+    background: none;
+    color: var(--muted, #9ca3b4);
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+@media (max-width: 600px) {
+    .share-cta {
+        margin: 8px 10px 4px;
+        font-size: 12.5px;
+    }
+}
