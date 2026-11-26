@@ -707,8 +707,9 @@ test.describe('Football Formation Builder', () => {
       await page.goto(`http://localhost:8080/${pageName}`);
       await page.waitForSelector('#field .player');
 
+      // The pitch image itself, before any optional frame (branding, bench) is added
       const result = await page.evaluate(() => new Promise((resolve, reject) => {
-        formationBuilder.downloadCanvas = canvas => {
+        const check = canvas => {
           const field = document.getElementById('field');
           const ctx = canvas.getContext('2d');
           // Sample the centre of the first home player's jersey: it must be jersey-coloured, not grass
@@ -719,7 +720,7 @@ test.describe('Football Formation Builder', () => {
             Math.round((icon.top - f.top + icon.height * 0.8) * sx), 1, 1).data;
           resolve({ w: canvas.width, h: canvas.height, fw: field.clientWidth, fh: field.clientHeight, px: Array.from(px) });
         };
-        formationBuilder.downloadImage().catch(reject);
+        formationBuilder.renderFieldToCanvas(document.getElementById('field')).then(check).catch(reject);
         setTimeout(() => reject(new Error('export timed out')), 15000);
       }));
 

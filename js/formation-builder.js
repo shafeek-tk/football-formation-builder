@@ -1,3 +1,32 @@
+// Tiny event bus that optional features hook into (see CLAUDE.md, "Features").
+// Each feature lives in its own js/feature-*.js file and only talks to the
+// core through these events, so features can be merged or dropped one by one.
+const EFL = {
+    _handlers: {},
+    on(event, fn) {
+        (this._handlers[event] = this._handlers[event] || []).push(fn);
+    },
+    emit(event, ...args) {
+        (this._handlers[event] || []).forEach(fn => {
+            try { fn(...args); } catch (e) { console.error(`[EFL] ${event} handler failed`, e); }
+        });
+    },
+    /** Pass a value through every async handler of `event` in turn (used for the export image). */
+    async pipe(event, value, ...args) {
+        for (const fn of this._handlers[event] || []) {
+            try {
+                const next = await fn(value, ...args);
+                if (next !== undefined) value = next;
+            } catch (e) { console.error(`[EFL] ${event} handler failed`, e); }
+        }
+        return value;
+    },
+    /** Record a user action (no-op unless a feature such as analytics listens). */
+    track(action, params = {}) {
+        this.emit('track', action, params);
+    }
+};
+
 // Formation Builder Core Logic
 class FormationBuilder {
     constructor(config) {
@@ -15,6 +44,8 @@ class FormationBuilder {
         this.setupEventListeners();
         this.createInteractionToggle();
         this.loadFormation();
+        window.formationBuilder = this;
+        EFL.emit('ready', this);
     }
 
     setupEventListeners() {
@@ -123,6 +154,8 @@ class FormationBuilder {
         this.playerNames[keyA] = nameB;
         this.playerNames[keyB] = nameA;
         localStorage.setItem('playerNames', JSON.stringify(this.playerNames));
+        EFL.emit('change', 'swap');
+        EFL.track('swap_players');
 
         const nameElA = playerA.querySelector('.player-name');
         const nameElB = playerB.querySelector('.player-name');
@@ -262,6 +295,7 @@ class FormationBuilder {
         icon.appendChild(number);
         player.appendChild(icon);
         player.appendChild(name);
+        EFL.emit('player:created', player, this);
 
         // Swap mode click handler on the whole player div
         player.addEventListener('click', (e) => {
@@ -302,6 +336,7 @@ class FormationBuilder {
 
         // Add penalty arcs after players so they render on top
         addPenaltyArcs();
+        EFL.emit('render', this);
     }
 
     createTeam(formation, teamClass, isMyTeam) {
@@ -384,7 +419,8 @@ class FormationBuilder {
 
     getPlayerName(team, index) {
         const key = `${team}_${index}`;
-        if (this.playerNames[key]) {
+        // A name the user cleared on purpose ('') stays blank
+        if (typeof this.playerNames[key] === 'string') {
             return this.playerNames[key];
         }
 
@@ -404,6 +440,7 @@ class FormationBuilder {
         const key = `${team}_${index}`;
         this.playerNames[key] = name.toUpperCase();
         localStorage.setItem('playerNames', JSON.stringify(this.playerNames));
+        EFL.emit('change', 'name');
     }
 
     updatePlayerDisplay(team, index, name) {
@@ -420,20 +457,47 @@ class FormationBuilder {
         }
     }
 
-    shareFormation() {
-        const homeFormation = document.getElementById('myTeamFormation').value;
-        const awayFormation = document.getElementById('awayTeamFormation')?.value || this.config.defaultAwayFormationKey;
-        
-        const data = {
-            h: homeFormation,
-            a: awayFormation,
-            n: this.playerNames
+    /**
+     * Everything needed to rebuild the current lineup. Features add their own
+     * keys through the 'state:collect' event, e.g. state.t for team names.
+     * Short keys keep share links short. Core keys: h, a (formations), n (names).
+     */
+    getState() {
+        const state = {
+            h: document.getElementById('myTeamFormation')?.value,
+            a: document.getElementById('awayTeamFormation')?.value || this.config.defaultAwayFormationKey,
+            n: { ...this.playerNames }
         };
-        
-        const compressed = LZString.compressToEncodedURIComponent(JSON.stringify(data));
-        const url = `${window.location.origin}${window.location.pathname}#f=${compressed}`;
-        
-        this.shareURL(url);
+        EFL.emit('state:collect', state, this);
+        return state;
+    }
+
+    /** Restore a state from getState() (or an old share link) and redraw. */
+    applyState(data) {
+        if (data.h) {
+            const homeSelect = document.getElementById('myTeamFormation');
+            if (homeSelect && this.formations[data.h]) homeSelect.value = data.h;
+        }
+        if (data.a) {
+            const awaySelect = document.getElementById('awayTeamFormation');
+            if (awaySelect && this.formations[data.a]) awaySelect.value = data.a;
+        }
+        if (data.n) {
+            this.playerNames = { ...data.n };
+            localStorage.setItem('playerNames', JSON.stringify(this.playerNames));
+        }
+        EFL.emit('state:apply', data, this);
+        this.loadFormation();
+    }
+
+    buildShareUrl() {
+        const compressed = LZString.compressToEncodedURIComponent(JSON.stringify(this.getState()));
+        return `${window.location.origin}${window.location.pathname}#f=${compressed}`;
+    }
+
+    shareFormation() {
+        EFL.track('share_link');
+        this.shareURL(this.buildShareUrl());
     }
 
     shareURL(url) {
@@ -499,22 +563,7 @@ class FormationBuilder {
                 data = decoded;
             }
             
-            if (data.h) {
-                const homeSelect = document.getElementById('myTeamFormation');
-                if (homeSelect) homeSelect.value = data.h;
-            }
-            
-            if (data.a) {
-                const awaySelect = document.getElementById('awayTeamFormation');
-                if (awaySelect) awaySelect.value = data.a;
-            }
-            
-            if (data.n) {
-                this.playerNames = data.n;
-                localStorage.setItem('playerNames', JSON.stringify(this.playerNames));
-            }
-            
-            this.loadFormation();
+            this.applyState(data);
         } catch (e) {
             console.error('Failed to load formation from URL:', e);
         }
@@ -528,7 +577,8 @@ class FormationBuilder {
         
         try {
             if (document.fonts && document.fonts.ready) await document.fonts.ready;
-            const canvas = await this.renderFieldToCanvas(field);
+            const canvas = await this.renderExport(field);
+            EFL.track('save_image');
             this.downloadCanvas(canvas, `formation-${this.config.gameType}.png`);
         } catch (error) {
             console.error('Error generating image:', error);
@@ -536,6 +586,16 @@ class FormationBuilder {
         } finally {
             if (loadingIndicator) loadingIndicator.style.display = 'none';
         }
+    }
+
+    /**
+     * The shared image: the pitch canvas, then passed through any 'export'
+     * handlers (features can add a header, a bench strip, another size...).
+     */
+    async renderExport(field = document.getElementById('field')) {
+        if (document.fonts && document.fonts.ready) await document.fonts.ready;
+        const canvas = await this.renderFieldToCanvas(field);
+        return EFL.pipe('export', canvas, this);
     }
 
     /**
@@ -571,7 +631,9 @@ class FormationBuilder {
         const origin = field.getBoundingClientRect();
         field.querySelectorAll('.player').forEach(player => {
             this.drawPlayer(ctx, player, origin, scale);
+            EFL.emit('export:player', ctx, player, origin, scale, this);
         });
+        EFL.emit('export:field', ctx, { field, origin, width: W, height: H, scale }, this);
         return canvas;
     }
 

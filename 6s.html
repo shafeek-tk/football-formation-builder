@@ -60,6 +60,9 @@
         gtag('js', new Date());
         gtag('config', 'G-BGH9W2K44G');
     </script>
+    <link rel="stylesheet" href="css/feature-base.css?v=1795660000">
+    <!-- Optional features that need a <head> line add it under their marker -->
+    <!-- feature-head: pwa -->
 </head>
 <body>
     <div class="header">
@@ -96,6 +99,8 @@
         </div>
 
         <div id="interactionToggleContainer"></div>
+
+        <div id="toolsBar" class="tools-bar" hidden></div>
     </div>
 
     <div class="share-bar">
@@ -131,12 +136,27 @@
         <p><strong>How big is a 6-a-side pitch?</strong><br>A standard 6-a-side pitch is roughly 45m x 30m, slightly larger than 5-a-side but still compact enough to encourage quick passing and high-tempo football.</p>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.4.4/lz-string.min.js?v=1768534621"></script>
+    <script src="js/vendor/lz-string-1.5.0.min.js"></script>
     <script src="js/pitch-common.js?v=1795656667"></script>
     <script src="js/formations.js?v=1777853909"></script>
-    <script src="js/formation-builder.js?v=1795656667"></script>
+    <script src="js/formation-builder.js?v=1795660000"></script>
+    <script src="js/app.js?v=1795660000"></script>
     <script src="js/common-mode-toggle.js?v=1777853909"></script>
     <script src="js/common-footer.js?v=1777853909"></script>
+    <!-- Optional features: each feature branch adds its one script line under its own marker -->
+    <!-- feature: share-tools -->
+    <!-- feature: export-styles -->
+    <!-- feature: bulk-names -->
+    <!-- feature: team-identity -->
+    <!-- feature: team-splitter -->
+    <!-- feature: drag-drop -->
+    <!-- feature: mobile-layout -->
+    <!-- feature: undo-reset -->
+    <!-- feature: bench -->
+    <!-- feature: recent-lineups -->
+    <!-- feature: analytics -->
+    <!-- feature: pwa -->
+
     <script>
         const formationBuilder = new FormationBuilder({
             gameType: '6v6',
@@ -146,44 +166,6 @@
             fieldMargin: 15,
             defaultAwayFormation: FORMATIONS_6V6['221'],
             defaultAwayFormationKey: '221'
-        });
-
-        function showToast(msg) {
-            var t = document.getElementById('toast');
-            t.textContent = msg;
-            t.classList.add('visible');
-            setTimeout(function() { t.classList.remove('visible'); }, 2500);
-        }
-
-        document.getElementById('copyLinkBtn').addEventListener('click', function() {
-            formationBuilder.shareFormation();
-        });
-
-        document.getElementById('downloadBtn').addEventListener('click', function() {
-            formationBuilder.downloadImage();
-        });
-
-        document.getElementById('whatsappBtn').addEventListener('click', async function() {
-            var homeFormation = document.getElementById('myTeamFormation').value;
-            var awayFormation = document.getElementById('awayTeamFormation') ? document.getElementById('awayTeamFormation').value : '';
-            var data = { h: homeFormation, a: awayFormation, n: formationBuilder.playerNames };
-            var compressed = LZString.compressToEncodedURIComponent(JSON.stringify(data));
-            var shareUrl = window.location.origin + window.location.pathname + '#f=' + compressed;
-
-            if (navigator.share && /Mobi|Android/i.test(navigator.userAgent)) {
-                try {
-                    var field = document.getElementById('field');
-                    if (document.fonts && document.fonts.ready) await document.fonts.ready;
-                    var canvas = await formationBuilder.renderFieldToCanvas(field);
-                    var blob = await new Promise(function(r) { canvas.toBlob(r, 'image/png'); });
-                    var file = new File([blob], 'lineup.png', { type: 'image/png' });
-                    await navigator.share({ text: "Here's my lineup for today 👇 " + shareUrl, files: [file] });
-                } catch (e) {
-                    window.open('https://wa.me/?text=' + encodeURIComponent("Here's my lineup for today 👇 " + shareUrl), '_blank');
-                }
-            } else {
-                window.open('https://wa.me/?text=' + encodeURIComponent("Here's my lineup for today 👇 " + shareUrl), '_blank');
-            }
         });
     </script>
 </body>
