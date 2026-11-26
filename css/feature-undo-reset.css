@@ -1,0 +1,9 @@
+.tool-btn:disabled {
+    opacity: 0.4;
+    cursor: default;
+}
+
+.tool-btn:disabled:hover {
+    background: var(--surface-2, #242938);
+    color: var(--text-2, #d1d5e0);
+}

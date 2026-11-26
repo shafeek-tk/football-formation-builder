@@ -1,0 +1,36 @@
+.efl-seg {
+    display: flex;
+    border: 1px solid var(--border, #3d4460);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.efl-seg-btn {
+    flex: 1;
+    padding: 8px 6px;
+    background: var(--bg, #151926);
+    color: var(--muted, #b0b8c9);
+    border: none;
+    border-right: 1px solid var(--border, #3d4460);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    min-height: 36px;
+}
+
+.efl-seg-btn:last-child {
+    border-right: none;
+}
+
+.efl-seg-btn.is-on {
+    background: var(--accent, #22c55e);
+    color: var(--accent-ink, #0b1a10);
+}
+
+.efl-check {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px !important;
+    color: var(--text-2, #d1d5e0) !important;
+}

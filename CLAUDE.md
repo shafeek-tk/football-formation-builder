@@ -35,7 +35,7 @@ This is a zero-duplication static site. One `FormationBuilder` class powers all 
 - `6s.html` - 6v6
 - `5s.html` - 5v5 / futsal
 
-Each HTML page includes the shared JS/CSS and initializes `FormationBuilder` with a game-type-specific config (formations, default names, etc.). Each page has its own inline `<script>` block wiring up share bar button handlers.
+Each HTML page includes the shared JS/CSS and initializes `FormationBuilder` with a game-type-specific config (formations, default names, etc.). The share bar buttons are wired up in `js/app.js`.
 
 ### Core JS (`js/`)
 - **`formation-builder.js`** - `FormationBuilder` class: player rendering, name editing, swap mode, URL sharing (LZString compression), image download (native high-res canvas renderer, ~2800px long side), localStorage persistence. Contains `getLayerY()` which has a 5v5-specific tighter spacing branch.
@@ -43,6 +43,19 @@ Each HTML page includes the shared JS/CSS and initializes `FormationBuilder` wit
 - **`pitch-common.js`** - `buildPitchSVG(w, h)` builds the vector pitch (grass stripes + true-to-scale markings); `initializePitch()` injects it into the field and redraws on resize. The same SVG is used for the exported image.
 - **`common-mode-toggle.js`** - `createModeToggle()` generates the format switcher tabs (11v11, 10v10, 9v9, 8v8, 7v7, 6v6, 5v5). Renders as a segmented control.
 - **`common-footer.js`** - `createFooter()` generates feature cards, internal nav links (cross-linking all formats), and attribution footer.
+
+- **`app.js`** - Share bar wiring (Copy Link, Save Image, WhatsApp), `showToast()`, and UI helpers for features: `EFL.addTool()` (a button in the tools row), `EFL.openPanel()` (a dialog), `EFL.css()` (load a stylesheet).
+- **`vendor/lz-string-1.5.0.min.js`** - Self-hosted LZString used for share links.
+
+### Features (optional, one file each)
+Optional features live in `js/feature-<name>.js` (+ `css/feature-<name>.css` loaded with `EFL.css()`), with tests in `tests/<name>.spec.js`. They never edit the core files; they only use the `EFL` event bus defined at the top of `formation-builder.js`:
+- `ready(builder)` once the builder exists · `render(builder)` after players are drawn · `player:created(el, builder)` per player
+- `change(kind)` after a name edit or swap
+- `state:collect(state)` add your own short key to the share-link/undo state · `state:apply(state)` restore it (runs before the redraw)
+- `export(canvas)` async pipe over the shared image canvas (return a new canvas to replace it) · `export:player(ctx, el, origin, scale)` and `export:field(ctx, info)` draw extras on the pitch image
+- `EFL.track(action, params)` record a user action (`track` event)
+
+Each page has one marker comment per feature (`<!-- feature: name -->`) just above the init script. A feature branch adds its `<script src="js/feature-name.js">` line directly under its own marker, so any subset of feature branches merges without conflicts. Features must be loaded before the init script so they see `state:apply` from a share link. A feature that needs a `<head>` line (e.g. the PWA manifest) adds it under its `<!-- feature-head: name -->` marker. Share-link state is additive: never rename or reuse a key, and treat a missing key as "off", so old links keep working.
 
 ### CSS (`css/`)
 - `pitch-styles.css` - Pitch/field rendering, player positioning, jersey icons

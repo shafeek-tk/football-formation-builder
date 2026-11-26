@@ -1,0 +1,164 @@
+/* Shared UI for optional features: tools row, dialogs, buttons.
+   Colours use the theme variables when the theme defines them, with the
+   original dark-slate values as fallbacks. */
+/* Tools row: buttons added by optional features (EFL.addTool) */
+.tools-bar {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+    margin: 8px auto 0;
+    max-width: 560px;
+}
+
+.tools-bar[hidden] {
+    display: none;
+}
+
+.tool-btn {
+    font-family: var(--font-display, 'Oswald', system-ui, sans-serif);
+    padding: 6px 12px;
+    border-radius: var(--radius-sm, 5px);
+    border: 1px solid var(--border, #3d4460);
+    background: var(--surface-2, #242938);
+    color: var(--text-2, #d1d5e0);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    min-height: 32px;
+    box-shadow: var(--highlight, none);
+}
+
+.tool-btn:hover {
+    background: var(--surface-3, #2f3447);
+    color: var(--text, #fff);
+}
+
+.tool-btn.is-on {
+    border-color: var(--accent, #22c55e);
+    color: var(--accent, #22c55e);
+}
+
+/* Panels opened by features (EFL.openPanel) */
+.efl-panel-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: rgba(8, 10, 16, 0.65);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+}
+
+.efl-panel {
+    width: min(100%, 460px);
+    max-height: calc(100vh - 32px);
+    overflow: auto;
+    background: var(--glass, none), var(--surface, #1f2433);
+    box-shadow: var(--highlight, 0 0 0 transparent), 0 20px 50px rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--border, #3d4460);
+    border-radius: var(--radius, 10px);
+    text-align: left;
+}
+
+.efl-panel-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--surface-3, #2f3447);
+}
+
+.efl-panel-head h2 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text, #fff);
+}
+
+.efl-panel-close {
+    background: none;
+    border: none;
+    color: var(--muted, #a0a8b8);
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+}
+
+.efl-panel-body {
+    padding: 14px 16px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    font-size: 14px;
+    color: var(--text-2, #d1d5e0);
+}
+
+.efl-panel-body label {
+    font-size: 12px;
+    color: var(--muted, #a0a8b8);
+    letter-spacing: 0.3px;
+}
+
+.efl-panel-body textarea,
+.efl-panel-body input[type="text"],
+.efl-panel-body select {
+    width: 100%;
+    background: var(--bg, #151926);
+    color: var(--text, #fff);
+    border: 1px solid var(--border, #3d4460);
+    border-radius: 6px;
+    padding: 8px 10px;
+    font-size: 14px;
+}
+
+.efl-panel-body textarea {
+    min-height: 140px;
+    resize: vertical;
+    line-height: 1.5;
+}
+
+.efl-panel-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+}
+
+.efl-btn {
+    font-family: var(--font-display, 'Oswald', system-ui, sans-serif);
+    padding: 8px 14px;
+    border-radius: 6px;
+    border: 1px solid var(--border, #3d4460);
+    background: var(--surface-3, #2a3042);
+    color: var(--text, #fff);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    min-height: 36px;
+}
+
+.efl-btn--primary {
+    background: var(--accent-grad, var(--accent, #22c55e));
+    border-color: var(--accent, #22c55e);
+    color: var(--accent-ink, #0b1a10);
+}
+
+.efl-hint {
+    font-size: 12px;
+    color: var(--muted-2, #8a93a6);
+}
+
+/* A name cleared on purpose stays blank but keeps a tappable label */
+.player-name:empty {
+    min-width: 44px;
+}
+
+.player-name:empty::before {
+    content: "Name";
+    opacity: 0.45;
+    font-weight: 400;
+}

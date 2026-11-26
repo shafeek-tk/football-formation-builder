@@ -16,14 +16,17 @@
     <meta property="og:description" content="Build and share your 5-a-side football lineup instantly. Free 5v5 formation creator for pickup games. No login needed.">
     <meta property="og:url" content="https://easyfootballlineup.com/5s.html">
     <meta property="og:type" content="website">
-    <meta property="og:image" content="https://easyfootballlineup.com/og-image.png">
+    <meta property="og:image" content="https://easyfootballlineup.com/images/og/og-5v5.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Football lineup builder showing a 5v5 lineup on a pitch">
     <meta property="og:site_name" content="Easy Football Lineup">
 
     <!-- Twitter Card meta tags -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="5-a-side Formation Builder | Easy Football Lineup – Free 5v5 Soccer Formations">
     <meta name="twitter:description" content="Build and share your 5-a-side football lineup instantly. Free 5v5 formation creator for pickup games. No login needed.">
-    <meta name="twitter:image" content="https://easyfootballlineup.com/og-image.png">
+    <meta name="twitter:image" content="https://easyfootballlineup.com/images/og/og-5v5.jpg">
 
     <!-- Schema.org structured data -->
     <script type="application/ld+json">
@@ -60,6 +63,12 @@
         gtag('js', new Date());
         gtag('config', 'G-BGH9W2K44G');
     </script>
+    <link rel="stylesheet" href="css/feature-base.css?v=1795660000">
+    <!-- Optional features that need a <head> line add it under their marker -->
+    <!-- feature-head: pwa -->
+    <link rel="manifest" href="manifest.webmanifest">
+    <meta name="theme-color" content="#1a1f2e">
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 </head>
 <body>
     <div class="header">
@@ -100,6 +109,8 @@
         </div>
 
         <div id="interactionToggleContainer"></div>
+
+        <div id="toolsBar" class="tools-bar" hidden></div>
     </div>
 
     <div class="share-bar">
@@ -139,12 +150,39 @@
         <p><strong>What pitch size is used for 5-a-side?</strong><br>A typical 5-a-side pitch is around 40m x 25m, though sizes vary between venues. Futsal courts are 40m x 20m. The small space means quick passing, tight control, and lots of goals.</p>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.4.4/lz-string.min.js?v=1768534621"></script>
+    <script src="js/vendor/lz-string-1.5.0.min.js"></script>
     <script src="js/pitch-common.js?v=1795656667"></script>
     <script src="js/formations.js?v=1777853909"></script>
-    <script src="js/formation-builder.js?v=1795656667"></script>
+    <script src="js/formation-builder.js?v=1795660000"></script>
+    <script src="js/app.js?v=1795660000"></script>
     <script src="js/common-mode-toggle.js?v=1777853909"></script>
-    <script src="js/common-footer.js?v=1777853909"></script>
+    <script src="js/common-footer.js?v=1795660000"></script>
+    <!-- Optional features: each feature branch adds its one script line under its own marker -->
+    <!-- feature: share-tools -->
+    <script src="js/feature-share-tools.js?v=1795660000"></script>
+    <!-- feature: export-styles -->
+    <script src="js/feature-export-styles.js?v=1795660000"></script>
+    <!-- feature: bulk-names -->
+    <script src="js/feature-bulk-names.js?v=1795660000"></script>
+    <!-- feature: team-identity -->
+    <script src="js/feature-team-identity.js?v=1795660000"></script>
+    <!-- feature: team-splitter -->
+    <script src="js/feature-team-splitter.js?v=1795660000"></script>
+    <!-- feature: drag-drop -->
+    <script src="js/feature-drag-drop.js?v=1795660000"></script>
+    <!-- feature: mobile-layout -->
+    <script src="js/feature-mobile-layout.js?v=1795660000"></script>
+    <!-- feature: undo-reset -->
+    <script src="js/feature-undo-reset.js?v=1795660000"></script>
+    <!-- feature: bench -->
+    <script src="js/feature-bench.js?v=1795660000"></script>
+    <!-- feature: recent-lineups -->
+    <script src="js/feature-recent-lineups.js?v=1795660000"></script>
+    <!-- feature: analytics -->
+    <script src="js/feature-analytics.js?v=1795660000"></script>
+    <!-- feature: pwa -->
+    <script src="js/feature-pwa.js?v=1795660000"></script>
+
     <script>
         const formationBuilder = new FormationBuilder({
             gameType: '5v5',
@@ -154,44 +192,6 @@
             fieldMargin: 15,
             defaultAwayFormation: FORMATIONS_5V5['22'],
             defaultAwayFormationKey: '22'
-        });
-
-        function showToast(msg) {
-            var t = document.getElementById('toast');
-            t.textContent = msg;
-            t.classList.add('visible');
-            setTimeout(function() { t.classList.remove('visible'); }, 2500);
-        }
-
-        document.getElementById('copyLinkBtn').addEventListener('click', function() {
-            formationBuilder.shareFormation();
-        });
-
-        document.getElementById('downloadBtn').addEventListener('click', function() {
-            formationBuilder.downloadImage();
-        });
-
-        document.getElementById('whatsappBtn').addEventListener('click', async function() {
-            var homeFormation = document.getElementById('myTeamFormation').value;
-            var awayFormation = document.getElementById('awayTeamFormation') ? document.getElementById('awayTeamFormation').value : '';
-            var data = { h: homeFormation, a: awayFormation, n: formationBuilder.playerNames };
-            var compressed = LZString.compressToEncodedURIComponent(JSON.stringify(data));
-            var shareUrl = window.location.origin + window.location.pathname + '#f=' + compressed;
-
-            if (navigator.share && /Mobi|Android/i.test(navigator.userAgent)) {
-                try {
-                    var field = document.getElementById('field');
-                    if (document.fonts && document.fonts.ready) await document.fonts.ready;
-                    var canvas = await formationBuilder.renderFieldToCanvas(field);
-                    var blob = await new Promise(function(r) { canvas.toBlob(r, 'image/png'); });
-                    var file = new File([blob], 'lineup.png', { type: 'image/png' });
-                    await navigator.share({ text: "Here's my lineup for today 👇 " + shareUrl, files: [file] });
-                } catch (e) {
-                    window.open('https://wa.me/?text=' + encodeURIComponent("Here's my lineup for today 👇 " + shareUrl), '_blank');
-                }
-            } else {
-                window.open('https://wa.me/?text=' + encodeURIComponent("Here's my lineup for today 👇 " + shareUrl), '_blank');
-            }
         });
     </script>
 </body>
