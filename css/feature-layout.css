@@ -1,0 +1,321 @@
+/* Page layout: match, squad, pitch, share. See js/feature-layout.js */
+
+/* The old single tools row is replaced by the groups below */
+.tools-bar { display: none !important; }
+
+.studio {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.studio-side,
+.studio-main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.st-card { width: 100%; }
+.st-card[hidden] { display: none; }
+
+.st-head {
+    display: none;
+    margin: 0 0 12px;
+    font-family: var(--font-display, 'Oswald', sans-serif);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    color: var(--muted, #9aa9a1);
+}
+
+.st-match {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Squad: three clear actions */
+.st-squad-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    width: 100%;
+    max-width: 520px;
+    margin: 0 auto;
+}
+
+.tool-btn.ly-squad-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 42px;
+    padding: 8px 10px;
+    margin: 0;
+    border-radius: 12px;
+    border: 1px solid var(--border-strong, rgba(255, 255, 255, 0.14));
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.015)), var(--surface, #121b17);
+    color: var(--text, #fff);
+    font-family: var(--font-display, 'Oswald', sans-serif);
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.4px;
+    white-space: nowrap;
+    box-shadow: var(--highlight, inset 0 1px 0 rgba(255, 255, 255, 0.06));
+}
+
+.tool-btn.ly-squad-btn:hover {
+    border-color: rgba(155, 224, 21, 0.45);
+    background: linear-gradient(180deg, rgba(155, 224, 21, 0.1), rgba(155, 224, 21, 0.03)), var(--surface, #121b17);
+}
+
+.ly-squad-btn .ly-icon { color: var(--accent-text, #b5f03c); }
+.ly-short { display: none; }
+
+.ly-icon {
+    width: 18px;
+    height: 18px;
+    flex: 0 0 auto;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.ly-more-btn .ly-icon circle { fill: currentColor; stroke: none; }
+
+/* Pitch toolbar: hint on the left, undo / redo / more on the right */
+.pitch-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    width: min(90vw, 500px);
+    margin: 14px auto 8px;
+}
+
+.pitch-bar #interactionToggleContainer {
+    flex: 1 1 auto;
+    min-width: 0;
+    justify-items: start;
+}
+
+.pitch-bar .interaction-hint {
+    margin: 0;
+    text-align: left;
+    font-size: 12px;
+}
+
+.pitch-actions {
+    display: flex;
+    gap: 6px;
+    flex: 0 0 auto;
+}
+
+.ly-icon-btn,
+.tool-btn.ly-icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-width: 38px;
+    height: 38px;
+    min-height: 38px;
+    padding: 0 10px;
+    margin: 0;
+    border-radius: 10px;
+    border: 1px solid var(--border, rgba(255, 255, 255, 0.1));
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--text-2, #d6ded9);
+    font-family: var(--font-display, 'Oswald', sans-serif);
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.4px;
+    cursor: pointer;
+}
+
+.ly-icon-btn:hover:not(:disabled) {
+    color: #fff;
+    border-color: rgba(155, 224, 21, 0.45);
+}
+
+.ly-icon-btn:disabled { opacity: 0.35; cursor: default; }
+.ly-icon-btn[aria-expanded="true"] { border-color: var(--accent, #9be015); color: #fff; }
+
+/* Share */
+.st-share .share-bar { margin-top: 14px; }
+
+/* More menu */
+.ly-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 960;
+}
+
+.ly-menu {
+    position: fixed;
+    z-index: 961;
+    width: 260px;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-sizing: border-box;
+    padding: 6px 6px 8px;
+    border-radius: 14px;
+    border: 1px solid var(--border-strong, rgba(255, 255, 255, 0.14));
+    background: var(--surface, #121b17);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
+    opacity: 0;
+    transform: translateY(-4px);
+    transition: opacity 0.14s ease, transform 0.14s ease;
+}
+
+.ly-menu.is-open { opacity: 1; transform: none; }
+.ly-menu[hidden], .ly-backdrop[hidden], .ly-menu-group[hidden] { display: none; }
+
+.ly-menu-head {
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 6px 4px 10px;
+    font-family: var(--font-display, 'Oswald', sans-serif);
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+}
+
+.ly-menu-close {
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--muted, #9aa9a1);
+    font-size: 22px;
+    cursor: pointer;
+}
+
+.ly-menu-title {
+    padding: 10px 10px 4px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted-2, #6f7d76);
+}
+
+.ly-menu .tool-btn.ly-menu-item {
+    display: flex;
+    width: 100%;
+    min-height: 40px;
+    margin: 0;
+    padding: 8px 10px;
+    border: none;
+    border-radius: 8px;
+    background: none;
+    box-shadow: none;
+    color: var(--text, #fff);
+    font-family: var(--font-body, sans-serif);
+    font-size: 15px;
+    font-weight: 500;
+    text-align: left;
+    justify-content: flex-start;
+}
+
+.ly-menu .tool-btn.ly-menu-item:hover,
+.ly-menu .tool-btn.ly-menu-item:focus-visible {
+    outline: none;
+    background: rgba(255, 255, 255, 0.07);
+}
+
+.ly-menu .tool-btn.ly-menu-item[hidden] { display: none; }
+
+/* Phones */
+@media (max-width: 600px) {
+    .st-squad-row { max-width: none; }
+    .tool-btn.ly-squad-btn { min-height: 40px; font-size: 14px; padding: 6px 6px; gap: 6px; }
+    .ly-long { display: none; }
+    .ly-short { display: inline; }
+    .ly-more-label { display: none; }
+    .pitch-bar { width: calc(100vw - 16px); margin: 8px auto 6px; }
+    .ly-icon-btn, .tool-btn.ly-icon-btn { min-width: 36px; height: 34px; min-height: 34px; padding: 0 8px; }
+
+    .ly-backdrop { background: rgba(0, 0, 0, 0.5); }
+    .ly-menu.is-sheet {
+        left: 0;
+        right: 0;
+        bottom: 0;
+        top: auto;
+        width: 100%;
+        max-height: 80vh;
+        padding: 8px 10px calc(12px + env(safe-area-inset-bottom));
+        border-radius: 18px 18px 0 0;
+        transform: translateY(24px);
+    }
+    .ly-menu.is-sheet.is-open { transform: none; }
+    .ly-menu.is-sheet .ly-menu-head { display: flex; }
+    .ly-menu.is-sheet .tool-btn.ly-menu-item { min-height: 48px; font-size: 16px; }
+}
+
+/* Wide screens: controls in a column beside the pitch */
+@media (min-width: 1024px) {
+    .studio {
+        display: grid;
+        grid-template-columns: 360px auto;
+        justify-content: center;
+        align-items: start;
+        gap: 36px;
+        margin: 0 auto 12px;
+    }
+
+    .studio-side {
+        position: sticky;
+        top: 20px;
+        gap: 14px;
+    }
+
+    .studio-main { width: auto; }
+
+    .st-card {
+        box-sizing: border-box;
+        padding: 16px;
+        border-radius: 16px;
+        border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.01));
+        box-shadow: var(--highlight, inset 0 1px 0 rgba(255, 255, 255, 0.05)), 0 18px 40px rgba(0, 0, 0, 0.25);
+    }
+
+    .st-head { display: block; align-self: flex-start; }
+
+    .st-match .mode-toggle { margin-bottom: 14px; width: 100%; box-sizing: border-box; justify-content: space-between; }
+    .st-match .mode-btn { padding-left: 0; padding-right: 0; flex: 1 1 0; text-align: center; }
+    .st-match .formation-container {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+        width: 100%;
+        margin: 0;
+    }
+    .st-match .formation-group { justify-content: space-between; }
+    .st-match .fp-trigger { min-width: 170px; }
+
+    .st-squad-row { grid-template-columns: 1fr; gap: 8px; }
+    .tool-btn.ly-squad-btn { justify-content: flex-start; padding: 10px 14px; min-height: 46px; font-size: 15px; }
+
+    .st-share .share-bar {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        margin: 0;
+        padding: 0;
+        max-width: none;
+    }
+    .st-share #downloadBtn { grid-column: 1 / -1; order: -1; min-height: 50px; }
+    .st-share .share-btn { justify-content: center; margin: 0; }
+
+    .pitch-bar { margin-top: 0; }
+}

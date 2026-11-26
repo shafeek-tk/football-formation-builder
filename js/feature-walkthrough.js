@@ -19,9 +19,9 @@ EFL.css('css/feature-walkthrough.css?v=1795666007');
             text: 'Drag a shirt onto another player to swap them, or onto the grass to put them anywhere.'
         },
         {
-            target: () => document.getElementById('toolsBar'),
-            title: 'Handy tools',
-            text: () => 'Paste every name at once, split players into fair teams, pick kit colours and more.' + (isPhone() ? ' Swipe the row for more.' : '')
+            target: () => document.querySelector('.st-squad') || document.getElementById('toolsBar'),
+            title: 'Your squad',
+            text: 'Paste every name at once, split players into fair teams, and pick kit colours. Undo and more options sit just above the pitch.'
         },
         {
             target: () => document.querySelector('.share-bar'),

@@ -35,13 +35,11 @@ test.describe('Feature foundation', () => {
     expect(result.height).toBe(before.height + 100);
   });
 
-  test('tools row stays hidden until a feature adds a button', async ({ page }) => {
+  test('a tool added by a feature shows up in the More menu', async ({ page }) => {
     await openFresh(page, 'index.html');
-    if (await page.locator('#toolsBar > *').count() === 0) {
-      await expect(page.locator('#toolsBar')).toBeHidden();
-    }
     await page.evaluate(() => EFL.addTool({ id: 't1', label: 'Test', onClick() {} }));
-    await expect(page.locator('#toolsBar')).toBeVisible();
+    await page.locator('#moreBtn').click();
+    await expect(page.locator('#moreMenu #t1')).toBeVisible();
     await expect(page.locator('#t1')).toHaveText('Test');
   });
 

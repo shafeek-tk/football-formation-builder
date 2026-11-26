@@ -11,6 +11,7 @@ test.describe('Recent lineups', () => {
     await page.evaluate(() => localStorage.removeItem('playerNames'));
     await page.goto('http://localhost:8080/5s.html');
     await page.waitForSelector('.player');
+    await page.locator('#moreBtn').click();
     await page.locator('#recentBtn').click();
     await expect(page.locator('.recent-row')).toHaveCount(1);
     await expect(page.locator('.recent-meta')).toContainText('7v7');
@@ -21,6 +22,7 @@ test.describe('Recent lineups', () => {
 
   test('save current, open on the same page, and remove', async ({ page }) => {
     await openFresh(page, '6s.html');
+    await page.locator('#moreBtn').click();
     await page.locator('#recentBtn').click();
     await expect(page.locator('.efl-panel')).toContainText('will appear here');
     await page.locator('.efl-panel .efl-btn--primary').click();

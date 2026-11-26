@@ -28,6 +28,7 @@ test.describe('Branded export', () => {
 
   test('match details travel in the share link', async ({ page }) => {
     await openFresh(page, '5s.html');
+    await page.locator('#moreBtn').click();
     await page.locator('#imageOptionsBtn').click();
     await page.fill('#exMatch', 'Thursday Futsal');
     await page.fill('#exVenue', 'Goals, Pitch 3');
@@ -39,6 +40,7 @@ test.describe('Branded export', () => {
 
     await page.evaluate(() => localStorage.clear());
     await openState(page, '5s.html', state);
+    await page.locator('#moreBtn').click();
     await page.locator('#imageOptionsBtn').click();
     await expect(page.locator('#exMatch')).toHaveValue('Thursday Futsal');
   });

@@ -26,6 +26,7 @@ test.describe('Share tools', () => {
     expect(text).toMatch(/AWAY \(\d-\d-\d\)/);
     expect(text).toContain(`1. ${names[0]}`);
     expect(text).toMatch(/View or edit: http.*#f=/);
+    await page.locator('#moreBtn').click();
     await expect(page.locator('#copyTextBtn')).toBeVisible();
   });
 

@@ -43,6 +43,7 @@ test.describe('First-visit walkthrough', () => {
     await firstVisit(page);
     await page.locator('.efl-tour-skip').click();
     await expect(page.locator('.efl-tour-card')).toHaveCount(0);
+    await page.locator('#moreBtn').click();
     await page.locator('#tourBtn').click();
     await expect(page.locator('.efl-tour-card')).toContainText('1 of 4');
     await page.keyboard.press('Escape');

@@ -193,7 +193,7 @@
         const container = document.getElementById('interactionToggleContainer');
         if (!container) return;
         container.innerHTML = `
-            <div class="interaction-hint">Tap a name to edit · Drag a player to move or swap</div>
+            <div class="interaction-hint">Tap a name to edit · Drag to move or swap</div>
             <button type="button" class="tool-link" id="resetPositionsBtn" hidden>Put players back in formation</button>`;
         container.querySelector('#resetPositionsBtn').addEventListener('click', resetPositions);
     };

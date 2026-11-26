@@ -47,6 +47,7 @@ test.describe('Undo, redo and reset', () => {
     await openFresh(page, '5s.html');
     const original = await page.locator('.my-team .player-name').first().textContent();
     await rename(page, 0, 'Cy');
+    await page.locator('#moreBtn').click();
     await page.locator('#resetBtn').click();
     await expect(page.locator('.my-team .player-name').first()).toHaveText(original);
     await expect(page.locator('#toast')).toContainText('Undo');

@@ -28,7 +28,7 @@ test.describe('Drag players', () => {
   test('no mode toggle; a hint explains tap and drag', async ({ page }) => {
     await openFresh(page, 'index.html');
     await expect(page.locator('.toggle-pill')).toHaveCount(0);
-    await expect(page.locator('.interaction-hint')).toContainText('Drag a player');
+    await expect(page.locator('.interaction-hint')).toContainText('Drag to move or swap');
     const editable = await page.locator('.player-name').evaluateAll(els => els.every(el => el.isContentEditable));
     expect(editable).toBe(true);
   });
