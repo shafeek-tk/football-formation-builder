@@ -1,0 +1,281 @@
+/* Formation picker: a styled button over the real <select>, and a panel of formation cards */
+.fp-wrap {
+    position: relative;
+    display: inline-flex;
+}
+
+.fp-trigger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    height: 44px;
+    min-width: 116px;
+    padding: 0 14px 0 16px;
+    box-sizing: border-box;
+    border-radius: var(--radius, 10px);
+    border: 1px solid var(--border-strong, rgba(255, 255, 255, 0.14));
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.015)), var(--surface, #121b17);
+    box-shadow: var(--highlight, inset 0 1px 0 rgba(255, 255, 255, 0.06)), 0 6px 18px rgba(0, 0, 0, 0.25);
+    color: var(--text, #fff);
+    font-family: var(--font-display, 'Oswald', sans-serif);
+    font-size: 17px;
+    font-weight: 500;
+    letter-spacing: 0.6px;
+    cursor: pointer;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.1s ease;
+}
+
+.fp-trigger:hover {
+    border-color: rgba(155, 224, 21, 0.45);
+}
+
+.fp-trigger:active {
+    transform: scale(0.98);
+}
+
+.fp-trigger:focus-visible,
+.fp-trigger[aria-expanded="true"] {
+    outline: none;
+    border-color: var(--accent, #9be015);
+    box-shadow: 0 0 0 3px rgba(155, 224, 21, 0.18), 0 6px 18px rgba(0, 0, 0, 0.25);
+}
+
+.fp-chevron {
+    width: 11px;
+    height: 7px;
+    fill: none;
+    stroke: var(--accent, #9be015);
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: transform 0.2s ease;
+}
+
+.fp-trigger[aria-expanded="true"] .fp-chevron {
+    transform: rotate(180deg);
+}
+
+/* Panel */
+.fp-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 950;
+    background: transparent;
+}
+
+.fp-panel {
+    position: fixed;
+    z-index: 951;
+    width: min(440px, calc(100vw - 24px));
+    max-height: min(70vh, 560px);
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    border-radius: 16px;
+    border: 1px solid var(--border-strong, rgba(255, 255, 255, 0.14));
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0)), var(--surface, #121b17);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(0, 0, 0, 0.3);
+    color: var(--text, #fff);
+    opacity: 0;
+    transform: translateY(-6px);
+    transition: opacity 0.16s ease, transform 0.16s ease;
+}
+
+.fp-panel.is-open {
+    opacity: 1;
+    transform: none;
+}
+
+.fp-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 12px 8px 16px;
+}
+
+.fp-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-display, 'Oswald', sans-serif);
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+}
+
+.fp-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--team);
+    box-shadow: 0 0 10px var(--team);
+}
+
+.fp-close {
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--muted, #9aa9a1);
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.fp-close:hover {
+    color: var(--text, #fff);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.fp-body {
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 0 12px 14px;
+    -webkit-overflow-scrolling: touch;
+}
+
+.fp-group {
+    margin: 10px 4px 8px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted-2, #6f7d76);
+}
+
+.fp-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
+    gap: 8px;
+}
+
+.fp-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 6px 8px;
+    border-radius: 12px;
+    border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+    background: rgba(255, 255, 255, 0.025);
+    color: var(--text-2, #d6ded9);
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease, transform 0.1s ease;
+}
+
+.fp-option:hover,
+.fp-option:focus-visible {
+    outline: none;
+    border-color: rgba(155, 224, 21, 0.5);
+    background: rgba(155, 224, 21, 0.06);
+}
+
+.fp-option:active {
+    transform: scale(0.97);
+}
+
+.fp-option[aria-selected="true"] {
+    border-color: var(--accent, #9be015);
+    background: rgba(155, 224, 21, 0.1);
+    box-shadow: 0 0 0 1px var(--accent, #9be015) inset, 0 0 18px rgba(155, 224, 21, 0.18);
+    color: #fff;
+}
+
+.fp-label {
+    font-family: var(--font-display, 'Oswald', sans-serif);
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.fp-diagram {
+    width: 44px;
+    height: 58px;
+}
+
+.fp-diagram .fp-pitch {
+    fill: #2f7d32;
+    fill: color-mix(in srgb, #3a9a3d 70%, #0a110e);
+    stroke: rgba(255, 255, 255, 0.35);
+    stroke-width: 2;
+}
+
+.fp-diagram .fp-line {
+    stroke: rgba(255, 255, 255, 0.3);
+    stroke-width: 2;
+}
+
+.fp-diagram circle {
+    fill: var(--team);
+    stroke: rgba(0, 0, 0, 0.35);
+    stroke-width: 1.5;
+}
+
+.fp-home { --team: var(--home, #60a5fa); }
+.fp-away { --team: var(--away, #f87171); }
+
+/* Phones: a sheet from the bottom of the screen */
+.fp-panel.is-sheet {
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: auto;
+    width: 100%;
+    max-height: 78vh;
+    border-radius: 18px 18px 0 0;
+    padding-bottom: env(safe-area-inset-bottom);
+    transform: translateY(24px);
+}
+
+.fp-panel.is-sheet.is-open {
+    transform: none;
+}
+
+.fp-panel.is-sheet .fp-head::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 6px;
+    width: 40px;
+    height: 4px;
+    margin-left: -20px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.18);
+}
+
+.fp-panel.is-sheet .fp-head {
+    position: relative;
+    padding-top: 16px;
+}
+
+.fp-panel.is-sheet .fp-grid {
+    grid-template-columns: repeat(4, 1fr);
+}
+
+.fp-panel.is-sheet ~ .fp-backdrop,
+.fp-backdrop:has(+ .fp-panel.is-sheet) {
+    background: rgba(0, 0, 0, 0.5);
+}
+
+@media (max-width: 600px) {
+    .fp-trigger {
+        height: 32px;
+        min-width: 84px;
+        padding: 0 10px 0 12px;
+        gap: 8px;
+        font-size: 15px;
+    }
+}
+
+@media (max-width: 360px) {
+    .fp-panel.is-sheet .fp-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .fp-panel, .fp-trigger, .fp-chevron { transition: none; }
+}
