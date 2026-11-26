@@ -603,7 +603,7 @@ class FormationBuilder {
      * (sharp on any phone and after WhatsApp compression), between 3x and 6x.
      */
     getExportScale(width, height) {
-        return Math.min(6, Math.max(3, EXPORT_LONG_SIDE_PX / Math.max(width, height)));
+        return Math.min(8, Math.max(3, EXPORT_LONG_SIDE_PX / Math.max(width, height)));
     }
 
     /**

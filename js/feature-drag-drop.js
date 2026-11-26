@@ -208,5 +208,5 @@
         if (btn) btn.hidden = !document.querySelector('#field .player.is-moved');
     });
 
-    EFL.on('ready', () => EFL.css('css/feature-drag-drop.css?v=1795660000'));
+    EFL.on('ready', () => EFL.css('css/feature-drag-drop.css?v=1795664498'));
 })();

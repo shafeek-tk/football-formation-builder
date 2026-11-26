@@ -3,7 +3,7 @@
 // to a bar fixed at the bottom of the screen (always in reach of a thumb),
 // the tools row scrolls sideways instead of wrapping, and the pitch is
 // sized to fill the space between the controls and the bottom bar.
-EFL.css('css/feature-mobile-layout.css?v=1795660000');
+EFL.css('css/feature-mobile-layout.css?v=1795664498');
 
 (function () {
     const PHONE = window.matchMedia('(max-width: 600px)');
@@ -20,6 +20,13 @@ EFL.css('css/feature-mobile-layout.css?v=1795660000');
         field.style.height = Math.round(Math.max(440, Math.min(free, max))) + 'px';
     }
 
+    // Drop the right-edge fade once the tools row is scrolled to its end
+    function markEnd() {
+        const tools = document.getElementById('toolsBar');
+        if (!tools) return;
+        tools.classList.toggle('is-scrolled-end', tools.scrollLeft + tools.clientWidth >= tools.scrollWidth - 4);
+    }
+
     let raf = 0;
     const schedule = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(fitPitch); };
     EFL.on('ready', () => {
@@ -29,6 +36,8 @@ EFL.css('css/feature-mobile-layout.css?v=1795660000');
         if (document.fonts) document.fonts.ready.then(schedule);
         // Tools may be added after ready (e.g. Install app)
         const tools = document.getElementById('toolsBar');
-        if (tools && window.ResizeObserver) new ResizeObserver(schedule).observe(tools);
+        if (tools && window.ResizeObserver) new ResizeObserver(() => { schedule(); markEnd(); }).observe(tools);
+        if (tools) tools.addEventListener('scroll', markEnd, { passive: true });
+        markEnd();
     });
 })();

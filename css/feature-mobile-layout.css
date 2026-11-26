@@ -49,6 +49,17 @@
         min-height: 36px;
     }
 
+    /* Fade the right edge so it's clear more tools are a swipe away */
+    .tools-bar {
+        -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
+        mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
+    }
+
+    .tools-bar.is-scrolled-end {
+        -webkit-mask-image: none;
+        mask-image: none;
+    }
+
     /* Share buttons fixed at the bottom of the screen */
     .share-bar {
         position: fixed;
@@ -70,6 +81,14 @@
     .share-btn {
         min-height: 44px;
         font-size: 13px;
+        gap: 6px;
+        padding-left: 6px;
+        padding-right: 6px;
+        white-space: nowrap;
+    }
+
+    .share-btn svg {
+        flex: 0 0 auto;
     }
 
     /* Pitch fills the width; its height is fitted above the bottom bar by the script */

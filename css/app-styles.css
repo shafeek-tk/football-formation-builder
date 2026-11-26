@@ -345,6 +345,9 @@ body {
     background-position: right 13px center, 0 0;
     box-shadow: var(--highlight), 0 6px 18px rgba(0, 0, 0, 0.25);
     min-width: 104px;
+    /* Fixed height so the page doesn't shift when the web font arrives */
+    box-sizing: border-box;
+    height: 44px;
 }
 
 .formation-select:hover {
@@ -575,6 +578,7 @@ body {
 
     .formation-select {
         min-width: 80px;
+        height: 32px;
         padding: 7px 28px 6px 10px;
         font-size: 14px;
         background-position: right 9px center;
