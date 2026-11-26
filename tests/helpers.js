@@ -39,3 +39,9 @@ export async function openState(page, file, state) {
   await page.goto(`${BASE}/${file}#f=${hash}`);
   await page.waitForSelector('.player');
 }
+
+/** Tools sit in the More menu on phones and tablets, and beside the pitch on wide screens. */
+export async function revealTool(page, id) {
+  if (await page.locator(`#${id}`).isVisible()) return;
+  await page.locator('#moreBtn').click();
+}

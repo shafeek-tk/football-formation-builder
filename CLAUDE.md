@@ -55,7 +55,7 @@ Optional features live in `js/feature-<name>.js` (+ `css/feature-<name>.css` loa
 - `export(canvas)` async pipe over the shared image canvas (return a new canvas to replace it) · `export:player(ctx, el, origin, scale)` and `export:field(ctx, info)` draw extras on the pitch image
 - `EFL.track(action, params)` record a user action (`track` event)
 
-Page layout comes from `feature-layout.js`: it moves the controls into groups (Match, Squad, a toolbar above the pitch with Undo/Redo/More, Share) and puts every other tool button into the More menu. On wide screens (≥1024px) the groups sit in a column beside the pitch.
+Page layout comes from `feature-layout.js`: it moves the controls into groups (Teams & formations, Squad, a toolbar above the pitch with Undo/Redo/More, Share) and puts every other tool button into the More menu. On wide screens (≥1100px) the pitch is centred, with setting up on its left and sharing on its right (with a live preview of the exported image; Image options and Copy as text move there from the More menu). Tests use `revealTool(page, id)` from `tests/helpers.js` to reach a tool wherever it sits.
 
 Each page has one marker comment per feature (`<!-- feature: name -->`) just above the init script. A feature branch adds its `<script src="js/feature-name.js">` line directly under its own marker, so any subset of feature branches merges without conflicts. Features must be loaded before the init script so they see `state:apply` from a share link. A feature that needs a `<head>` line (e.g. the PWA manifest) adds it under its `<!-- feature-head: name -->` marker. Share-link state is additive: never rename or reuse a key, and treat a missing key as "off", so old links keep working.
 

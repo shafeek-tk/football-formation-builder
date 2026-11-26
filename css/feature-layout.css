@@ -261,52 +261,106 @@
     .ly-menu.is-sheet .tool-btn.ly-menu-item { min-height: 48px; font-size: 16px; }
 }
 
-/* Wide screens: controls in a column beside the pitch */
-@media (min-width: 1024px) {
-    .studio {
+/* Wide screens: setting up on the left, the pitch in the centre, sharing on the right */
+.ly-preview { display: none; }
+
+@media (min-width: 1100px) {
+    body.is-wide .header { margin-bottom: 6px; }
+    body.is-wide .mode-toggle { margin-bottom: 4px; }
+
+    body.is-wide .studio {
         display: grid;
-        grid-template-columns: 360px auto;
+        grid-template-columns: 290px auto 290px;
         justify-content: center;
         align-items: start;
-        gap: 36px;
+        column-gap: 40px;
         margin: 0 auto 12px;
     }
 
-    .studio-side {
+    body.is-wide .studio-side {
+        grid-column: 1;
+        grid-row: 1;
         position: sticky;
         top: 20px;
         gap: 14px;
+        margin-top: 50px;
+        width: 290px;
+    }
+    body.is-wide .studio-main { grid-column: 2; grid-row: 1; width: auto; }
+    body.is-wide .studio-right { grid-column: 3; }
+
+    /* The pitch fills the screen height under the header */
+    body.is-wide .field {
+        height: clamp(560px, calc(100vh - 270px), 900px);
+        width: auto;
+        aspect-ratio: 5 / 7;
     }
 
-    .studio-main { width: auto; }
+    body.is-wide .pitch-bar { width: 100%; margin: 6px 0 10px; }
 
-    .st-card {
+    body.is-wide .st-card {
         box-sizing: border-box;
         padding: 16px;
-        border-radius: 16px;
-        border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
-        background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.01));
-        box-shadow: var(--highlight, inset 0 1px 0 rgba(255, 255, 255, 0.05)), 0 18px 40px rgba(0, 0, 0, 0.25);
+        border-radius: 18px;
+        border: 1px solid rgba(255, 255, 255, 0.09);
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.012));
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 24px 60px rgba(0, 0, 0, 0.35);
+        animation: lySideIn 0.45s ease-out both;
     }
+    body.is-wide .studio-right .st-card { animation-delay: 0.06s; }
 
-    .st-head { display: block; align-self: flex-start; }
+    body.is-wide .st-head { display: block; align-self: flex-start; }
 
-    .st-match .mode-toggle { margin-bottom: 14px; width: 100%; box-sizing: border-box; justify-content: space-between; }
-    .st-match .mode-btn { padding-left: 0; padding-right: 0; flex: 1 1 0; text-align: center; }
-    .st-match .formation-container {
+    /* Teams: one row per team with its formation */
+    body.is-wide .st-match .formation-container {
         flex-direction: column;
         align-items: stretch;
-        gap: 10px;
+        gap: 8px;
         width: 100%;
         margin: 0;
     }
-    .st-match .formation-group { justify-content: space-between; }
-    .st-match .fp-trigger { min-width: 170px; }
+    body.is-wide .st-match .formation-group {
+        justify-content: space-between;
+        padding: 6px 6px 6px 12px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.035);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    body.is-wide .st-match .formation-label {
+        font-size: 14px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        min-width: 0;
+    }
+    body.is-wide .st-match .fp-trigger { min-width: 118px; height: 40px; }
 
-    .st-squad-row { grid-template-columns: 1fr; gap: 8px; }
-    .tool-btn.ly-squad-btn { justify-content: flex-start; padding: 10px 14px; min-height: 46px; font-size: 15px; }
+    body.is-wide .st-squad-row { grid-template-columns: 1fr; gap: 8px; }
+    body.is-wide .tool-btn.ly-squad-btn { justify-content: flex-start; padding: 10px 14px; min-height: 46px; font-size: 15px; }
 
-    .st-share .share-bar {
+    /* Share: preview, then the buttons */
+    body.is-wide .ly-preview {
+        display: block;
+        margin: 0 0 14px;
+        width: 100%;
+    }
+    .ly-preview-canvas {
+        display: block;
+        width: 100%;
+        max-height: min(340px, calc(100vh - 520px));
+        object-fit: contain;
+        min-height: 120px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.04);
+        box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08), 0 16px 36px rgba(0, 0, 0, 0.45);
+    }
+    .ly-preview figcaption {
+        margin-top: 8px;
+        font-size: 12px;
+        color: var(--muted, #9aa9a1);
+        text-align: center;
+    }
+
+    body.is-wide .st-share .share-bar {
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 8px;
@@ -314,8 +368,28 @@
         padding: 0;
         max-width: none;
     }
-    .st-share #downloadBtn { grid-column: 1 / -1; order: -1; min-height: 50px; }
-    .st-share .share-btn { justify-content: center; margin: 0; }
+    body.is-wide .st-share #downloadBtn { grid-column: 1 / -1; order: -1; min-height: 52px; }
+    body.is-wide .st-share .share-btn { justify-content: center; margin: 0; min-height: 44px; padding: 0 10px; white-space: nowrap; }
 
-    .pitch-bar { margin-top: 0; }
+    .ly-share-extras {
+        display: flex;
+        gap: 8px;
+        margin-top: 10px;
+    }
+    .ly-share-extras .tool-btn {
+        flex: 1 1 0;
+        margin: 0;
+        min-height: 36px;
+        border-radius: 10px;
+        border: 1px dashed rgba(255, 255, 255, 0.14);
+        background: transparent;
+        color: var(--muted, #9aa9a1);
+        font-size: 13px;
+    }
+    .ly-share-extras .tool-btn:hover { color: #fff; border-color: rgba(155, 224, 21, 0.45); }
+}
+
+@keyframes lySideIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: none; }
 }

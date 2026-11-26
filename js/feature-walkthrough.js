@@ -21,7 +21,7 @@ EFL.css('css/feature-walkthrough.css?v=1795666007');
         {
             target: () => document.querySelector('.st-squad') || document.getElementById('toolsBar'),
             title: 'Your squad',
-            text: 'Paste every name at once, split players into fair teams, and pick kit colours. Undo and more options sit just above the pitch.'
+            text: 'Paste every name at once, split players into fair teams, and pick kit colours. Undo, redo and more options are close by.'
         },
         {
             target: () => document.querySelector('.share-bar'),

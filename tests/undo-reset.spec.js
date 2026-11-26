@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { openFresh } from './helpers.js';
+import { openFresh, revealTool } from './helpers.js';
 
 async function rename(page, i, name) {
   await page.locator('.my-team .player-name').nth(i).evaluate((el, n) => {
@@ -47,7 +47,7 @@ test.describe('Undo, redo and reset', () => {
     await openFresh(page, '5s.html');
     const original = await page.locator('.my-team .player-name').first().textContent();
     await rename(page, 0, 'Cy');
-    await page.locator('#moreBtn').click();
+    await revealTool(page, 'resetBtn');
     await page.locator('#resetBtn').click();
     await expect(page.locator('.my-team .player-name').first()).toHaveText(original);
     await expect(page.locator('#toast')).toContainText('Undo');

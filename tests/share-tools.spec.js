@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { openFresh } from './helpers.js';
+import { openFresh, revealTool } from './helpers.js';
 
 test.describe('Share tools', () => {
   test.use({ permissions: ['clipboard-read', 'clipboard-write'] });
@@ -26,7 +26,7 @@ test.describe('Share tools', () => {
     expect(text).toMatch(/AWAY \(\d-\d-\d\)/);
     expect(text).toContain(`1. ${names[0]}`);
     expect(text).toMatch(/View or edit: http.*#f=/);
-    await page.locator('#moreBtn').click();
+    await revealTool(page, 'copyTextBtn');
     await expect(page.locator('#copyTextBtn')).toBeVisible();
   });
 

@@ -1,17 +1,17 @@
 import { test, expect } from '@playwright/test';
-import { openFresh } from './helpers.js';
+import { openFresh, revealTool } from './helpers.js';
 
 test.describe('Page layout', () => {
   test('controls are grouped: match, squad, pitch actions, share', async ({ page }) => {
     await openFresh(page, 'index.html');
-    await expect(page.locator('.st-match #myTeamFormation')).toBeAttached();
+    await expect(page.locator('#myTeamFormationPicker')).toBeVisible();
     for (const id of ['bulkNamesBtn', 'splitTeamsBtn', 'teamsBtn']) {
-      await expect(page.locator(`.st-squad #${id}`)).toBeVisible();
+      await expect(page.locator(`.st-squad-row #${id}`)).toBeVisible();
     }
     for (const id of ['undoBtn', 'redoBtn', 'moreBtn']) {
       await expect(page.locator(`.pitch-actions #${id}`)).toBeVisible();
     }
-    await expect(page.locator('.st-share #downloadBtn')).toBeVisible();
+    await expect(page.locator('#downloadBtn')).toBeVisible();
     // Secondary items are tucked away until the menu opens
     for (const id of ['imageOptionsBtn', 'copyTextBtn', 'recentBtn', 'resetBtn', 'tourBtn']) {
       await expect(page.locator(`#moreMenu #${id}`)).toBeHidden();
@@ -24,19 +24,45 @@ test.describe('Page layout', () => {
 
   test('picking a menu item runs it and closes the menu', async ({ page }) => {
     await openFresh(page, '7s.html');
-    await page.locator('#moreBtn').click();
+    await revealTool(page, 'recentBtn');
     await page.locator('#recentBtn').click();
     await expect(page.locator('#moreMenu')).toBeHidden();
     await expect(page.locator('.efl-panel')).toBeVisible();
   });
 
-  test('wide screens put the controls in a column beside the pitch', async ({ page }) => {
+  test('wide screens: setting up on the left, pitch in the centre, sharing with a live preview on the right', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await openFresh(page, 'index.html');
-    const side = await page.locator('.studio-side').boundingBox();
     const field = await page.locator('#field').boundingBox();
-    expect(side.x + side.width).toBeLessThan(field.x);
-    expect(field.y).toBeLessThan(260);
+    expect(Math.abs(field.x + field.width / 2 - 720)).toBeLessThan(20);
+    const left = await page.locator('.studio-side:not(.studio-right)').boundingBox();
+    const right = await page.locator('.studio-right').boundingBox();
+    expect(left.x + left.width).toBeLessThan(field.x);
+    expect(right.x).toBeGreaterThan(field.x + field.width);
+    for (const id of ['myTeamFormationPicker', 'bulkNamesBtn', 'splitTeamsBtn', 'teamsBtn']) {
+      await expect(page.locator(`.studio-side:not(.studio-right) #${id}`)).toBeVisible();
+    }
+    for (const id of ['downloadBtn', 'copyLinkBtn', 'whatsappBtn', 'imageOptionsBtn', 'copyTextBtn']) {
+      await expect(page.locator(`.studio-right #${id}`)).toBeVisible();
+    }
+    // The preview is drawn, and redrawn after a change
+    const canvas = page.locator('.ly-preview-canvas');
+    await expect(canvas).toHaveAttribute('data-ready', '1', { timeout: 10000 });
+    const before = await canvas.evaluate(c => c.toDataURL());
+    await page.selectOption('#myTeamFormation', '433');
+    await expect.poll(() => canvas.evaluate(c => c.toDataURL()), { timeout: 10000 }).not.toBe(before);
+  });
+
+  test('going narrow puts the controls back in the page', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await openFresh(page, 'index.html');
+    await page.setViewportSize({ width: 800, height: 900 });
+    await expect(page.locator('.ly-preview')).toHaveCount(0);
+    await page.locator('#moreBtn').click();
+    await expect(page.locator('#moreMenu #imageOptionsBtn')).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(page.locator('.st-squad #bulkNamesBtn')).toBeVisible();
+    await expect(page.locator('.st-share #downloadBtn')).toBeVisible();
   });
 
   test('on a phone nothing scrolls sideways and the squad row fits', async ({ page }) => {
