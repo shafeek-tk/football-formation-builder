@@ -26,11 +26,11 @@ test.describe('Football Formation Builder', () => {
     await expect(page).toHaveTitle(/Football Formation Builder/);
     await expect(page.locator('#myTeamFormation')).toBeVisible();
     await expect(page.locator('#awayTeamFormation')).toBeVisible();
-    await expect(page.getByText('SHARE FORMATION')).toBeVisible();
+    await expect(page.locator('#copyLinkBtn')).toBeVisible();
     await expect(page.locator('#downloadBtn')).toBeVisible();
-    await expect(page.getByText('11v11')).toBeVisible();
-    await expect(page.getByText('7v7')).toBeVisible();
-    await expect(page.getByText('6v6')).toBeVisible();
+    await expect(page.locator('.mode-btn', { hasText: '11v11' })).toBeVisible();
+    await expect(page.locator('.mode-btn', { hasText: '7v7' })).toBeVisible();
+    await expect(page.locator('.mode-btn', { hasText: '6v6' })).toBeVisible();
   });
 
   test('should change formation and update players', async ({ page }) => {
@@ -82,7 +82,7 @@ test.describe('Football Formation Builder', () => {
     }
 
     await captureShareUrl(page);
-    await page.getByText('SHARE FORMATION').click();
+    await page.locator('#copyLinkBtn').click();
 
     const shareUrl = await page.evaluate(() => window.capturedShareUrl);
     expect(shareUrl).toBeTruthy();
@@ -106,14 +106,14 @@ test.describe('Football Formation Builder', () => {
     await page.setViewportSize({ width: 375, height: 667 });
     await page.goto('http://localhost:8080/index.html');
 
-    await expect(page.getByText('SHARE IMAGE')).toBeVisible();
-    await expect(page.getByText('11v11')).toBeVisible();
-    await expect(page.locator('.controls')).toBeVisible();
+    await expect(page.locator('#downloadBtn')).toBeVisible();
+    await expect(page.locator('.mode-btn', { hasText: '11v11' })).toBeVisible();
+    await expect(page.locator('.header')).toBeVisible();
   });
 
   test('should load 7v7 format correctly', async ({ page }) => {
     await page.goto('http://localhost:8080/7s.html');
-    await expect(page).toHaveTitle(/7v7 Football Formation/);
+    await expect(page).toHaveTitle(/7-a-side Formation Builder/);
     await page.waitForSelector('.player');
     const players = await page.locator('.player').count();
     expect(players).toBe(14);
@@ -121,7 +121,7 @@ test.describe('Football Formation Builder', () => {
 
   test('should load 6v6 format correctly', async ({ page }) => {
     await page.goto('http://localhost:8080/6s.html');
-    await expect(page).toHaveTitle(/6v6 Football Formation/);
+    await expect(page).toHaveTitle(/6-a-side Formation Builder/);
     await page.waitForSelector('.player');
     const players = await page.locator('.player').count();
     expect(players).toBe(12);
@@ -155,9 +155,9 @@ test.describe('Football Formation Builder', () => {
   // 7v7 Format Tests
   test('should load 7v7 format and display formation controls', async ({ page }) => {
     await page.goto('http://localhost:8080/7s.html');
-    await expect(page).toHaveTitle(/7v7 Football Formation/);
+    await expect(page).toHaveTitle(/7-a-side Formation Builder/);
     await expect(page.locator('#myTeamFormation')).toBeVisible();
-    await expect(page.getByText('SHARE FORMATION')).toBeVisible();
+    await expect(page.locator('#copyLinkBtn')).toBeVisible();
     await expect(page.locator('#downloadBtn')).toBeVisible();
 
     await expect(page.locator('.mode-btn', { hasText: '11v11' })).toBeVisible();
@@ -203,9 +203,9 @@ test.describe('Football Formation Builder', () => {
     await page.setViewportSize({ width: 375, height: 667 });
     await page.goto('http://localhost:8080/7s.html');
 
-    await expect(page.getByText('SHARE IMAGE')).toBeVisible();
+    await expect(page.locator('#downloadBtn')).toBeVisible();
     await expect(page.locator('.mode-btn', { hasText: '7v7' })).toBeVisible();
-    await expect(page.locator('.controls')).toBeVisible();
+    await expect(page.locator('.header')).toBeVisible();
   });
 
   test('should edit 7v7 player names', async ({ page }) => {
@@ -227,7 +227,7 @@ test.describe('Football Formation Builder', () => {
     }
 
     await captureShareUrl(page);
-    await page.getByText('SHARE FORMATION').click();
+    await page.locator('#copyLinkBtn').click();
     await page.waitForTimeout(500);
 
     const shareUrl = await page.evaluate(() => window.capturedShareUrl);
@@ -246,9 +246,9 @@ test.describe('Football Formation Builder', () => {
   // 6v6 Format Tests
   test('should load 6v6 format and display formation controls', async ({ page }) => {
     await page.goto('http://localhost:8080/6s.html');
-    await expect(page).toHaveTitle(/6v6 Football Formation/);
+    await expect(page).toHaveTitle(/6-a-side Formation Builder/);
     await expect(page.locator('#myTeamFormation')).toBeVisible();
-    await expect(page.getByText('SHARE FORMATION')).toBeVisible();
+    await expect(page.locator('#copyLinkBtn')).toBeVisible();
     await expect(page.locator('#downloadBtn')).toBeVisible();
 
     await expect(page.locator('.mode-btn', { hasText: '11v11' })).toBeVisible();
@@ -294,9 +294,9 @@ test.describe('Football Formation Builder', () => {
     await page.setViewportSize({ width: 375, height: 667 });
     await page.goto('http://localhost:8080/6s.html');
 
-    await expect(page.getByText('SHARE IMAGE')).toBeVisible();
+    await expect(page.locator('#downloadBtn')).toBeVisible();
     await expect(page.locator('.mode-btn', { hasText: '6v6' })).toBeVisible();
-    await expect(page.locator('.controls')).toBeVisible();
+    await expect(page.locator('.header')).toBeVisible();
   });
 
   test('should edit 6v6 player names', async ({ page }) => {
@@ -318,7 +318,7 @@ test.describe('Football Formation Builder', () => {
     }
 
     await captureShareUrl(page);
-    await page.getByText('SHARE FORMATION').click();
+    await page.locator('#copyLinkBtn').click();
     await page.waitForTimeout(500);
 
     const shareUrl = await page.evaluate(() => window.capturedShareUrl);
@@ -523,7 +523,7 @@ test.describe('Football Formation Builder', () => {
     await page.locator('.toggle-pill[data-mode="edit"]').click();
 
     await captureShareUrl(page);
-    await page.getByText('SHARE FORMATION').click();
+    await page.locator('#copyLinkBtn').click();
     const shareUrl = await page.evaluate(() => window.capturedShareUrl);
     const localUrl = shareUrl.replace('https://easyfootballlineup.com', 'http://localhost:8080');
 
