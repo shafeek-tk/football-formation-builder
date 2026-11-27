@@ -162,3 +162,54 @@
     opacity: 0.45;
     font-weight: 400;
 }
+
+/* One clear close button for every panel, sheet and menu */
+button.efl-panel-close,
+button.fp-close,
+button.ly-menu-close {
+    width: 40px;
+    height: 40px;
+    flex: none;
+    padding: 0;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    background: rgba(255, 255, 255, 0.14);
+    color: #fff;
+    font-size: 0;
+    cursor: pointer;
+    position: relative;
+    transition: background 0.15s, transform 0.15s;
+}
+
+button.efl-panel-close::before,
+button.fp-close::before,
+button.ly-menu-close::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    width: 16px;
+    height: 16px;
+    background: currentColor;
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M2 2l12 12M14 2L2 14' stroke='black' stroke-width='2.6' stroke-linecap='round'/%3E%3C/svg%3E") center / contain no-repeat;
+            mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M2 2l12 12M14 2L2 14' stroke='black' stroke-width='2.6' stroke-linecap='round'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+button.efl-panel-close:hover,
+button.fp-close:hover,
+button.ly-menu-close:hover {
+    background: rgba(255, 255, 255, 0.24);
+}
+
+button.efl-panel-close:active,
+button.fp-close:active,
+button.ly-menu-close:active {
+    transform: scale(0.92);
+}
+
+button.efl-panel-close:focus-visible,
+button.fp-close:focus-visible,
+button.ly-menu-close:focus-visible {
+    outline: 2px solid var(--accent, #22c55e);
+    outline-offset: 2px;
+}
