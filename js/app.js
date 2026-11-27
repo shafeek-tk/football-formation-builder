@@ -44,6 +44,17 @@ EFL.addTool = function ({ id, label, title, order = 50, onClick }) {
     return btn;
 };
 
+/**
+ * iPhone Safari zooms the whole page in when you tap a text box (or a name on
+ * the pitch) set smaller than 16px, and leaves it zoomed, so the page spills
+ * off the right edge. maximum-scale=1 stops that; iOS still lets you pinch-zoom.
+ */
+(function () {
+    const ios = /iP(hone|od|ad)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    const meta = document.querySelector('meta[name="viewport"]');
+    if (ios && meta && !/maximum-scale/.test(meta.content)) meta.content += ', maximum-scale=1';
+})();
+
 /** Phones show panels, pickers and menus as a short tray along the bottom. */
 EFL.PHONE = window.matchMedia('(max-width: 600px)');
 
@@ -56,6 +67,13 @@ EFL.PHONE = window.matchMedia('(max-width: 600px)');
     if (!vv) return;
     const root = document.documentElement;
     const update = () => {
+        if (vv.scale > 1.01) {
+            // Pinch-zoomed: the smaller visible area is not a keyboard
+            root.style.removeProperty('--vv-top');
+            root.style.removeProperty('--vv-h');
+            root.classList.remove('kb-open');
+            return;
+        }
         const kb = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
         root.style.setProperty('--vv-top', vv.offsetTop + 'px');
         root.style.setProperty('--vv-h', vv.height + 'px');
@@ -88,14 +106,16 @@ EFL.revealPitch = function (tray, end = 'bottom') {
     });
 };
 
-/** Tray gone: glide back to where you were, then drop the extra room. */
+/** Tray gone: the page stays where it is (no jump); drop the extra room. */
 EFL.releasePitch = function () {
     if (EFL._pitchFrom === undefined) return;
-    const to = EFL._pitchFrom;
     EFL._pitchFrom = undefined;
-    window.scrollTo({ top: to, behavior: EFL.calm() ? 'auto' : 'smooth' });
     clearTimeout(EFL._releaseTimer);
-    EFL._releaseTimer = setTimeout(() => { document.body.style.paddingBottom = ''; }, EFL.calm() ? 0 : 450);
+    EFL._releaseTimer = setTimeout(() => {
+        // Only if that doesn't move the page: else keep the room until next time
+        const max = document.documentElement.scrollHeight - parseFloat(document.body.style.paddingBottom || 0) - window.innerHeight;
+        if (window.scrollY <= max) document.body.style.paddingBottom = '';
+    }, EFL.calm() ? 0 : 300);
 };
 
 /** People who ask for less motion get none. */
@@ -107,22 +127,42 @@ EFL.calm = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
  * Out: slides back down, then `done()` removes or hides it.
  */
 EFL.trayIn = function (el) {
+    el._tray = {}; // a newer open wins over a close still sliding away
+    if (el.getAnimations) el.getAnimations().forEach(a => a.cancel());
     el.classList.remove('is-leaving');
     el.style.transform = '';
-    el.getBoundingClientRect(); // start from the off-screen position
-    requestAnimationFrame(() => el.classList.add('is-open'));
+    el.classList.add('is-open');
+    if (EFL.calm() || !el.animate) return;
+    // Web Animations run on the compositor from the very first frame, so the
+    // tray glides up on iPhone too instead of popping in
+    el.animate(
+        [{ transform: 'translateY(105%)' }, { transform: 'translateY(0)' }],
+        { duration: 420, easing: 'cubic-bezier(0.32, 0.72, 0, 1)' }
+    );
 };
 
 EFL.trayOut = function (el, done) {
-    if (!el.isConnected || EFL.calm()) { done(); return; }
-    el.style.transition = '';
+    if (!el.isConnected || EFL.calm() || !el.animate) { el.classList.remove('is-open'); done(); return; }
+    const from = getComputedStyle(el).transform; // where it is now, mid-drag included
+    el.style.transition = 'none';
     el.style.transform = '';
-    el.classList.remove('is-open');
     el.classList.add('is-leaving');
+    const token = el._tray = {};
     let finished = false;
-    const finish = () => { if (finished) return; finished = true; el.classList.remove('is-leaving'); done(); };
-    el.addEventListener('transitionend', e => { if (e.target === el && e.propertyName === 'transform') finish(); });
-    setTimeout(finish, 420);
+    const finish = () => {
+        if (finished || el._tray !== token) return;
+        finished = true;
+        el.classList.remove('is-open', 'is-leaving');
+        el.style.transition = '';
+        done();
+        anim.cancel();
+    };
+    const anim = el.animate(
+        [{ transform: from === 'none' ? 'translateY(0)' : from }, { transform: 'translateY(105%)' }],
+        { duration: 260, easing: 'cubic-bezier(0.4, 0, 0.9, 0.6)', fill: 'forwards' }
+    );
+    anim.onfinish = finish;
+    setTimeout(finish, 400);
 };
 
 /**

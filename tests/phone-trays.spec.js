@@ -115,4 +115,15 @@ test.describe('Phone trays', () => {
     await drag(160);
     await expect(page.locator('.efl-panel')).toHaveCount(0);
   });
+
+  test('iPhone: tapping a text box does not zoom the page (maximum-scale=1 on iOS only)', async ({ browser }) => {
+    const iphone = await browser.newContext({
+      viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true,
+      userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1'
+    });
+    const p = await iphone.newPage();
+    await openFresh(p, '7s.html');
+    expect(await p.locator('meta[name="viewport"]').getAttribute('content')).toContain('maximum-scale=1');
+    await iphone.close();
+  });
 });
