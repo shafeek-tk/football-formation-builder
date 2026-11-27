@@ -321,3 +321,28 @@ button.ly-menu-close:focus-visible {
     .fp-panel.is-sheet,
     .ly-menu.is-sheet { transition: none !important; }
 }
+
+/* Desktop: panels drop down from the button that opened them, the same way
+   the formation picker does (placed by EFL._placePopover in app.js) */
+@media (min-width: 601px) {
+    .efl-panel-overlay.is-popover {
+        display: block;
+        padding: 0;
+        background: transparent;
+    }
+
+    .efl-panel-overlay.is-popover .efl-panel {
+        position: fixed;
+        width: min(420px, calc(100vw - 24px));
+        border-radius: 16px;
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(0, 0, 0, 0.3);
+        opacity: 0;
+        transform: translateY(-6px);
+        transition: opacity 0.16s ease, transform 0.16s ease;
+    }
+
+    .efl-panel-overlay.is-popover .efl-panel.is-open {
+        opacity: 1;
+        transform: none;
+    }
+}

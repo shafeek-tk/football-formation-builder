@@ -106,16 +106,14 @@ EFL.revealPitch = function (tray, end = 'bottom') {
     });
 };
 
-/** Tray gone: the page stays where it is (no jump); drop the extra room. */
+/** Tray gone: glide back to where you were, so the controls are right there. */
 EFL.releasePitch = function () {
     if (EFL._pitchFrom === undefined) return;
+    const to = EFL._pitchFrom;
     EFL._pitchFrom = undefined;
+    window.scrollTo({ top: to, behavior: EFL.calm() ? 'auto' : 'smooth' });
     clearTimeout(EFL._releaseTimer);
-    EFL._releaseTimer = setTimeout(() => {
-        // Only if that doesn't move the page: else keep the room until next time
-        const max = document.documentElement.scrollHeight - parseFloat(document.body.style.paddingBottom || 0) - window.innerHeight;
-        if (window.scrollY <= max) document.body.style.paddingBottom = '';
-    }, EFL.calm() ? 0 : 300);
+    EFL._releaseTimer = setTimeout(() => { document.body.style.paddingBottom = ''; }, EFL.calm() ? 0 : 450);
 };
 
 /** People who ask for less motion get none. */
@@ -205,7 +203,11 @@ EFL.trayDrag = function (el, handle, dismiss) {
  * `onClose()` runs however the panel is closed. Returns the close function.
  * On phones it is a short tray with the pitch still in view above it.
  */
-EFL.openPanel = function ({ title, build, onClose }) {
+EFL.openPanel = function ({ title, build, onClose, anchor }) {
+    // The button that opened it (a More menu item counts as the More button)
+    anchor = anchor || document.activeElement;
+    if (anchor && anchor.closest && anchor.closest('#moreMenu')) anchor = document.getElementById('moreBtn');
+    if (!anchor || !anchor.matches || !anchor.matches('button') || !anchor.offsetParent) anchor = null;
     EFL.closePanel(true);
     const overlay = document.createElement('div');
     overlay.className = 'efl-panel-overlay';
@@ -231,11 +233,41 @@ EFL.openPanel = function ({ title, build, onClose }) {
         EFL.trayIn(panel);
         EFL.revealPitch(panel);
     } else {
-        panel.classList.add('is-open');
+        if (anchor) {
+            // Desktop: drops down from its button, like the formation picker
+            overlay.classList.add('is-popover');
+            const place = () => EFL._placePopover(panel, anchor);
+            place();
+            window.addEventListener('resize', place);
+            window.addEventListener('scroll', place, { passive: true });
+            overlay._unplace = () => {
+                window.removeEventListener('resize', place);
+                window.removeEventListener('scroll', place);
+            };
+        }
+        requestAnimationFrame(() => panel.classList.add('is-open'));
         const first = overlay.querySelector('textarea, input, select, button:not(.efl-panel-close)');
         if (first) first.focus();
     }
     return close;
+};
+
+/** Put a desktop panel under its button (or above it when there's more room). */
+EFL._placePopover = function (panel, anchor) {
+    const r = anchor.getBoundingClientRect();
+    const vw = window.innerWidth, vh = window.innerHeight, gap = 8, edge = 12;
+    const w = panel.offsetWidth;
+    panel.style.left = Math.min(Math.max(edge, r.left + r.width / 2 - w / 2), vw - w - edge) + 'px';
+    const below = vh - r.bottom - gap - edge, above = r.top - gap - edge;
+    panel.style.maxHeight = '';
+    const h = panel.offsetHeight;
+    if (h <= below || below >= above) {
+        panel.style.top = r.bottom + gap + 'px';
+        panel.style.maxHeight = below + 'px';
+    } else {
+        panel.style.top = Math.max(edge, r.top - gap - Math.min(h, above)) + 'px';
+        panel.style.maxHeight = above + 'px';
+    }
 };
 
 EFL._escClose = function (e) {
@@ -247,6 +279,7 @@ EFL.closePanel = function (instant) {
     document.querySelectorAll('.efl-panel-overlay').forEach(el => {
         if (el.classList.contains('is-closing')) { if (instant) el.remove(); return; }
         el.classList.add('is-closing');
+        if (el._unplace) el._unplace();
         if (el._onClose) el._onClose();
         if (instant || !EFL.PHONE.matches) el.remove();
         else EFL.trayOut(el.querySelector('.efl-panel'), () => el.remove());
