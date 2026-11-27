@@ -213,3 +213,79 @@ button.ly-menu-close:focus-visible {
     outline: 2px solid var(--accent, #22c55e);
     outline-offset: 2px;
 }
+
+/* Phones: every panel is a short tray along the bottom. No dark overlay, so
+   the pitch above stays in view and shows changes as they happen. It sits
+   just above the on-screen keyboard (--vv-* are set in app.js). */
+@media (max-width: 600px) {
+    .efl-panel-overlay {
+        top: var(--vv-top, 0);
+        bottom: auto;
+        height: var(--vv-h, 100%);
+        padding: 0;
+        align-items: flex-end;
+        background: transparent;
+    }
+
+    .efl-panel {
+        width: 100%;
+        max-height: min(48vh, calc(var(--vv-h, 100vh) - 96px));
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        border-radius: 20px 20px 0 0;
+        border-bottom: none;
+        box-shadow: 0 -14px 40px rgba(0, 0, 0, 0.55);
+        animation: efl-tray-in 0.22s ease-out;
+    }
+
+    .efl-panel-head {
+        flex: none;
+        padding: 10px 14px 8px 16px;
+    }
+
+    .efl-panel-head h2 {
+        font-size: 17px;
+    }
+
+    .efl-panel-body {
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        padding: 10px 16px calc(14px + env(safe-area-inset-bottom, 0px));
+    }
+
+    .efl-panel-body textarea {
+        min-height: 96px;
+        height: 96px;
+        font-size: 16px; /* 16px stops iOS zooming in on focus */
+    }
+
+    .efl-panel-body input[type="text"],
+    .efl-panel-body select {
+        font-size: 16px;
+    }
+
+    /* Keyboard up: drop the hints and keep the tray compact */
+    .kb-open .efl-panel {
+        max-height: calc(var(--vv-h, 100vh) - 56px);
+        border-radius: 14px 14px 0 0;
+    }
+
+    .kb-open .efl-panel-body p.efl-hint {
+        display: none;
+    }
+
+    .kb-open .efl-panel-body textarea {
+        min-height: 72px;
+        height: 72px;
+    }
+}
+
+@keyframes efl-tray-in {
+    from { transform: translateY(40px); opacity: 0; }
+    to { transform: none; opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .efl-panel { animation: none; }
+}

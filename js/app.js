@@ -44,11 +44,58 @@ EFL.addTool = function ({ id, label, title, order = 50, onClick }) {
     return btn;
 };
 
+/** Phones show panels, pickers and menus as a short tray along the bottom. */
+EFL.PHONE = window.matchMedia('(max-width: 600px)');
+
 /**
- * Open a simple dialog panel. `build(body, close)` fills the body element.
- * Returns the close function.
+ * Keep the visible area (above the on-screen keyboard) in CSS variables, so a
+ * tray always sits just above the keyboard and its close button stays on screen.
  */
-EFL.openPanel = function ({ title, build }) {
+(function () {
+    const vv = window.visualViewport;
+    if (!vv) return;
+    const root = document.documentElement;
+    const update = () => {
+        const kb = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
+        root.style.setProperty('--vv-top', vv.offsetTop + 'px');
+        root.style.setProperty('--vv-h', vv.height + 'px');
+        root.classList.toggle('kb-open', kb > 120);
+    };
+    vv.addEventListener('resize', update);
+    vv.addEventListener('scroll', update);
+    update();
+})();
+
+/**
+ * With a tray open on a phone, scroll the pitch into the space above it so
+ * changes show as they happen. `end` picks which half matters most:
+ * 'bottom' (home team, the default) or 'top' (away team).
+ */
+EFL.revealPitch = function (tray, end = 'bottom') {
+    const field = document.getElementById('field');
+    if (!EFL.PHONE.matches || !field || !tray) return;
+    requestAnimationFrame(() => {
+        const trayH = tray.getBoundingClientRect().height;
+        document.body.style.paddingBottom = trayH + 'px';
+        const f = field.getBoundingClientRect();
+        const room = window.innerHeight - trayH;
+        let delta = end === 'top' || f.height <= room - 16
+            ? f.top - 8
+            : f.bottom - (room - 8);
+        window.scrollBy({ top: delta, behavior: 'smooth' });
+    });
+};
+
+EFL.releasePitch = function () {
+    document.body.style.paddingBottom = '';
+};
+
+/**
+ * Open a simple dialog panel. `build(body, close)` fills the body element;
+ * `onClose()` runs however the panel is closed. Returns the close function.
+ * On phones it is a short tray with the pitch still in view above it.
+ */
+EFL.openPanel = function ({ title, build, onClose }) {
     EFL.closePanel();
     const overlay = document.createElement('div');
     overlay.className = 'efl-panel-overlay';
@@ -60,14 +107,20 @@ EFL.openPanel = function ({ title, build }) {
             </div>
             <div class="efl-panel-body"></div>
         </div>`;
+    overlay._onClose = onClose;
     const close = () => EFL.closePanel();
     overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
     overlay.querySelector('.efl-panel-close').addEventListener('click', close);
     document.body.appendChild(overlay);
     document.addEventListener('keydown', EFL._escClose);
     build(overlay.querySelector('.efl-panel-body'), close);
-    const first = overlay.querySelector('textarea, input, select, button:not(.efl-panel-close)');
-    if (first) first.focus();
+    if (EFL.PHONE.matches) {
+        // No keyboard popping up on open: it comes when a text box is tapped
+        EFL.revealPitch(overlay.querySelector('.efl-panel'));
+    } else {
+        const first = overlay.querySelector('textarea, input, select, button:not(.efl-panel-close)');
+        if (first) first.focus();
+    }
     return close;
 };
 
@@ -76,8 +129,12 @@ EFL._escClose = function (e) {
 };
 
 EFL.closePanel = function () {
-    document.querySelectorAll('.efl-panel-overlay').forEach(el => el.remove());
+    document.querySelectorAll('.efl-panel-overlay').forEach(el => {
+        el.remove();
+        if (el._onClose) el._onClose();
+    });
     document.removeEventListener('keydown', EFL._escClose);
+    EFL.releasePitch();
 };
 
 async function shareToWhatsApp() {

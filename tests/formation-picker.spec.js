@@ -10,11 +10,17 @@ test.describe('Formation picker', () => {
     await trigger.click();
     const panel = page.locator('.fp-panel');
     await expect(panel).toBeVisible();
+    const isTray = await panel.evaluate(el => el.classList.contains('is-sheet'));
     await expect(panel.locator('.fp-option[aria-selected="true"]')).toHaveAttribute('data-value', '442');
     expect(await panel.locator('.fp-option svg circle').count()).toBeGreaterThan(100);
     await panel.locator('.fp-option[data-value="433"]').click();
-    await expect(panel).toHaveCount(0);
     await expect(page.locator('#myTeamFormation')).toHaveValue('433');
+    if (isTray) {
+      // Phones: the tray stays open so you can try formations, then close it
+      await expect(panel.locator('.fp-option[aria-selected="true"]')).toHaveAttribute('data-value', '433');
+      await panel.locator('.fp-close').click();
+    }
+    await expect(panel).toHaveCount(0);
     await expect(trigger).toHaveText('4-3-3');
     await expect(trigger).toHaveAttribute('aria-expanded', 'false');
   });
@@ -27,7 +33,7 @@ test.describe('Formation picker', () => {
     const value = await page.locator('.fp-option:focus').getAttribute('data-value');
     await page.keyboard.press('Enter');
     await expect(page.locator('#awayTeamFormation')).toHaveValue(value);
-    await page.locator('#awayTeamFormationPicker').click();
+    if (await page.locator('.fp-panel').count() === 0) await page.locator('#awayTeamFormationPicker').click();
     await page.keyboard.press('Escape');
     await expect(page.locator('.fp-panel')).toHaveCount(0);
     await expect(page.locator('#awayTeamFormationPicker')).toBeFocused();

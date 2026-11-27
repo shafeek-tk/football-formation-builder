@@ -128,7 +128,7 @@
     function openPanel() {
         const hasAway = spots('opp-team') > 0;
         if (!hasAway) { showToast('Team splitter needs two teams on the pitch.'); return; }
-        let result = null;
+        let result = null, subs = [[], []];
         EFL.openPanel({
             title: 'Split teams',
             build(body, close) {
@@ -140,7 +140,7 @@
                     <div class="efl-panel-actions">
                         <button type="button" class="efl-btn" id="spShuffle" hidden>Reshuffle</button>
                         <button type="button" class="efl-btn efl-btn--primary" id="spSplit">Split</button>
-                        <button type="button" class="efl-btn efl-btn--primary" id="spUse" hidden>Use these teams</button>
+                        <button type="button" class="efl-btn efl-btn--primary" id="spUse" hidden>Done</button>
                     </div>`;
                 const area = body.querySelector('#spList');
                 const count = body.querySelector('#spCount');
@@ -160,6 +160,7 @@
                     localStorage.setItem(LIST_KEY, area.value);
                     result = EFL.splitSquad(players);
                     renderResult(out, result);
+                    subs = applyTeams(result); // straight onto the pitch
                     out.hidden = false;
                     body.querySelector('#spShuffle').hidden = false;
                     body.querySelector('#spUse').hidden = false;
@@ -174,7 +175,6 @@
                     body.querySelector('#spUse').hidden = true;
                 });
                 body.querySelector('#spUse').addEventListener('click', () => {
-                    const subs = applyTeams(result);
                     close();
                     const extra = subs[0].length + subs[1].length;
                     showToast(extra && !EFL.setBench

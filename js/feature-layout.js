@@ -8,7 +8,7 @@
 // lives in the More menu. On wide screens the pitch is the centrepiece:
 // setting up (formations, squad) on its left, sharing on its right. Buttons are moved, never rebuilt, so every feature keeps
 // working with its own button.
-EFL.css('css/feature-layout.css?v=1795676988');
+EFL.css('css/feature-layout.css?v=1795754203');
 
 (function () {
     const SQUAD = [

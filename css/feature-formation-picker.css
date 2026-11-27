@@ -224,8 +224,8 @@
     bottom: 0;
     top: auto;
     width: 100%;
-    max-height: 78vh;
     border-radius: 18px 18px 0 0;
+    box-shadow: 0 -14px 40px rgba(0, 0, 0, 0.55);
     padding-bottom: env(safe-area-inset-bottom);
     transform: translateY(24px);
 }
@@ -251,13 +251,31 @@
     padding-top: 16px;
 }
 
-.fp-panel.is-sheet .fp-grid {
-    grid-template-columns: repeat(4, 1fr);
+/* One row of formations you swipe through, so the pitch above stays in view
+   and changes as you tap */
+.fp-panel.is-sheet .fp-body {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x proximity;
+    scroll-padding: 0 12px;
+    padding: 4px 12px 14px;
 }
 
-.fp-panel.is-sheet ~ .fp-backdrop,
-.fp-backdrop:has(+ .fp-panel.is-sheet) {
-    background: rgba(0, 0, 0, 0.5);
+.fp-panel.is-sheet .fp-group {
+    display: none;
+}
+
+.fp-panel.is-sheet .fp-grid {
+    display: contents;
+}
+
+.fp-panel.is-sheet .fp-option {
+    flex: none;
+    width: 84px;
+    scroll-snap-align: start;
 }
 
 @media (max-width: 600px) {
@@ -267,12 +285,6 @@
         padding: 0 10px 0 12px;
         gap: 8px;
         font-size: 15px;
-    }
-}
-
-@media (max-width: 360px) {
-    .fp-panel.is-sheet .fp-grid {
-        grid-template-columns: repeat(3, 1fr);
     }
 }
 

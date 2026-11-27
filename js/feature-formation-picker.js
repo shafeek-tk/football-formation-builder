@@ -3,10 +3,10 @@
 // that opens a picker of formation cards, each with a small diagram. The real
 // <select> stays in the page (invisible, under the button), so share links,
 // undo and every other feature keep working with it exactly as before.
-EFL.css('css/feature-formation-picker.css?v=1795674165');
+EFL.css('css/feature-formation-picker.css?v=1795754203');
 
 (function () {
-    const PHONE = window.matchMedia('(max-width: 600px)');
+    const PHONE = EFL.PHONE;
     let open = null; // { select, trigger, panel, backdrop }
 
     const SIDES = {
@@ -126,18 +126,22 @@ EFL.css('css/feature-formation-picker.css?v=1795674165');
         if (current) {
             current.tabIndex = 0;
             current.focus({ preventScroll: true });
-            current.scrollIntoView({ block: 'nearest' });
+            current.scrollIntoView({ block: 'nearest', inline: 'center' });
         }
         requestAnimationFrame(() => panel.classList.add('is-open'));
+        if (panel.classList.contains('is-sheet')) EFL.revealPitch(panel, side.team === 'away' ? 'top' : 'bottom');
     }
 
     function choose(value) {
-        const { select } = open;
-        close(true);
-        if (select.value === value) return;
+        const { select, panel } = open;
+        // Phones: the tray stays open so you can try formations on the pitch
+        const stay = panel.classList.contains('is-sheet');
+        if (!stay) close(true);
+        if (select.value === value) { if (stay) close(true); return; }
         select.value = value;
         select.dispatchEvent(new Event('change', { bubbles: true }));
         updateLabel(select);
+        if (stay) panel.querySelectorAll('.fp-option').forEach(o => o.setAttribute('aria-selected', String(o.dataset.value === value)));
     }
 
     function close(refocus) {
@@ -149,6 +153,7 @@ EFL.css('css/feature-formation-picker.css?v=1795674165');
         backdrop.remove();
         window.removeEventListener('resize', position);
         window.removeEventListener('scroll', position);
+        EFL.releasePitch();
         if (refocus) trigger.focus({ preventScroll: true });
     }
 

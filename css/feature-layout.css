@@ -244,21 +244,23 @@
     .pitch-bar { width: calc(100vw - 16px); margin: 8px auto 6px; }
     .ly-icon-btn, .tool-btn.ly-icon-btn { min-width: 36px; height: 34px; min-height: 34px; padding: 0 8px; }
 
-    .ly-backdrop { background: rgba(0, 0, 0, 0.5); }
+    /* A short tray, no dark overlay: the pitch stays in view */
+    .ly-backdrop { background: transparent; }
     .ly-menu.is-sheet {
         left: 0;
         right: 0;
         bottom: 0;
         top: auto;
         width: 100%;
-        max-height: 80vh;
+        max-height: 52vh;
+        box-shadow: 0 -14px 40px rgba(0, 0, 0, 0.55);
         padding: 8px 10px calc(12px + env(safe-area-inset-bottom));
         border-radius: 18px 18px 0 0;
         transform: translateY(24px);
     }
     .ly-menu.is-sheet.is-open { transform: none; }
     .ly-menu.is-sheet .ly-menu-head { display: flex; }
-    .ly-menu.is-sheet .tool-btn.ly-menu-item { min-height: 48px; font-size: 16px; }
+    .ly-menu.is-sheet .tool-btn.ly-menu-item { min-height: 44px; font-size: 16px; }
 }
 
 /* Wide screens: setting up on the left, the pitch in the centre, sharing on the right */

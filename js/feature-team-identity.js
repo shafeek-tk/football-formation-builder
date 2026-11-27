@@ -138,9 +138,38 @@
 
     function openPanel() {
         const hasAway = !!document.querySelector('#field .player.opp-team');
+        let body = null, dirty = false;
+
+        // Read the form into the teams and show it on the pitch straight away
+        const live = () => {
+            body.querySelectorAll('.team-fields').forEach(fs => {
+                const side = fs.dataset.side;
+                const team = side === 'h' ? 'my-team' : 'opp-team';
+                const color = fs.querySelector('.kit-swatch.is-on')?.dataset.color;
+                const cap = fs.querySelector(`#tiCap_${side}`).value;
+                teams[side] = {
+                    n: fs.querySelector(`#tiName_${side}`).value.trim(),
+                    c: color && color !== DEFAULTS[team].c ? color : '',
+                    k: cap === '' ? '' : Number(cap)
+                };
+            });
+            dirty = true;
+            applyToPage();
+        };
+        const commit = () => {
+            if (!dirty) return;
+            dirty = false;
+            save();
+            applyToPage();
+            EFL.emit('change', 'teams');
+            EFL.track('team_identity');
+        };
+
         EFL.openPanel({
             title: 'Teams',
-            build(body, close) {
+            onClose: commit,
+            build(el, close) {
+                body = el;
                 body.innerHTML = teamFields('my-team', 'Home team') + (hasAway ? teamFields('opp-team', 'Away team') : '') + `
                     <div class="efl-panel-actions">
                         <button type="button" class="efl-btn efl-btn--primary" id="tiDone">Done</button>
@@ -148,28 +177,14 @@
                 body.querySelectorAll('.team-fields').forEach(fs => {
                     const side = fs.dataset.side;
                     fs.querySelector(`#tiName_${side}`).value = teams[side].n || '';
+                    fs.querySelector(`#tiName_${side}`).addEventListener('input', live);
+                    fs.querySelector(`#tiCap_${side}`).addEventListener('change', live);
                     fs.querySelectorAll('.kit-swatch').forEach(sw => sw.addEventListener('click', () => {
                         fs.querySelectorAll('.kit-swatch').forEach(s => s.classList.toggle('is-on', s === sw));
+                        live();
                     }));
                 });
-                body.querySelector('#tiDone').addEventListener('click', () => {
-                    body.querySelectorAll('.team-fields').forEach(fs => {
-                        const side = fs.dataset.side;
-                        const team = side === 'h' ? 'my-team' : 'opp-team';
-                        const color = fs.querySelector('.kit-swatch.is-on')?.dataset.color;
-                        const cap = fs.querySelector(`#tiCap_${side}`).value;
-                        teams[side] = {
-                            n: fs.querySelector(`#tiName_${side}`).value.trim(),
-                            c: color && color !== DEFAULTS[team].c ? color : '',
-                            k: cap === '' ? '' : Number(cap)
-                        };
-                    });
-                    save();
-                    applyToPage();
-                    EFL.emit('change', 'teams');
-                    EFL.track('team_identity');
-                    close();
-                });
+                body.querySelector('#tiDone').addEventListener('click', () => { live(); close(); });
             }
         });
     }
