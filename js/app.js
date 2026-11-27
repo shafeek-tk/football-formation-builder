@@ -74,20 +74,90 @@ EFL.PHONE = window.matchMedia('(max-width: 600px)');
 EFL.revealPitch = function (tray, end = 'bottom') {
     const field = document.getElementById('field');
     if (!EFL.PHONE.matches || !field || !tray) return;
+    if (EFL._pitchFrom === undefined) EFL._pitchFrom = window.scrollY;
+    clearTimeout(EFL._releaseTimer);
     requestAnimationFrame(() => {
         const trayH = tray.getBoundingClientRect().height;
         document.body.style.paddingBottom = trayH + 'px';
         const f = field.getBoundingClientRect();
         const room = window.innerHeight - trayH;
-        let delta = end === 'top' || f.height <= room - 16
+        const delta = end === 'top' || f.height <= room - 16
             ? f.top - 8
             : f.bottom - (room - 8);
-        window.scrollBy({ top: delta, behavior: 'smooth' });
+        if (Math.abs(delta) > 2) window.scrollBy({ top: delta, behavior: EFL.calm() ? 'auto' : 'smooth' });
     });
 };
 
+/** Tray gone: glide back to where you were, then drop the extra room. */
 EFL.releasePitch = function () {
-    document.body.style.paddingBottom = '';
+    if (EFL._pitchFrom === undefined) return;
+    const to = EFL._pitchFrom;
+    EFL._pitchFrom = undefined;
+    window.scrollTo({ top: to, behavior: EFL.calm() ? 'auto' : 'smooth' });
+    clearTimeout(EFL._releaseTimer);
+    EFL._releaseTimer = setTimeout(() => { document.body.style.paddingBottom = ''; }, EFL.calm() ? 0 : 450);
+};
+
+/** People who ask for less motion get none. */
+EFL.calm = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/**
+ * Tray motion shared by every phone tray (panels, formation picker, More).
+ * In: slides up from the bottom edge (.is-open, CSS does the easing).
+ * Out: slides back down, then `done()` removes or hides it.
+ */
+EFL.trayIn = function (el) {
+    el.classList.remove('is-leaving');
+    el.style.transform = '';
+    el.getBoundingClientRect(); // start from the off-screen position
+    requestAnimationFrame(() => el.classList.add('is-open'));
+};
+
+EFL.trayOut = function (el, done) {
+    if (!el.isConnected || EFL.calm()) { done(); return; }
+    el.style.transition = '';
+    el.style.transform = '';
+    el.classList.remove('is-open');
+    el.classList.add('is-leaving');
+    let finished = false;
+    const finish = () => { if (finished) return; finished = true; el.classList.remove('is-leaving'); done(); };
+    el.addEventListener('transitionend', e => { if (e.target === el && e.propertyName === 'transform') finish(); });
+    setTimeout(finish, 420);
+};
+
+/**
+ * Swipe a tray down by its top bar to close it. It follows the finger, then
+ * either slides away (far or fast enough) or springs back.
+ */
+EFL.trayDrag = function (el, handle, dismiss) {
+    let start = null;
+    handle.addEventListener('pointerdown', e => {
+        if (!EFL.PHONE.matches || e.target.closest('button:not(.tray-grip)')) return;
+        start = { y: e.clientY, t: performance.now(), dy: 0 };
+        handle.setPointerCapture(e.pointerId);
+        el.style.transition = 'none';
+    });
+    handle.addEventListener('pointermove', e => {
+        if (!start) return;
+        const raw = e.clientY - start.y;
+        // Down follows the finger; up resists, like pulling on elastic
+        start.dy = raw > 0 ? raw : -Math.sqrt(-raw) * 2;
+        el.style.transform = `translateY(${start.dy}px)`;
+        if (raw > 0) start.v = raw / Math.max(1, performance.now() - start.t);
+    });
+    const end = () => {
+        if (!start) return;
+        const { dy, v = 0 } = start;
+        start = null;
+        el.style.transition = '';
+        if (dy > Math.min(120, el.offsetHeight * 0.3) || (dy > 20 && v > 0.5)) {
+            dismiss();
+        } else {
+            el.style.transform = '';
+        }
+    };
+    handle.addEventListener('pointerup', end);
+    handle.addEventListener('pointercancel', end);
 };
 
 /**
@@ -96,7 +166,7 @@ EFL.releasePitch = function () {
  * On phones it is a short tray with the pitch still in view above it.
  */
 EFL.openPanel = function ({ title, build, onClose }) {
-    EFL.closePanel();
+    EFL.closePanel(true);
     const overlay = document.createElement('div');
     overlay.className = 'efl-panel-overlay';
     overlay.innerHTML = `
@@ -109,6 +179,7 @@ EFL.openPanel = function ({ title, build, onClose }) {
         </div>`;
     overlay._onClose = onClose;
     const close = () => EFL.closePanel();
+    const panel = overlay.querySelector('.efl-panel');
     overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
     overlay.querySelector('.efl-panel-close').addEventListener('click', close);
     document.body.appendChild(overlay);
@@ -116,8 +187,11 @@ EFL.openPanel = function ({ title, build, onClose }) {
     build(overlay.querySelector('.efl-panel-body'), close);
     if (EFL.PHONE.matches) {
         // No keyboard popping up on open: it comes when a text box is tapped
-        EFL.revealPitch(overlay.querySelector('.efl-panel'));
+        EFL.trayDrag(panel, overlay.querySelector('.efl-panel-head'), close);
+        EFL.trayIn(panel);
+        EFL.revealPitch(panel);
     } else {
+        panel.classList.add('is-open');
         const first = overlay.querySelector('textarea, input, select, button:not(.efl-panel-close)');
         if (first) first.focus();
     }
@@ -128,13 +202,17 @@ EFL._escClose = function (e) {
     if (e.key === 'Escape') EFL.closePanel();
 };
 
-EFL.closePanel = function () {
+/** Close the open panel; on phones it slides away unless `instant`. */
+EFL.closePanel = function (instant) {
     document.querySelectorAll('.efl-panel-overlay').forEach(el => {
-        el.remove();
+        if (el.classList.contains('is-closing')) { if (instant) el.remove(); return; }
+        el.classList.add('is-closing');
         if (el._onClose) el._onClose();
+        if (instant || !EFL.PHONE.matches) el.remove();
+        else EFL.trayOut(el.querySelector('.efl-panel'), () => el.remove());
     });
     document.removeEventListener('keydown', EFL._escClose);
-    EFL.releasePitch();
+    if (!instant) EFL.releasePitch();
 };
 
 async function shareToWhatsApp() {

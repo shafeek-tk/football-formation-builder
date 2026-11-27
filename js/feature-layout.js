@@ -8,7 +8,7 @@
 // lives in the More menu. On wide screens the pitch is the centrepiece:
 // setting up (formations, squad) on its left, sharing on its right. Buttons are moved, never rebuilt, so every feature keeps
 // working with its own button.
-EFL.css('css/feature-layout.css?v=1795754203');
+EFL.css('css/feature-layout.css?v=1795754907');
 
 (function () {
     const SQUAD = [
@@ -105,6 +105,7 @@ EFL.css('css/feature-layout.css?v=1795754203');
         moreBtn.addEventListener('click', () => (more.open ? closeMenu() : openMenu()));
         backdrop.addEventListener('click', () => closeMenu());
         menu.querySelector('.ly-menu-close').addEventListener('click', () => closeMenu(true));
+        EFL.trayDrag(menu, menu.querySelector('.ly-menu-head'), () => closeMenu(true));
         // An item does its own job first, then the menu closes
         menu.addEventListener('click', e => { if (e.target.closest('.tool-btn')) closeMenu(); });
         document.addEventListener('keydown', e => { if (e.key === 'Escape' && more.open) closeMenu(true); });
@@ -209,7 +210,12 @@ EFL.css('css/feature-layout.css?v=1795754203');
         more.backdrop.hidden = false;
         more.btn.setAttribute('aria-expanded', 'true');
         placeMenu();
-        requestAnimationFrame(() => more.menu.classList.add('is-open'));
+        if (more.menu.classList.contains('is-sheet')) {
+            more.menu.style.pointerEvents = '';
+            EFL.trayIn(more.menu);
+        } else {
+            requestAnimationFrame(() => more.menu.classList.add('is-open'));
+        }
         const first = more.menu.querySelector('.ly-menu-item:not([hidden])');
         if (first) first.focus({ preventScroll: true });
     }
@@ -217,9 +223,14 @@ EFL.css('css/feature-layout.css?v=1795754203');
     function closeMenu(refocus) {
         if (!more || !more.open) return;
         more.open = false;
-        more.menu.classList.remove('is-open');
-        more.menu.hidden = true;
         more.backdrop.hidden = true;
+        const hide = () => { if (!more.open) { more.menu.classList.remove('is-open'); more.menu.hidden = true; } };
+        if (more.menu.classList.contains('is-sheet')) {
+            more.menu.style.pointerEvents = 'none';
+            EFL.trayOut(more.menu, hide);
+        } else {
+            hide();
+        }
         more.btn.setAttribute('aria-expanded', 'false');
         if (refocus) more.btn.focus({ preventScroll: true });
     }

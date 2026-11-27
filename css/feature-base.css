@@ -236,12 +236,39 @@ button.ly-menu-close:focus-visible {
         border-radius: 20px 20px 0 0;
         border-bottom: none;
         box-shadow: 0 -14px 40px rgba(0, 0, 0, 0.55);
-        animation: efl-tray-in 0.22s ease-out;
+        transform: translateY(105%);
+        transition: transform var(--tray-in, 420ms) var(--tray-ease, cubic-bezier(0.32, 0.72, 0, 1));
+        will-change: transform;
     }
 
+    .efl-panel.is-open { transform: none; }
+
+    .efl-panel.is-leaving {
+        transition-duration: var(--tray-out, 260ms);
+        transition-timing-function: var(--tray-ease-out, cubic-bezier(0.4, 0, 0.9, 0.6));
+    }
+
+    .efl-panel-overlay.is-closing { pointer-events: none; }
+
+    /* The top bar is the grip: swipe it down to close */
     .efl-panel-head {
         flex: none;
-        padding: 10px 14px 8px 16px;
+        position: relative;
+        padding: 18px 14px 8px 16px;
+        touch-action: none;
+        cursor: grab;
+    }
+
+    .efl-panel-head::before {
+        content: '';
+        position: absolute;
+        left: 50%;
+        top: 7px;
+        width: 40px;
+        height: 4px;
+        margin-left: -20px;
+        border-radius: 2px;
+        background: rgba(255, 255, 255, 0.22);
     }
 
     .efl-panel-head h2 {
@@ -281,11 +308,16 @@ button.ly-menu-close:focus-visible {
     }
 }
 
-@keyframes efl-tray-in {
-    from { transform: translateY(40px); opacity: 0; }
-    to { transform: none; opacity: 1; }
+/* Tray motion: one feel everywhere (iOS-style sheet curve) */
+:root {
+    --tray-ease: cubic-bezier(0.32, 0.72, 0, 1);
+    --tray-ease-out: cubic-bezier(0.4, 0, 0.9, 0.6);
+    --tray-in: 420ms;
+    --tray-out: 260ms;
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .efl-panel { animation: none; }
+    .efl-panel,
+    .fp-panel.is-sheet,
+    .ly-menu.is-sheet { transition: none !important; }
 }

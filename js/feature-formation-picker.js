@@ -3,7 +3,7 @@
 // that opens a picker of formation cards, each with a small diagram. The real
 // <select> stays in the page (invisible, under the button), so share links,
 // undo and every other feature keep working with it exactly as before.
-EFL.css('css/feature-formation-picker.css?v=1795754203');
+EFL.css('css/feature-formation-picker.css?v=1795754907');
 
 (function () {
     const PHONE = EFL.PHONE;
@@ -81,7 +81,8 @@ EFL.css('css/feature-formation-picker.css?v=1795754203');
     }
 
     function show(select, trigger, side) {
-        close();
+        close(false, true);
+        document.querySelectorAll('.fp-panel.is-leaving').forEach(el => el.remove());
         const builder = window.formationBuilder;
         const formations = (builder && builder.formations) || {};
         const panel = document.createElement('div');
@@ -128,8 +129,13 @@ EFL.css('css/feature-formation-picker.css?v=1795754203');
             current.focus({ preventScroll: true });
             current.scrollIntoView({ block: 'nearest', inline: 'center' });
         }
-        requestAnimationFrame(() => panel.classList.add('is-open'));
-        if (panel.classList.contains('is-sheet')) EFL.revealPitch(panel, side.team === 'away' ? 'top' : 'bottom');
+        if (panel.classList.contains('is-sheet')) {
+            EFL.trayDrag(panel, panel.querySelector('.fp-head'), () => close(true));
+            EFL.trayIn(panel);
+            EFL.revealPitch(panel, side.team === 'away' ? 'top' : 'bottom');
+        } else {
+            requestAnimationFrame(() => panel.classList.add('is-open'));
+        }
     }
 
     function choose(value) {
@@ -144,16 +150,21 @@ EFL.css('css/feature-formation-picker.css?v=1795754203');
         if (stay) panel.querySelectorAll('.fp-option').forEach(o => o.setAttribute('aria-selected', String(o.dataset.value === value)));
     }
 
-    function close(refocus) {
+    function close(refocus, instant) {
         if (!open) return;
         const { trigger, panel, backdrop } = open;
         open = null;
         trigger.setAttribute('aria-expanded', 'false');
-        panel.remove();
         backdrop.remove();
+        if (panel.classList.contains('is-sheet') && !instant) {
+            panel.style.pointerEvents = 'none';
+            EFL.trayOut(panel, () => panel.remove());
+        } else {
+            panel.remove();
+        }
         window.removeEventListener('resize', position);
         window.removeEventListener('scroll', position);
-        EFL.releasePitch();
+        if (!instant) EFL.releasePitch();
         if (refocus) trigger.focus({ preventScroll: true });
     }
 

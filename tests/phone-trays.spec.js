@@ -86,4 +86,33 @@ test.describe('Phone trays', () => {
     expect((await menu.boundingBox()).height).toBeLessThanOrEqual(page.viewportSize().height * 0.53);
     expect(await page.locator('.ly-backdrop').evaluate(el => getComputedStyle(el).backgroundColor)).toBe('rgba(0, 0, 0, 0)');
   });
+
+  test('trays slide away on close instead of vanishing', async ({ page }) => {
+    await openFresh(page, '7s.html');
+    await page.locator('#bulkNamesBtn').click();
+    await expect(page.locator('.efl-panel.is-open')).toHaveCount(1);
+    await page.locator('.efl-panel-close').click();
+    // Mid-slide it is still on screen, then it is gone
+    expect(await page.locator('.efl-panel.is-leaving').count()).toBe(1);
+    await expect(page.locator('.efl-panel')).toHaveCount(0);
+  });
+
+  test('swipe a tray down by its top bar to close it; a small tug springs back', async ({ page }) => {
+    await openFresh(page, '7s.html');
+    const drag = async distance => {
+      const h = await page.locator('.efl-panel-head h2').boundingBox();
+      await page.mouse.move(h.x + 10, h.y + 5);
+      await page.mouse.down();
+      for (let i = 1; i <= 8; i++) { await page.mouse.move(h.x + 10, h.y + 5 + (distance * i) / 8); await page.waitForTimeout(16); }
+      await page.mouse.up();
+    };
+    await page.locator('#bulkNamesBtn').click();
+    await expect(page.locator('.efl-panel.is-open')).toHaveCount(1);
+    await page.waitForTimeout(450);
+    const top = (await page.locator('.efl-panel').boundingBox()).y;
+    await drag(20);
+    await expect.poll(async () => Math.round((await page.locator('.efl-panel').boundingBox()).y)).toBe(Math.round(top));
+    await drag(160);
+    await expect(page.locator('.efl-panel')).toHaveCount(0);
+  });
 });

@@ -227,11 +227,24 @@
     border-radius: 18px 18px 0 0;
     box-shadow: 0 -14px 40px rgba(0, 0, 0, 0.55);
     padding-bottom: env(safe-area-inset-bottom);
-    transform: translateY(24px);
+    opacity: 1;
+    transform: translateY(105%);
+    transition: transform var(--tray-in, 420ms) var(--tray-ease, cubic-bezier(0.32, 0.72, 0, 1));
+    will-change: transform;
 }
 
 .fp-panel.is-sheet.is-open {
     transform: none;
+}
+
+.fp-panel.is-sheet.is-leaving {
+    transition-duration: var(--tray-out, 260ms);
+    transition-timing-function: var(--tray-ease-out, cubic-bezier(0.4, 0, 0.9, 0.6));
+}
+
+.fp-panel.is-sheet .fp-head {
+    touch-action: none;
+    cursor: grab;
 }
 
 .fp-panel.is-sheet .fp-head::before {

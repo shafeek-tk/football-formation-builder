@@ -256,10 +256,28 @@
         box-shadow: 0 -14px 40px rgba(0, 0, 0, 0.55);
         padding: 8px 10px calc(12px + env(safe-area-inset-bottom));
         border-radius: 18px 18px 0 0;
-        transform: translateY(24px);
+        opacity: 1;
+        transform: translateY(105%);
+        transition: transform var(--tray-in, 420ms) var(--tray-ease, cubic-bezier(0.32, 0.72, 0, 1));
+        will-change: transform;
     }
     .ly-menu.is-sheet.is-open { transform: none; }
-    .ly-menu.is-sheet .ly-menu-head { display: flex; }
+    .ly-menu.is-sheet.is-leaving {
+        transition-duration: var(--tray-out, 260ms);
+        transition-timing-function: var(--tray-ease-out, cubic-bezier(0.4, 0, 0.9, 0.6));
+    }
+    .ly-menu.is-sheet .ly-menu-head { display: flex; position: relative; padding-top: 14px; touch-action: none; cursor: grab; }
+    .ly-menu.is-sheet .ly-menu-head::before {
+        content: '';
+        position: absolute;
+        left: 50%;
+        top: 0;
+        width: 40px;
+        height: 4px;
+        margin-left: -20px;
+        border-radius: 2px;
+        background: rgba(255, 255, 255, 0.22);
+    }
     .ly-menu.is-sheet .tool-btn.ly-menu-item { min-height: 44px; font-size: 16px; }
 }
 
